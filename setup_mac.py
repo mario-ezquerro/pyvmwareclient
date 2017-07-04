@@ -1,14 +1,30 @@
 #!/usr/bin/python5.5
 # -*- coding: utf-8 -*-
 
-# para ejecutar python3.5 setup_mac.py py2app
-
 from setuptools import setup
+
+APP = ['app.py']
+APP_NAME = "vmWareClient"
+DATA_FILES = []
+
 OPTIONS = {
- 'iconfile':'./icons/vmwareclient.ico',
+    'argv_emulation': True,
+    'iconfile': './icons/vmwareclient.ico',
+    'plist': {
+        'CFBundleName': APP_NAME,
+        'CFBundleDisplayName': APP_NAME,
+        'CFBundleGetInfoString': "Cliente VMWare",
+        'CFBundleIdentifier': "com.ezquerro.mario",
+        'CFBundleVersion': "0.3.0a",
+        'CFBundleShortVersionString': "0.3.0a",
+        'NSHumanReadableCopyright': u"Copyright © 2017, Mario Ezquerro, All Rights Reserved"
+    }
 }
+
 setup(
- app=["app.py"],
- options = {'py2app': OPTIONS},
- setup_requires=["py2app"],
+    name=APP_NAME,
+    app=APP,
+    data_files=DATA_FILES,
+    options={'py2app': OPTIONS},
+    setup_requires=['py2app'],
 )
