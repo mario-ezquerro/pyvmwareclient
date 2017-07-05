@@ -734,7 +734,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         # logger.info("")
 
 
-########################### Iniciamos el programa  ####################
+########################### Aqui comienza todo  ####################
 if __name__ == "__main__":
 
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
