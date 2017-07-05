@@ -15,7 +15,7 @@ import argparse
 import sys
 import wx.lib.inspection
 from wxgladegen import dialogos
-from pyVim.connect import SmartConnect, Disconnect
+from pyvim.connect import SmartConnect, Disconnect
 from tools import tasks
 
 
@@ -196,7 +196,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         logger.info (fila[8])
         #Dialogo para pedir datos para el snapshop......
 
-        self.my_dialogo_sanshot = dialogos.Dialog_snapshot(None, -1, 'Propiedades Snapshop')
+        self.my_dialogo_sanshot = dialogos.Dialog_snapshot(None, -1, 'Propiedades Snapshot')
 
         self.my_dialogo_sanshot.nombre_snap.SetValue(fila[1] + ' Razon del snapshot? ...' )
         result = self.my_dialogo_sanshot.ShowModal()
@@ -212,7 +212,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         #logger.info('wx.ID_OK = ' + str(wx.ID_OK))
 
         """dlg_reset = wx.MessageDialog(self,
-                                     "¿Hacer snapshop de : ? \n " + fila[1] + " ",
+                                     "¿Hacer snapshot de : ? \n " + fila[1] + " ",
                                      "Confirm Exit",
                                      wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         result = dlg_reset.ShowModal()
@@ -734,7 +734,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         # logger.info("")
 
 
-########################### Aqui comienza todo  ####################
+########################### Iniciamos el programa  ####################
 if __name__ == "__main__":
 
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
