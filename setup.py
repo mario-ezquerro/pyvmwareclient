@@ -1,7 +1,7 @@
 # Dependencies are automatically detected, but it might need
-# fine tuning . python3.5 setup.py build
-# mejor python setup.py bdist_dmg en Macos
-# con python setup.py bdist_rpm
+# Fine tuning . python3.5 setup.py build
+# Mejor python setup.py bdist_dmg en Macos
+# Con python setup.py bdist_rpm
 
 from cx_Freeze import setup, Executable
 import sys
