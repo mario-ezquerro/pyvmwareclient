@@ -15,7 +15,7 @@ import argparse
 import sys
 import wx.lib.inspection
 from wxgladegen import dialogos
-from pyvim.connect import SmartConnect, Disconnect
+from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
 
 

@@ -1,6 +1,7 @@
 # Dependencies are automatically detected, but it might need
 # fine tuning . python3.5 setup.py build
-# mejor python setup.py bdist_dmg
+# mejor python setup.py bdist_dmg en Macos
+# con python setup.py bdist_rpm
 
 from cx_Freeze import setup, Executable
 import sys
@@ -13,13 +14,15 @@ base = 'Win32GUI' if sys.platform == 'win32' else None
 
 
 build_options = {'build_exe':
-                     {'packages': [],
+                     {'include_files': ['logging.conf','LICENSE','README.md','README.txt'],
+                      'packages': [],
                       'includes': [],
                       'excludes': []
                       },
                  'bdist_mac':
                      {'iconfile': "./icons/vmwareclient.icns",
                       },
+
                  }
 script = os.path.join("app.py")
 
