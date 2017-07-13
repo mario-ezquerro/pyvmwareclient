@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python5.5
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
