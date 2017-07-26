@@ -492,7 +492,7 @@ class MyFrame(wx.Frame):
 # ######Pantalla para el Dialogo de acceso a vcenter######################
 class DialogAcceso(wx.Dialog):
     def __init__(self, parent, id_dialogo, title):
-        wx.Dialog.__init__(self, parent, id_dialogo, title, size=(220, 160))
+        wx.Dialog.__init__(self, parent, id_dialogo, title, size=(420, 260))
 
         # precarga de fichero config
         self.cfg = wx.Config('appconfig')
