@@ -3,18 +3,18 @@
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
 # Mejor python setup.py bdist_dmg en Macos
-# Con python setup.py bdist_rpm
+# Con python setup.py bdist_rpm y en windows bdist_msi
 
-from cx_Freeze import setup, Executable
 import sys
 import os.path
+from cx_Freeze import setup, Executable
 
 buildOptions = dict(packages=[], excludes=[])
 
-base = 'Win32GUI' if sys.platform == 'win32' else None
+# base = 'Win32GUI' if sys.platform == 'win32' else None
 
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'README.txt'],
-                                'packages': [],
+                                'packages': ["os"],
                                 'includes': [],
                                 'excludes': []
                                 }, bdist_mac={'iconfile': "./icons/vmwareclient.icns",
@@ -22,7 +22,11 @@ build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'RE
 script = os.path.join("app.py")
 
 if sys.platform == 'win32':
-    exe = Executable(script, targetName="pyvmwareclient.exe", base="Win32GUI",
+    exe = Executable(script='app.py',
+                     targetName="pyvmwareclient.exe",
+                     base="Win32GUI",
+                     shortcutName='PyVMwareClient',
+                     copyright='All Right reserver',
                      icon=os.path.join("icons", "vmwareclient.ico"))
 else:
     exe = Executable(script='app.py',
