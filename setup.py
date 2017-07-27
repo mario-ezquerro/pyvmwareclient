@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
@@ -9,16 +9,14 @@ import sys
 import os.path
 from cx_Freeze import setup, Executable
 
-buildOptions = dict(packages=[], excludes=[])
 
-# base = 'Win32GUI' if sys.platform == 'win32' else None
-
-build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'README.txt'],
-                                'packages': ["os"],
-                                'includes': [],
+build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'README.txt', 'icons'],
+                                'packages': ['os','OpenSSL','wx'],
+                                'includes': ['idna'],
                                 'excludes': []
-                                }, bdist_mac={'iconfile': "./icons/vmwareclient.icns",
-                                              })
+                                },
+                     bdist_mac={'iconfile': "./icons/vmwareclient.icns",
+                                })
 script = os.path.join("app.py")
 
 if sys.platform == 'win32':
@@ -27,7 +25,10 @@ if sys.platform == 'win32':
                      base="Win32GUI",
                      shortcutName='PyVMwareClient',
                      copyright='All Right reserver',
-                     icon=os.path.join("icons", "vmwareclient.ico"))
+                     shortcutDir='DesktopFolder')
+                    # icon='icons/vmwareclient.ico')
+                    # icon=os.path.join("icons", "vmwareclient.ico"))
+
 else:
     exe = Executable(script='app.py',
                      base='Console',
@@ -35,7 +36,7 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.0a',
+      version='0.3.0',
       description='Client for Vcenter 6.0/6.5 VMware en python',
       options=build_options,
       maintainer="Mario Ezquerro",
