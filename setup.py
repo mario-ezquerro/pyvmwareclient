@@ -9,10 +9,9 @@ import sys
 import os.path
 from cx_Freeze import setup, Executable
 
-
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'README.txt', 'icons'],
-                                'packages': ['os','OpenSSL','wx'],
-                                'includes': ['idna'],
+                                'packages': ['idna'],
+                                'includes': [],
                                 'excludes': []
                                 },
                      bdist_mac={'iconfile': "./icons/vmwareclient.icns",
