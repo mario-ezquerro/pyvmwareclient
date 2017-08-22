@@ -9,7 +9,6 @@ import os
 import re
 import OpenSSL
 import webbrowser
-import logging
 import logging.config
 import argparse
 import sys
@@ -311,48 +310,57 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         logger.info ("Waiting for 60 seconds, then exit")
 
     def onRdp(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            logger.info(fila[i])
-        # El tercer elemento es la ip osea la fila 2
-        ruta_fichero_config = os.getcwd()
-        archConfiguracion = open('remminaconfig.remmina','w')
-        archConfiguracion.write('[remmina]' + '\n')
-        archConfiguracion.write('disableclipboard=0' + '\n')
-        archConfiguracion.write('ssh_auth=0' + '\n')
-        archConfiguracion.write('clientname=' + '\n')
-        archConfiguracion.write('quality=0' + '\n')
-        archConfiguracion.write('ssh_charset=' + '\n')
-        archConfiguracion.write('ssh_privatekey=' + '\n')
-        archConfiguracion.write('sharesmartcard=0' + '\n')
-        archConfiguracion.write('resolution=' + '\n')
-        archConfiguracion.write('group=' + '\n')
-        archConfiguracion.write('password=' + '\n')
-        archConfiguracion.write('name=' + fila[1] + '\n')
-        archConfiguracion.write('ssh_loopback=0' + '\n')
-        archConfiguracion.write('sharelogger.infoer=0' + '\n')
-        archConfiguracion.write('ssh_username=' + '\n')
-        archConfiguracion.write('ssh_server=' + '\n')
-        archConfiguracion.write('security=' + '\n')
-        archConfiguracion.write('protocol=RDP' + '\n')
-        archConfiguracion.write('execpath=' + '\n')
-        archConfiguracion.write('sound=off' + '\n')
-        archConfiguracion.write('exec=' + '\n')
-        archConfiguracion.write('ssh_enabled=0' + '\n')
-        archConfiguracion.write('username=' + '\n')
-        archConfiguracion.write('sharefolder=' + '\n')
-        archConfiguracion.write('console=0' + '\n')
-        archConfiguracion.write('domain=' + '\n')
-        archConfiguracion.write('server=' +fila[2] + '\n')
-        archConfiguracion.write('colordepth=24' + '\n')
-        archConfiguracion.write('window_maximize=0' + '\n')
-        archConfiguracion.write('window_height=' + '\n')
-        archConfiguracion.write('window_width=' + '\n')
-        archConfiguracion.write('viewmode=1' + '\n')
-        archConfiguracion.write('scale=1' + '\n')
-        archConfiguracion.close
-        comando = 'remmina -c ' + ruta_fichero_config +'/remminaconfig.remmina' + ' &'
-        os.system(comando)
+        if os.name == 'nt':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            comando = 'mstsc ' +'/v:'+ fila[2]
+            os.system(comando)
+
+        if os.name == 'posix':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                logger.info(fila[i])
+            # El tercer elemento es la ip osea la fila 2
+            ruta_fichero_config = os.getcwd()
+            archConfiguracion = open('remminaconfig.remmina','w')
+            archConfiguracion.write('[remmina]' + '\n')
+            archConfiguracion.write('disableclipboard=0' + '\n')
+            archConfiguracion.write('ssh_auth=0' + '\n')
+            archConfiguracion.write('clientname=' + '\n')
+            archConfiguracion.write('quality=0' + '\n')
+            archConfiguracion.write('ssh_charset=' + '\n')
+            archConfiguracion.write('ssh_privatekey=' + '\n')
+            archConfiguracion.write('sharesmartcard=0' + '\n')
+            archConfiguracion.write('resolution=' + '\n')
+            archConfiguracion.write('group=' + '\n')
+            archConfiguracion.write('password=' + '\n')
+            archConfiguracion.write('name=' + fila[1] + '\n')
+            archConfiguracion.write('ssh_loopback=0' + '\n')
+            archConfiguracion.write('sharelogger.infoer=0' + '\n')
+            archConfiguracion.write('ssh_username=' + '\n')
+            archConfiguracion.write('ssh_server=' + '\n')
+            archConfiguracion.write('security=' + '\n')
+            archConfiguracion.write('protocol=RDP' + '\n')
+            archConfiguracion.write('execpath=' + '\n')
+            archConfiguracion.write('sound=off' + '\n')
+            archConfiguracion.write('exec=' + '\n')
+            archConfiguracion.write('ssh_enabled=0' + '\n')
+            archConfiguracion.write('username=' + '\n')
+            archConfiguracion.write('sharefolder=' + '\n')
+            archConfiguracion.write('console=0' + '\n')
+            archConfiguracion.write('domain=' + '\n')
+            archConfiguracion.write('server=' +fila[2] + '\n')
+            archConfiguracion.write('colordepth=24' + '\n')
+            archConfiguracion.write('window_maximize=0' + '\n')
+            archConfiguracion.write('window_height=' + '\n')
+            archConfiguracion.write('window_width=' + '\n')
+            archConfiguracion.write('viewmode=1' + '\n')
+            archConfiguracion.write('scale=1' + '\n')
+            archConfiguracion.close
+            comando = 'remmina -c ' + ruta_fichero_config +'/remminaconfig.remmina' + ' &'
+            os.system(comando)
 
 
 
@@ -741,11 +749,14 @@ if __name__ == "__main__":
     #parser.add_argument('--d', action="store_true", help='imprimir informacion de debug')
     #args     =    parser.parse_args()
 
-    #if args.d:
+    #read inital config file
+    # log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
     logging.config.fileConfig('logging.conf')
+    # create logger
     logger = logging.getLogger('pyvmwareclient')
-      #logger.getLogger(__name__)
-      #logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
+    logger.info("# Start here a new loggin now")
+      # logger.getLogger(__name__)
+      # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
 
 
     app = wx.App(False)
