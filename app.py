@@ -754,7 +754,7 @@ if __name__ == "__main__":
     logging.config.fileConfig('logging.conf')
     # create logger
     logger = logging.getLogger('pyvmwareclient')
-    logger.info("# Start here a new loggin now")
+    logger.debug("# Start here a new loggin now")
       # logger.getLogger(__name__)
       # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
 

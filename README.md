@@ -1,8 +1,10 @@
 # pyvmwareclient
-Cliente de vmware visual que usa las API de python pyVMotion, para trabajar con el vmwarecenter 6.0.
 
-Demomento funciona En linux con la instalacion de puTTY ( si en linux) y el Remmina. 
-Opciones disponibles sobre una VM.
+Vmware client that connect to esxi or vcenter 6.0, uses the python APIs.
+
+Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path.
+
+Availabel Options for a VM:
 
   1. Snapshot
   2. Conexión ssh
