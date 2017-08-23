@@ -9,7 +9,7 @@ import sys
 import os.path
 from cx_Freeze import setup, Executable
 
-build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'README.txt', 'icons'],
+build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
                                 'packages': ['idna', 'cryptography', 'cffi'],
                                 'includes': [],
                                 'excludes': []

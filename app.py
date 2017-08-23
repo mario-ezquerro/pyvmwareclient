@@ -134,14 +134,14 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onItemSelected(self, event):
 
         #localizamos el elemento seleccionado en el listado ordenado , y cargamos la fila
-        logger.info('evento= '+ str(event.Index))
+        if logger != None: logger.info('evento= '+ str(event.Index))
         self.posicionLista = event.Index
         self.listadoVM = []
-        logger.info('datos en la fila= '+ str(self.list_ctrl.GetColumnCount()))
+        if logger != None: logger.info('datos en la fila= '+ str(self.list_ctrl.GetColumnCount()))
         for item_comlum in range(self.list_ctrl.GetColumnCount()):
             self.listadoVM.append(self.list_ctrl.GetItemText( self.posicionLista,item_comlum))
-        logger.info( 'el otro ' + self.list_ctrl.GetItemText( self.posicionLista,1))
-        logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listadoVM))
+        if logger != None: logger.info( 'el otro ' + self.list_ctrl.GetItemText( self.posicionLista,1))
+        if logger != None: logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listadoVM))
 
         if not hasattr(self, "sshID"):
             self.snapID = wx.NewId()
@@ -190,9 +190,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onSnap(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Dialogo para pedir datos para el snapshop......
 
         self.my_dialogo_sanshot = dialogos.Dialog_snapshot(None, -1, 'Propiedades Snapshot')
@@ -207,8 +207,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
 
         self.my_dialogo_sanshot.Destroy()
-        #logger.info ('resultado = ' + str(result))
-        #logger.info('wx.ID_OK = ' + str(wx.ID_OK))
+        #if logger != None: logger.info ('resultado = ' + str(result))
+        #if logger != None: logger.info('wx.ID_OK = ' + str(wx.ID_OK))
 
         """dlg_reset = wx.MessageDialog(self,
                                      "¿Hacer snapshot de : ? \n " + fila[1] + " ",
@@ -220,10 +220,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
         if result == wx.ID_OK:
             if  vm  is not None:
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = task = vm.CreateSnapshot_Task(nombre, description = descricion, memory=checkbox_memory, quiesce=checkbox_quiesce)
                 tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("Snapshot Completed.")
+                if logger != None: logger.info("Snapshot Completed.")
 
         #listado de snapshot en una ventana emergente
 
@@ -236,12 +236,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         snaptexto = 'Listado de snapshot \n'
         if not snap_info:
             self.my_dialogo_texto.salida_texto.SetValue('No hay snapshot')
-            logger.info ('No hay snapshot')
+            if logger != None: logger.info ('No hay snapshot')
         else:
             tree = snap_info.rootSnapshotList
             while tree[0].childSnapshotList is not None:
                 snaptexto = snaptexto +  ("Nombre Snap: {0} = description> {1}  \n".format(tree[0].name, tree[0].description))
-                logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
+                if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
                 if len(tree[0].childSnapshotList) < 1:
                     break
                 tree = tree[0].childSnapshotList
@@ -255,7 +255,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onSsh(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El tercer elemento es la ip es decier la fila[2]
         self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
         self.my_dialogo_ssh.usuario.SetValue('root' )
@@ -270,12 +270,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onHtml(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El tercer elemento es la ip y el 9 es el UUID
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
         vm_name = vm.summary.config.name
         vm_moid = vm._moId
-        logger.info('void= '.format(vm_moid))
+        if logger != None: logger.info('void= '.format(vm_moid))
         vcenter_data = conexion.setting
         vcenter_settings = vcenter_data.setting
         console_port = '9443'
@@ -293,27 +293,27 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         vc_pem = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM,vc_cert)
         vc_fingerprint = vc_pem.digest('sha1')
 
-        logger.info("Open the following URL in your browser to access the " \
+        if logger != None: logger.info("Open the following URL in your browser to access the " \
               "Remote Console.\n" \
               "You have 60 seconds to open the URL, or the session" \
               "will be terminated.\n")
 
-        """logger.info ("http://" + host + ":" + console_port + "/console/?vmId=" \
+        """if logger != None: logger.info ("http://" + host + ":" + console_port + "/console/?vmId=" \
               + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
               + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerlogger.info.decode('utf-8'))"""
 
         URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
               + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
               + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
-        logger.info(URL)
+        if logger != None: logger.info(URL)
         webbrowser.open(URL, new=1, autoraise=True)
-        logger.info ("Waiting for 60 seconds, then exit")
+        if logger != None: logger.info ("Waiting for 60 seconds, then exit")
 
     def onRdp(self, event):
         if os.name == 'nt':
             fila = self.listadoVM
             for i in range(len(fila)):
-                logger.info(fila[i])
+                if logger != None: logger.info(fila[i])
             # El tercer elemento es la ip es decier la fila[2]
             comando = 'mstsc ' +'/v:'+ fila[2]
             os.system(comando)
@@ -321,7 +321,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if os.name == 'posix':
             fila = self.listadoVM
             for i in range(len(fila)):
-                logger.info(fila[i])
+                if logger != None: logger.info(fila[i])
             # El tercer elemento es la ip osea la fila 2
             ruta_fichero_config = os.getcwd()
             archConfiguracion = open('remminaconfig.remmina','w')
@@ -369,9 +369,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onsoftreboot(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Pedimos confirmacion del reset de la mv con ventana dialogo
         dlg_reset = wx.MessageDialog(self,
                                      "Estas a punto de reiniciar \n " + fila[1] + " ",
@@ -383,17 +383,17 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
             if  vm  is not None:
 
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = vm.RebootGuest()
                 #Este da error tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("Soft reboot its done.")
+                if logger != None: logger.info("Soft reboot its done.")
 
     def onsoftPowerOff(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Pedimos confirmacion del reset de la mv con ventana dialogo
         dlg_reset = wx.MessageDialog(self,
                                      "Estas a punto de Soft Apagar \n " + fila[1] + " ",
@@ -405,18 +405,18 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
             if  vm  is not None:
 
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = vm.ShutdownGuest()
                 #Este da error tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("Soft poweroff its done.")
+                if logger != None: logger.info("Soft poweroff its done.")
 
     # Reiniciamos el ordenador seleccionado en el menu contextual
     def onreboot(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Pedimos confirmacion del reset de la mv con ventana dialogo
         dlg_reset = wx.MessageDialog(self,
                                      "Estas a punto de reiniciar \n " + fila[1] + " ",
@@ -428,17 +428,17 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
             if  vm  is not None:
 
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = vm.ResetVM_Task()
                 tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("reboot its done.")
+                if logger != None: logger.info("reboot its done.")
 
     def onpowerOn(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Pedimos confirmacion del poweron de la mv con ventana dialogo
         dlg_reset = wx.MessageDialog(self,
                                      "Estas a punto de iniciar \n " + fila[1] + "\nAhora esta:  " + fila[3],
@@ -449,17 +449,17 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if result == wx.ID_OK:
             vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
             if  vm  is not None and not vm.runtime.powerState == 'poweredOn':
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = vm.PowerOn()
                 tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("Power ON  its done.")
+                if logger != None: logger.info("Power ON  its done.")
 
     def onpowerOff(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
-            logger.info(fila[i])
+            if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        logger.info (fila[8])
+        if logger != None: logger.info (fila[8])
         #Pedimos confirmacion del reset de la mv con ventana dialogo
         dlg_reset = wx.MessageDialog(self,
                                      "Estas a punto de Apagar \n " + fila[1] + " ",
@@ -470,10 +470,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if result == wx.ID_OK:
             vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
             if  vm  is not None and not vm.runtime.powerState == 'poweredOff':
-                logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = vm.PowerOff()
                 tasks.wait_for_tasks(conexion, [TASK])
-                logger.info("Power OFF its done.")
+                if logger != None: logger.info("Power OFF its done.")
 
     def onExit(self, event):
         """
@@ -553,7 +553,7 @@ class DialogAcceso(wx.Dialog):
             if not self.si:
                 self.context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
                 self.context.verify_mode = ssl.CERT_NONE
-                logger.info('vcenter:  ' + self.vcenter)
+                if logger != None: logger.info('vcenter:  ' + self.vcenter)
 
                 self.si = SmartConnect(host=self.vcenter,
                                        user=self.login,
@@ -564,7 +564,7 @@ class DialogAcceso(wx.Dialog):
 
 
         except:
-            logger.warning('Error en el acceso a vcenter')
+            if logger != None: logger.warning('Error en el acceso a vcenter')
             dlg = wx.MessageDialog(self,
                                    "Error en Conexion o ya esta conectado Verifique parametros",
                                    "Confirm Exit", wx.OK | wx.ICON_QUESTION)
@@ -572,7 +572,7 @@ class DialogAcceso(wx.Dialog):
             # dlg.Destroy()
 
     def OnDisConnect(self, event):
-        logger.info('desconecion')
+        if logger != None: logger.info('desconecion')
         dlg = wx.MessageDialog(self,
                                "Do you really want to close this application?",
                                "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
@@ -592,7 +592,7 @@ def conectar_con_vcenter():
        dlg1.ShowModal()
 
        if dlg1:
-           logger.info('conectado')
+           if logger != None: logger.info('conectado')
            si = dlg1.si
            atexit.register(Disconnect, si)
            content = si.RetrieveContent()
@@ -627,7 +627,7 @@ def sacar_listado_capertas(conexion):
             vmList = vmFolder.childEntity
             max = max + len(vmList)
 
-    logger.info('el maximo es : {}'.format(max))
+    if logger != None: logger.info('el maximo es : {}'.format(max))
     keepGoing = True
     count = 0
     dlg = wx.ProgressDialog("Proceso cargando datos",
@@ -654,12 +654,12 @@ def sacar_listado_capertas(conexion):
             for vm in vmList:
                 count += 1
                 keepGoing= dlg.Update(count, "Loading")
-                # logger.info (vm.name) # imprime todo el listado de carpetas
+                # if logger != None: logger.info (vm.name) # imprime todo el listado de carpetas
                 carpeta = vm.name
                 PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid, carpeta, listado_carpetas)
 
     # salida tabulada----------------------------------------
-    logger.info('###############################')
+    if logger != None: logger.info('###############################')
 
     tabla = []
     elemento = []
@@ -678,7 +678,7 @@ def sacar_listado_capertas(conexion):
         elemento = []
 
     # headers=['Carpeta', 'pool', 'Nombre','IP','Estado','pregunta', 'Disco Path', 'Sistema', 'Notas', 'uuid']
-    # logger.info (tabulate(tabla, headers, tablefmt="fancy_grid"))
+    # if logger != None: logger.info (tabulate(tabla, headers, tablefmt="fancy_grid"))
 
     dlg.Destroy()
     return (tabla)
@@ -726,7 +726,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
     else:
         anotacion.append('sin anotacion')
 
-    # logger.info("State      : ", summary.runtime.powerState)
+    # if logger != None: logger.info("State      : ", summary.runtime.powerState)
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
@@ -738,8 +738,8 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         pregunta.append(summary.runtime.question)
     else:
         pregunta.append('no datos')
-        # logger.info("Question  : ", summary.runtime.question.text)
-        # logger.info("")
+        # if logger != None: logger.info("Question  : ", summary.runtime.question.text)
+        # if logger != None: logger.info("")
 
 
 ########################### Iniciamos el programa  ####################
@@ -748,13 +748,15 @@ if __name__ == "__main__":
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
     #parser.add_argument('--d', action="store_true", help='imprimir informacion de debug')
     #args     =    parser.parse_args()
-
+    # Use logger to control the activate log.
+    logger = None
     #read inital config file
     # log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
-    logging.config.fileConfig('logging.conf')
-    # create logger
-    logger = logging.getLogger('pyvmwareclient')
-    logger.debug("# Start here a new loggin now")
+    if os.name == 'poxis':
+        logging.config.fileConfig('logging.conf')
+        # create logger
+        logger = logging.getLogger('pyvmwareclient')
+        logger.info("# Start here a new loggin now")
       # logger.getLogger(__name__)
       # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
 
