@@ -70,30 +70,20 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.list_ctrl.InsertColumn(x, name_rows[x])
 
         # conexion = conectar_con_vcenter(self, id)
-        tabla = []
-        tabla = sacar_listado_capertas(conexion)
+        self.tabla = []
+        self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
 
-        # cargamos las busquedas en el listado de tablas.
-        self.myRowDict = {}
-        index = 0
-        for elemen in tabla:
-            self.list_ctrl.InsertItem(index, elemen[0])
-            total_elemen = len(elemen)
-            for i in range(total_elemen):
-                self.list_ctrl.SetItem(index, i, elemen[i])
-            self.list_ctrl.SetItemData(index, index)
-            self.myRowDict[index] = elemen
-            index += 1
+        self.cargardatos_en_listctrl(self.tabla)
 
         # para la ordenacion--- llama a Getlistctrl
-        self.itemDataMap = tabla
+        self.itemDataMap = self.tabla
         listmix.ColumnSorterMixin.__init__(self, len(name_rows))
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.list_ctrl)
         # self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
 
         # Metemos las cosas en le ventana en orden
-        txtcontador = wx.StaticText(self, label='total VM: ' + str(len(tabla)))
+        txtcontador = wx.StaticText(self, label='total VM: ' + str(len(self.tabla)))
         sizer = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox1.Add(st1, wx.ALL | wx.ALIGN_CENTER, 5)
@@ -106,8 +96,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
 
-        #herramienta de inspeccion y debug  de wx (para activar descomentar la linea)
-        #wx.lib.inspection.InspectionTool().Show()
+        # herramienta de inspeccion y debug  de wx (para activar descomentar la linea)
+        # wx.lib.inspection.InspectionTool().Show()
 
     # ----------------------------------------------------------------------
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
@@ -117,18 +107,33 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     # buscamos un string en el nombre de las VM y lo pintamos de amarillo
     # si habia antes algo de amarillo lo ponemos blanco
     def busquedadatos(self, event):
+
         parabuscar = self.cadenaBusqueda.GetValue()
-        for i in range(self.list_ctrl.GetItemCount()):
-            if 'yellow' == self.list_ctrl.GetItemBackgroundColour(i):
-                self.list_ctrl.SetItemBackgroundColour(i, 'white')
-        #Si no hay palabra a buscar lo dejamos todo en blanco
         if parabuscar:
-            # buscamos dentro del campo nombre copia[i][1]
-            for i in range(self.list_ctrl.GetItemCount()):
-                # if re.search( parabuscar, self.copia[i][1]):
+            i = self.list_ctrl.GetItemCount() - 1
+            while i >= 0 :
                 if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
                     self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
-                    #self.vm_buscados = append()
+                else:
+                    self.list_ctrl.DeleteItem(i)
+                i -= 1
+        else:
+            self.cargardatos_en_listctrl(self.tabla)
+
+
+    def cargardatos_en_listctrl(self, _tabla_paracargar):
+        # cargamos las busquedas en el listado de tablas.
+        self.myRowDict = {}
+        index = 0
+        for elemen in _tabla_paracargar:
+            self.list_ctrl.InsertItem(index, elemen[0])
+            total_elemen = len(elemen)
+            for i in range(total_elemen):
+                self.list_ctrl.SetItem(index, i, elemen[i])
+            self.list_ctrl.SetItemData(index, index)
+            self.myRowDict[index] = elemen
+            index += 1
+
 
     # Cuando selecionamos una fila activamos el menu de contexto##############
     def onItemSelected(self, event):
@@ -746,7 +751,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
 if __name__ == "__main__":
 
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
-    #parser.add_argument('--d', action="store_true", help='imprimir informacion de debug')
+    #parser.add_argument('--d', action="store_true", help='imprimir informacion  debug')
     #args     =    parser.parse_args()
     # Use logger to control the activate log.
     logger = None
