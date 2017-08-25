@@ -10,7 +10,7 @@ import re
 import OpenSSL
 import webbrowser
 import logging.config
-import argparse
+# import argparse
 import sys
 import wx.lib.inspection
 from wxgladegen import dialogos
@@ -133,6 +133,29 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.list_ctrl.SetItemData(index, index)
             self.myRowDict[index] = elemen
             index += 1
+
+
+        # Dejaremos solo la fila que coincida con el nombre de la maquina que buscamos
+        parabuscar = self.cadenaBusqueda.GetValue()
+        if parabuscar:
+            for i in range(self.list_ctrl.GetItemCount()):
+                # buscamos dentro del campo nombre copia[i][1]
+                for i in range(self.list_ctrl.GetItemCount()):
+                    # if re.search( parabuscar, self.copia[i][1]):
+                    if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
+                        self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
+                    else:
+                        self.list_ctrl.DeleteItem(i)
+                        # self.vm_buscados = append()
+        else:
+                for elemen in self.tabla:
+                    self.list_ctrl.InsertItem(index, elemen[0])
+                    total_elemen = len(elemen)
+                    for i in range(total_elemen):
+                        self.list_ctrl.SetItem(index, i, elemen[i])
+                    self.list_ctrl.SetItemData(index, index)
+                    self.myRowDict[index] = elemen
+                    index += 1
 
 
     # Cuando selecionamos una fila activamos el menu de contexto##############
@@ -503,46 +526,42 @@ class MyFrame(wx.Frame):
 
 
 # ######Pantalla para el Dialogo de acceso a vcenter######################
-class DialogAcceso(wx.Dialog):
-    def __init__(self, parent, id_dialogo, title):
-        wx.Dialog.__init__(self, parent, id_dialogo, title, size=(420, 260))
+
+class DialogAcceso():
+    def __init__(self):
+
+        # listado de snapshot en una ventana emergente
+
+        self.my_dialog_acceso_vcenter = dialogos.Dialogo_acceso_vcenter(None, -1, 'Datos de conexión')
+
+
 
         # precarga de fichero config
         self.cfg = wx.Config('appconfig')
         if self.cfg.Exists('vcenter'):
-            self.vcenter = self.cfg.Read('vcenter')
-            self.login = self.cfg.Read('login')
-            self.pwd = self.cfg.Read('pwd')
-            self.port = self.cfg.Read('port')
+            self.my_dialog_acceso_vcenter.nombre_vcenter.SetValue(self.cfg.Read('vcenter'))
+            self.my_dialog_acceso_vcenter.login_vcenter .SetValue(self.cfg.Read('login'))
+            self.my_dialog_acceso_vcenter.passwor_vcenter .SetValue(self.cfg.Read('pwd'))
+            self.my_dialog_acceso_vcenter.puert_vcenter.SetValue(self.cfg.Read('port'))
+
         else:
-            self.vcenter = 'vcenter.host.com'
-            self.login = 'usuario@dominio.es'
-            self.pwd = 'estanoes'
-            self.port = '443'
+            self.my_dialog_acceso_vcenter.nombre_vcenter.SetValue(self.cfg.Read('vcenter.host.com'))
+            self.my_dialog_acceso_vcenter.login_vcenter.SetValue(self.cfg.Read('usuario@dominio.es'))
+            self.my_dialog_acceso_vcenter.passwor_vcenter.SetValue(self.cfg.Read('estanoes'))
+            self.my_dialog_acceso_vcenter.puert_vcenter.SetValue(self.cfg.Read('443'))
 
         self.si = None
 
-        wx.StaticText(self, -1, '   Vcenter:', (10, 20))
-        wx.StaticText(self, -1, '      Login:', (10, 45))
-        wx.StaticText(self, -1, 'Password:', (10, 70))
-        wx.StaticText(self, -1, '     Puerto:', (10, 95))
 
-        self.TCvcenter = wx.TextCtrl(self, -1, self.vcenter, (70, 15), (140, -1))
-        self.TClogin = wx.TextCtrl(self, -1, self.login, (70, 40), (140, -1))
-        self.TCpassword = wx.TextCtrl(self, -1, self.pwd, (70, 65), (140, -1), style=wx.TE_PASSWORD)
-        self.TCport = wx.TextCtrl(self, -1, self.port, (70, 90), (70, -1))
 
-        con = wx.Button(self, 1, 'Connect', (130, 120))
-        disco = wx.Button(self, 2, 'DisConnect', (40, 120))
+            # pintamos la ventana con la informcion
 
-        self.Bind(wx.EVT_BUTTON, self.OnConnect, con)
-        self.Bind(wx.EVT_BUTTON, self.OnDisConnect, disco)
 
-    def OnConnect(self, event):
-        self.vcenter = self.TCvcenter.GetValue()
-        self.login = self.TClogin.GetValue()
-        self.pwd = self.TCpassword.GetValue()
-        self.port = self.TCport.GetValue()
+    def OnConnect(self):
+        self.vcenter = self.my_dialog_acceso_vcenter.nombre_vcenter.GetValue()
+        self.login = self.my_dialog_acceso_vcenter.login_vcenter.GetValue()
+        self.pwd = self.my_dialog_acceso_vcenter.passwor_vcenter.GetValue()
+        self.port = self.my_dialog_acceso_vcenter.puert_vcenter.GetValue()
 
         # grabamos datos en el fichero config
         self.cfg.WriteInt('version', 1)
@@ -569,18 +588,21 @@ class DialogAcceso(wx.Dialog):
 
 
         except:
-            if logger != None: logger.warning('Error en el acceso a vcenter')
-            dlg = wx.MessageDialog(self,
-                                   "Error en Conexion o ya esta conectado Verifique parametros",
-                                   "Confirm Exit", wx.OK | wx.ICON_QUESTION)
-            result = dlg.ShowModal()
-            # dlg.Destroy()
 
-    def OnDisConnect(self, event):
+            if logger != None: logger.warning('Error en el acceso a vcenter')
+            dlgexcept = wx.MessageDialog(self.my_dialog_acceso_vcenter,
+                                   "Error en Conexion o ya esta conectado Verifique parametros",
+                                   caption= "Confirm Exit",
+                                   style= wx.OK | wx.ICON_QUESTION)
+            dlgexcept.ShowModal()
+            dlgexcept.Destroy()
+
+
+    def OnDisConnect(self):
         if logger != None: logger.info('desconecion')
-        dlg = wx.MessageDialog(self,
-                               "Do you really want to close this application?",
-                               "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?',
+                               'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        # wx.MessageDialog()
         result = dlg.ShowModal()
         dlg.Destroy()
         if result == wx.ID_OK:
@@ -593,15 +615,25 @@ class DialogAcceso(wx.Dialog):
 # Conectamos con el Vcenter
 def conectar_con_vcenter():
 
-       dlg1 = DialogAcceso(None, -1, 'Datos Acceso')
-       dlg1.ShowModal()
+       dlgDialogo = DialogAcceso()
+       result = dlgDialogo.my_dialog_acceso_vcenter.ShowModal()
+       if result == wx.ID_OK:
+           dlgDialogo.OnConnect()
+       else:
+           dlgDialogo.OnDisConnect()
 
-       if dlg1:
+           # self.my_dialog_acceso_vcenter.Destroy()
+
+       #dlg1 = self.my_dialogo_texto.ShowModal()  # pintamos la ventana con la informcion
+       #self.my_dialog_acceso_vcenter.Destroy()
+
+
+
+       if dlgDialogo.si:
            if logger != None: logger.info('conectado')
-           si = dlg1.si
-           atexit.register(Disconnect, si)
-           content = si.RetrieveContent()
-           dlg1.Destroy()
+           atexit.register(Disconnect, dlgDialogo.si)
+           content = dlgDialogo.si.RetrieveContent()
+           dlgDialogo.my_dialog_acceso_vcenter.Destroy()
            return content
        else:
            exit()
