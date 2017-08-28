@@ -135,28 +135,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             index += 1
 
 
-        # Dejaremos solo la fila que coincida con el nombre de la maquina que buscamos
-        parabuscar = self.cadenaBusqueda.GetValue()
-        if parabuscar:
-            for i in range(self.list_ctrl.GetItemCount()):
-                # buscamos dentro del campo nombre copia[i][1]
-                for i in range(self.list_ctrl.GetItemCount()):
-                    # if re.search( parabuscar, self.copia[i][1]):
-                    if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
-                        self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
-                    else:
-                        self.list_ctrl.DeleteItem(i)
-                        # self.vm_buscados = append()
-        else:
-                for elemen in self.tabla:
-                    self.list_ctrl.InsertItem(index, elemen[0])
-                    total_elemen = len(elemen)
-                    for i in range(total_elemen):
-                        self.list_ctrl.SetItem(index, i, elemen[i])
-                    self.list_ctrl.SetItemData(index, index)
-                    self.myRowDict[index] = elemen
-                    index += 1
-
 
     # Cuando selecionamos una fila activamos el menu de contexto##############
     def onItemSelected(self, event):
