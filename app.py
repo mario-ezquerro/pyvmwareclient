@@ -184,6 +184,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         item_reboot = self.menu.Append(self.reboot, "Reboot...")
         item_poweron = self.menu.Append(self.powerOn, "PowerOn...")
         item_poweroff = self.menu.Append(self.powerOff, "PowerOff...")
+        item_separador = self.menu.AppendSeparator()
         item_exit = self.menu.Append(self.exitID, "Exit")
 
         # show the popup menu
@@ -508,11 +509,7 @@ class MyFrame(wx.Frame):
 class DialogAcceso():
     def __init__(self):
 
-        # listado de snapshot en una ventana emergente
-
         self.my_dialog_acceso_vcenter = dialogos.Dialogo_acceso_vcenter(None, -1, 'Datos de conexión')
-
-
 
         # precarga de fichero config
         self.cfg = wx.Config('appconfig')
@@ -531,10 +528,6 @@ class DialogAcceso():
         self.si = None
 
 
-
-            # pintamos la ventana con la informcion
-
-
     def OnConnect(self):
         self.vcenter = self.my_dialog_acceso_vcenter.nombre_vcenter.GetValue()
         self.login = self.my_dialog_acceso_vcenter.login_vcenter.GetValue()
@@ -548,7 +541,6 @@ class DialogAcceso():
         self.cfg.Write('pwd', self.pwd)
         self.cfg.Write('port', self.port)
 
-        # self.statusbar.SetStatusText('Configuration saved, %s ' % wx.Now())
 
         # accedemos al vcenter
         try:
@@ -562,18 +554,16 @@ class DialogAcceso():
                                        pwd=self.pwd,
                                        port=int(self.port),
                                        sslContext=self.context)
-                self.Close(True)
-
+                #self.Close(True)
 
         except:
-
-            if logger != None: logger.warning('Error en el acceso a vcenter')
             dlgexcept = wx.MessageDialog(self.my_dialog_acceso_vcenter,
                                    "Error en Conexion o ya esta conectado Verifique parametros",
                                    caption= "Confirm Exit",
                                    style= wx.OK | wx.ICON_QUESTION)
             dlgexcept.ShowModal()
             dlgexcept.Destroy()
+            if logger != None: logger.warning('Error en el acceso a vcenter')
 
 
     def OnDisConnect(self):
@@ -582,9 +572,9 @@ class DialogAcceso():
                                'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         # wx.MessageDialog()
         result = dlg.ShowModal()
-        dlg.Destroy()
+        #dlg.Destroy()
         if result == wx.ID_OK:
-            self.Destroy()
+            dlg.Destroy()
             sys.exit(0)
 
 
@@ -594,27 +584,21 @@ class DialogAcceso():
 def conectar_con_vcenter():
 
        dlgDialogo = DialogAcceso()
-       result = dlgDialogo.my_dialog_acceso_vcenter.ShowModal()
-       if result == wx.ID_OK:
-           dlgDialogo.OnConnect()
-       else:
-           dlgDialogo.OnDisConnect()
 
-           # self.my_dialog_acceso_vcenter.Destroy()
-
-       #dlg1 = self.my_dialogo_texto.ShowModal()  # pintamos la ventana con la informcion
-       #self.my_dialog_acceso_vcenter.Destroy()
-
-
-
-       if dlgDialogo.si:
-           if logger != None: logger.info('conectado')
-           atexit.register(Disconnect, dlgDialogo.si)
-           content = dlgDialogo.si.RetrieveContent()
-           dlgDialogo.my_dialog_acceso_vcenter.Destroy()
-           return content
-       else:
-           exit()
+       while not dlgDialogo.si:
+           result = dlgDialogo.my_dialog_acceso_vcenter.ShowModal()
+           if result == wx.ID_OK:
+               dlgDialogo.OnConnect()
+               if dlgDialogo.si:
+                   if logger != None: logger.info('conectado')
+                   atexit.register(Disconnect, dlgDialogo.si)
+                   content = dlgDialogo.si.RetrieveContent()
+                   dlgDialogo.my_dialog_acceso_vcenter.Destroy()
+                   return content
+               else:
+                    sys.exit(0)
+           else:
+               dlgDialogo.OnDisConnect()
 
 
 # ----------------------------------------------------------------------
@@ -757,7 +741,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         # if logger != None: logger.info("")
 
 
-########################### Iniciamos el programa  ####################
+########################### Start the program  ####################
 if __name__ == "__main__":
 
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
@@ -767,7 +751,7 @@ if __name__ == "__main__":
     logger = None
     #read inital config file
     # log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
-    if os.name == 'poxis':
+    if os.name == 'posix':
         logging.config.fileConfig('logging.conf')
         # create logger
         logger = logging.getLogger('pyvmwareclient')
