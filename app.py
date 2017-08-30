@@ -580,7 +580,7 @@ class DialogAcceso():
 
 
 # ----------------------------------------------------------------------
-# Conectamos con el Vcenter
+# connect with Vcenter code and Dialog
 def conectar_con_vcenter():
 
        dlgDialogo = DialogAcceso()
