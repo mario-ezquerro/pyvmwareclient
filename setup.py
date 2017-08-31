@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
-# Mejor python setup.py bdist_dmg en Macos
-# Con python setup.py bdist_rpm y en windows bdist_msi
+# Usar python setup.py bdist_dmg en Macos
+# Or in python setup.py bdist_rpm y en windows bdist_msi
 
 import sys
 import os.path
@@ -35,7 +35,7 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.05',
+      version='0.3.06',
       description='Client for Vcenter 6.0/6.5 VMware en python',
       options=build_options,
       maintainer="Mario Ezquerro",
