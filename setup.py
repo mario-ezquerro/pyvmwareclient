@@ -24,9 +24,8 @@ if sys.platform == 'win32':
                      base="Win32GUI",
                      shortcutName='PyVMwareClient',
                      copyright='All Right reserver',
-                     shortcutDir='DesktopFolder')
-                    # icon='icons/vmwareclient.ico')
-                    # icon=os.path.join("icons", "vmwareclient.ico"))
+                     shortcutDir='DesktopFolder',
+                     icon=os.path.join("icons", "vmwareclient.ico"))
 
 else:
     exe = Executable(script='app.py',
