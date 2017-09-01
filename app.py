@@ -260,17 +260,31 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
 
     def onSsh(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El tercer elemento es la ip es decier la fila[2]
-        self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-        self.my_dialogo_ssh.usuario.SetValue('root' )
-        result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
-        if result == wx.ID_OK:
-            comando = 'putty ' + fila[2] +' -l '+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
-            os.system(comando)
-        self.my_dialogo_ssh.Destroy()
+        if sys.platform == 'darwin':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+            self.my_dialogo_ssh.usuario.SetValue('root' )
+            result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
+            if result == wx.ID_OK:
+                comando = 'ssh ' + fila[2] +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                os.system(comando)
+            self.my_dialogo_ssh.Destroy()
+
+        if sys.platform == 'nt' or sys.platform == 'posix':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+            self.my_dialogo_ssh.usuario.SetValue('root')
+            result = self.my_dialogo_ssh.ShowModal()  # pintamos la ventan con la informcion
+            if result == wx.ID_OK:
+                comando = 'putty ' + fila[2] + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                os.system(comando)
+            self.my_dialogo_ssh.Destroy()
 
 
 
@@ -317,6 +331,43 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if logger != None: logger.info ("Waiting for 60 seconds, then exit")
 
     def onRdp(self, event):
+        if sys.platform == 'darwin':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            ruta_fichero_config = os.getcwd()
+            archConfiguracion = open('conexion.rdp', 'w')
+            archConfiguracion.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' + '\n')
+            archConfiguracion.write('<plist version="1.0">' + '\n')
+            archConfiguracion.write('<dict>' + '\n')
+            archConfiguracion.write('<key>AddToKeychain</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>ApplicationPath</key>' + '\n')
+            archConfiguracion.write('<string></string>' + '\n')
+            archConfiguracion.write('<key>AudioRedirectionMode</key>' + '\n')
+            archConfiguracion.write('<integer>0</integer>' + '\n')
+            archConfiguracion.write('<key>AuthenticateLevel</key>' + '\n')
+            archConfiguracion.write('<integer>0</integer>' + '\n')
+            archConfiguracion.write('<key>AutoReconnect</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>BitmapCaching</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>ColorDepth</key>' + '\n')
+            archConfiguracion.write('<integer>1</integer>' + '\n')
+            archConfiguracion.write('<key>ConnectionString</key>' + '\n')
+            archConfiguracion.write('<string>' + fila[2] + '</string>' + '\n')
+            archConfiguracion.write('<key>DesktopSize</key>' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('</dict>' + '\n')
+            archConfiguracion.write('</plist>' + '\n')
+            archConfiguracion.close
+            comando = 'open -a \"Remote Desktop Connection.app\" ' + ruta_fichero_config +'/conexion.rdp' + ' &'
+            os.system(comando)
+
         if os.name == 'nt':
             fila = self.listadoVM
             for i in range(len(fila)):
