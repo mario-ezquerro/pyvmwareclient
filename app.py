@@ -16,27 +16,9 @@ import wx.lib.inspection
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
+#from tools import virtual_machine_device_info as vminfo
 
 
-########################################################################
-class Virtualmachine(object):
-    """"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self, carpeta, nombre, ip, estado, pregunta, pathdisco, sistema, notas, iduu):
-        """Constructor"""
-        self.carpeta = carpeta
-        self.nombre = nombre
-        self.ip = ip
-        self.estado = estado
-        self.pregunta = pregunta
-        self.pathdisco = pathdisco
-        self.sistema = sistema
-        self.notas = notas
-        self.iduu = iduu
-
-
-########################################################################
 class theListCtrl(wx.ListCtrl):
     # ----------------------------------------------------------------------
     def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition,
@@ -150,6 +132,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if logger != None: logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listadoVM))
 
         if not hasattr(self, "sshID"):
+            self.info_vm = wx.NewId()
             self.snapID = wx.NewId()
             self.sshID = wx.NewId()
             self.htmlID = wx.NewId()
@@ -161,6 +144,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.powerOn = wx.NewId()
             self.powerOff = wx.NewId()
             self.exitID = wx.NewId()
+            self.Bind(wx.EVT_MENU, self.on_info_vm, id=self.info_vm)
             self.Bind(wx.EVT_MENU, self.onSnap, id=self.snapID)
             self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
             self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
@@ -168,12 +152,13 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.Bind(wx.EVT_MENU, self.onsoftreboot, id=self.softreboot)
             self.Bind(wx.EVT_MENU, self.onsoftPowerOff, id=self.softpoweroff)
             self.Bind(wx.EVT_MENU, self.onreboot, id=self.reboot)
-            self.Bind(wx.EVT_MENU, self.onpowerOn, id=self.powerOn)
+            self.Bind(wx.EVT_MENU, self.onpower_on, id=self.powerOn)
             self.Bind(wx.EVT_MENU, self.onpowerOff, id=self.powerOff)
             self.Bind(wx.EVT_MENU, self.onExit, id=self.exitID)
 
         # build the menu
         self.menu = wx.Menu()
+        ietm_info_vm = self.menu.Append(self.info_vm, "Info VM...")
         item_snap = self.menu.Append(self.snapID, "Snapshot...")
         item_ssh = self.menu.Append(self.sshID, "Conexión ssh")
         item_html = self.menu.Append(self.htmlID, "Conexión html")
@@ -193,6 +178,88 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     #########Evetnto del menu de contexto sobre maquina VM ######
 
+
+
+
+    def on_info_vm(self, event):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+
+        # List about vm detail in dialog box
+
+        self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de datos VM')
+        snaptexto = 'Listado de snapshot \n'
+
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+
+        if logger != None: logger.info('informacion vm: '+ vm.summary.config.name)
+        self.my_dialogo_texto.salida_texto.SetValue('Maquna vm = ' + fila[1]  )
+        self.my_dialogo_texto.salida_texto.SetValue("Found Virtual Machine")
+        self.my_dialogo_texto.salida_texto.SetValue("=====================")
+        details = {'name': vm.summary.config.name,
+                   'instance UUID': vm.summary.config.instanceUuid,
+                   'bios UUID': vm.summary.config.uuid,
+                   'path to VM': vm.summary.config.vmPathName,
+                   'guest OS id': vm.summary.config.guestId,
+                   'guest OS name': vm.summary.config.guestFullName,
+                   'host name': vm.runtime.host.name,
+                   'last booted timestamp': vm.runtime.bootTime}
+
+        for name, value in details.items():
+            self.my_dialogo_texto.salida_texto.SetValue("  {0:{width}{base}}: {1}".format(name, value, width=25, base='s'))
+
+        self.my_dialogo_texto.salida_texto.SetValue("  Devices:")
+        self.my_dialogo_texto.salida_texto.SetValue("  --------")
+        for device in vm.config.hardware.device:
+            # diving into each device, we pull out a few interesting bits
+            dev_details = {'key': device.key,
+                           'summary': device.deviceInfo.summary,
+                           'device type': type(device).__name__,
+                           'backing type': type(device.backing).__name__}
+
+            self.my_dialogo_texto.salida_texto.SetValue("  label: {0}".format(device.deviceInfo.label))
+            self.my_dialogo_texto.salida_texto.SetValue("  ------------------")
+            for name, value in dev_details.items():
+                self.my_dialogo_texto.salida_texto.SetValue("    {0:{width}{base}}: {1}".format(name, value,
+                                                                                                 width=15, base='s'))
+
+            if device.backing is None:
+                continue
+
+            # the following is a bit of a hack, but it lets us build a summary
+            # without making many assumptions about the backing type, if the
+            # backing type has a file name we *know* it's sitting on a datastore
+            # and will have to have all of the following attributes.
+            if hasattr(device.backing, 'fileName'):
+                datastore = device.backing.datastore
+                if datastore:
+                    self.my_dialogo_texto.salida_texto.SetValue(u"    datastore")
+                    self.my_dialogo_texto.salida_texto.SetValue(u"        name: {0}".format(datastore.name))
+                    # there may be multiple hosts, the host property
+                    # is a host mount info type not a host system type
+                    # but we can navigate to the host system from there
+                    for host_mount in datastore.host:
+                        host_system = host_mount.key
+                        self.my_dialogo_texto.salida_texto.SetValue("        host: {0}".format(host_system.name))
+                    self.my_dialogo_texto.salida_texto.SetValue("        summary")
+                    summary = {'capacity': datastore.summary.capacity,
+                               'freeSpace': datastore.summary.freeSpace,
+                               'file system': datastore.summary.type,
+                               'url': datastore.summary.url}
+                    for key, val in summary.items():
+                        snaptexto +=(u"            {0}: {1}".format(key, val))
+                snaptexto +=("    fileName: {0}\n".format(device.backing.fileName))
+                snaptexto +=("    device ID: {0}\n".format(device.backing.backingObjectId))
+
+            snaptexto +="  ------------------\n"
+
+        snaptexto += "====================="
+        self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
+        result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
+        self.my_dialogo_texto.Destroy()
 
     def onSnap(self, event):
         fila = self.listadoVM
@@ -273,7 +340,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                 os.system(comando)
             self.my_dialogo_ssh.Destroy()
 
-        if sys.platform == 'nt' or sys.platform == 'posix':
+        if os.name == 'nt' or os.name == 'posix':
             fila = self.listadoVM
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
@@ -491,7 +558,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                 tasks.wait_for_tasks(conexion, [TASK])
                 if logger != None: logger.info("reboot its done.")
 
-    def onpowerOn(self, event):
+    def onpower_on(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
@@ -781,6 +848,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
             dirip.append(summary.guest.ipAddress)
+
         else:
             dirip.append('ip?')
 
