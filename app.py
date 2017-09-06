@@ -196,9 +196,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
 
         if logger != None: logger.info('informacion vm: '+ vm.summary.config.name)
-        self.my_dialogo_texto.salida_texto.SetValue('Maquna vm = ' + fila[1]  )
-        self.my_dialogo_texto.salida_texto.SetValue("Found Virtual Machine")
-        self.my_dialogo_texto.salida_texto.SetValue("=====================")
+        snaptexto +='Maquna vm = \n' + fila[1]
+        snaptexto +="Found Virtual Machine\n"
+        snaptexto +="=====================\n"
         details = {'name': vm.summary.config.name,
                    'instance UUID': vm.summary.config.instanceUuid,
                    'bios UUID': vm.summary.config.uuid,
@@ -209,10 +209,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                    'last booted timestamp': vm.runtime.bootTime}
 
         for name, value in details.items():
-            self.my_dialogo_texto.salida_texto.SetValue("  {0:{width}{base}}: {1}".format(name, value, width=25, base='s'))
+            snaptexto +=u"\n  {0:{width}{base}}: {1}".format(name, value, width=25, base='s')
 
-        self.my_dialogo_texto.salida_texto.SetValue("  Devices:")
-        self.my_dialogo_texto.salida_texto.SetValue("  --------")
+        snaptexto += "\n------------------------------"
+        snaptexto += "\nDevices:"
+        snaptexto +="\n------------------------------\n"
         for device in vm.config.hardware.device:
             # diving into each device, we pull out a few interesting bits
             dev_details = {'key': device.key,
@@ -220,11 +221,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                            'device type': type(device).__name__,
                            'backing type': type(device.backing).__name__}
 
-            self.my_dialogo_texto.salida_texto.SetValue("  label: {0}".format(device.deviceInfo.label))
-            self.my_dialogo_texto.salida_texto.SetValue("  ------------------")
+            snaptexto +="\n------------------\n"
+            snaptexto +=u"\n  label: {0}".format(device.deviceInfo.label)
+
             for name, value in dev_details.items():
-                self.my_dialogo_texto.salida_texto.SetValue("    {0:{width}{base}}: {1}".format(name, value,
-                                                                                                 width=15, base='s'))
+                snaptexto +=u"\n    {0:{width}{base}}: {1}".format(name, value, width=15, base='s')
 
             if device.backing is None:
                 continue
@@ -236,25 +237,25 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if hasattr(device.backing, 'fileName'):
                 datastore = device.backing.datastore
                 if datastore:
-                    self.my_dialogo_texto.salida_texto.SetValue(u"    datastore")
-                    self.my_dialogo_texto.salida_texto.SetValue(u"        name: {0}".format(datastore.name))
+                    snaptexto +="    datastore\n"
+                    snaptexto +="        name: {0}\n".format(datastore.name)
                     # there may be multiple hosts, the host property
                     # is a host mount info type not a host system type
                     # but we can navigate to the host system from there
                     for host_mount in datastore.host:
                         host_system = host_mount.key
-                        self.my_dialogo_texto.salida_texto.SetValue("        host: {0}".format(host_system.name))
-                    self.my_dialogo_texto.salida_texto.SetValue("        summary")
+                        snaptexto +=u"\n        host: {0}".format(host_system.name)
+                    snaptexto +="        summary"
                     summary = {'capacity': datastore.summary.capacity,
                                'freeSpace': datastore.summary.freeSpace,
                                'file system': datastore.summary.type,
                                'url': datastore.summary.url}
                     for key, val in summary.items():
-                        snaptexto +=(u"            {0}: {1}".format(key, val))
-                snaptexto +=("    fileName: {0}\n".format(device.backing.fileName))
-                snaptexto +=("    device ID: {0}\n".format(device.backing.backingObjectId))
+                        snaptexto +=(u"\n            {0}: {1}".format(key, val))
+                snaptexto +=(u"\n    fileName: {0}".format(device.backing.fileName))
+                snaptexto +=(u"\n    device ID: {0}".format(device.backing.backingObjectId))
 
-            snaptexto +="  ------------------\n"
+            snaptexto +="\n--------------------------------------------\n"
 
         snaptexto += "====================="
         self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
