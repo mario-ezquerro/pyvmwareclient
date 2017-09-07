@@ -191,12 +191,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # List about vm detail in dialog box
 
         self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de datos VM')
-        snaptexto = 'Listado de snapshot \n'
 
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-
         if logger != None: logger.info('informacion vm: '+ vm.summary.config.name)
-        snaptexto +='Maquna vm = \n' + fila[1]
+
+
+        snaptexto ='\n Maquna vm = ' + fila[1]
         snaptexto +="Found Virtual Machine\n"
         snaptexto +="=====================\n"
         details = {'name': vm.summary.config.name,
