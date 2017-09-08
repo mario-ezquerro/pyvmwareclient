@@ -1,19 +1,22 @@
 #!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
+# Use http://sveinbjorn.org/platypus
 
 from setuptools import setup
+import py2app
 
 APP = ['app.py']
 APP_NAME = "vmWareClient"
-DATA_FILES = []
+DATA_FILES = [('../Frameworks', ['/usr/local/lib/libwx_mac-2.4.0.rsrc',])'logging.conf', 'LICENSE', 'README.md']
 
 OPTIONS = {
     'argv_emulation': True,
-    'iconfile': './icons/vmwareclient.ico',
+    'packages': ['idna', 'cryptography', 'cffi'],
+    'iconfile': './icons/vmwareclient.icns',
     'plist': {
         'CFBundleName': APP_NAME,
         'CFBundleDisplayName': APP_NAME,
-        'CFBundleGetInfoString': "Cliente VMWare",
+        'CFBundleGetInfoString': "Cliente VMWare fabricado en python",
         'CFBundleIdentifier': "com.ezquerro.mario",
         'CFBundleVersion': "0.3.0a",
         'CFBundleShortVersionString': "0.3.0a",

@@ -196,8 +196,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if logger != None: logger.info('informacion vm: '+ vm.summary.config.name)
 
 
-        snaptexto ='\n Maquna vm = ' + fila[1]
-        snaptexto +="Found Virtual Machine\n"
+        snaptexto ='\n Maquna vm = ' + fila[1] + '\n'
+
         snaptexto +="=====================\n"
         details = {'name': vm.summary.config.name,
                    'instance UUID': vm.summary.config.instanceUuid,
