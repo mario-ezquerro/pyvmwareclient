@@ -372,8 +372,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         for item in vcenter_settings:
             key = getattr(item, 'key')
+            #print ('key: ' + key + ' =>'+ str(getattr(item, 'value')))
             if key == 'VirtualCenter.FQDN':
                 vcenter_fqdn = getattr(item, 'value')
+            #if key == 'WebService.Ports.https':
+                #console_port = str(getattr(item, 'value'))
+
         host = vcenter_fqdn
 
         session_manager = conexion.sessionManager
@@ -386,15 +390,19 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
               "Remote Console.\n" \
               "You have 60 seconds to open the URL, or the session" \
               "will be terminated.\n")
-
-        """if logger != None: logger.info ("http://" + host + ":" + console_port + "/console/?vmId=" \
+        print(str(vcenter_data))
+        #For version vcenter 5.5
+        console_portv5 = '7331'
+        URL5 = "http://" + host + ":" + console_portv5 + "/console/?vmId=" \
               + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
-              + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerlogger.info.decode('utf-8'))"""
-
+              + "&sessionTicket=" + session + "&thumbprint=" + vc_fingerprint.decode('utf8')
+	
+	#For version vcenter 6.0 and 6.5
         URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
               + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
               + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
         if logger != None: logger.info(URL)
+        webbrowser.open(URL5, new=1, autoraise=True)
         webbrowser.open(URL, new=1, autoraise=True)
         if logger != None: logger.info ("Waiting for 60 seconds, then exit")
 
