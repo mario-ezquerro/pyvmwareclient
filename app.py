@@ -44,6 +44,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         st1 = wx.StaticText(self, label=' Cadena Busqueda')
         self.cadenaBusqueda = wx.TextCtrl(self)
         btnbusqueda = wx.Button(self, label="Buscar")
+        btnrecargaVM = wx.Button(self, label="Actualizar VM")
 
         name_rows = ['Carpeta', 'Nombre', 'IP', 'Estado', 'pregunta', 'Disco Path', 'Sistema', 'Notas', 'uuid']
 
@@ -71,14 +72,16 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         hbox1.Add(st1, wx.ALL | wx.ALIGN_CENTER, 5)
         hbox1.Add(self.cadenaBusqueda, wx.ALL | wx.ALIGN_CENTER, 5)
         hbox1.Add(btnbusqueda, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btnrecargaVM, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(txtcontador, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
         self.Bind(wx.EVT_BUTTON, self.busquedadatos, btnbusqueda)
+        self.Bind(wx.EVT_BUTTON, self.recarga_VM, btnrecargaVM)
 
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
 
-        # herramienta de inspeccion y debug  de wx (para activar descomentar la linea)
+        # tools for search an debug (to use uncomment the next line, works only linux)
         # wx.lib.inspection.InspectionTool().Show()
 
     # ----------------------------------------------------------------------
@@ -101,6 +104,16 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                 i -= 1
         else:
             self.cargardatos_en_listctrl(self.tabla)
+
+    def recarga_VM(self, event):
+        # conexion = conectar_con_vcenter(self, id)
+        self.tabla = []
+        self.tabla = sacar_listado_capertas(conexion)
+        self.vm_buscados = []
+
+        self.cargardatos_en_listctrl(self.tabla)
+
+
 
 
     def cargardatos_en_listctrl(self, _tabla_paracargar):
