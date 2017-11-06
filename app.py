@@ -16,6 +16,8 @@ import wx.lib.inspection
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
+from tools import vm
+from pyVmomi import vim
 #from tools import virtual_machine_device_info as vminfo
 
 
@@ -110,6 +112,31 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.tabla = []
         self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
+
+
+
+        #sacar datos acerca de vcenter.
+        object_about = conexion.about
+        """for obj in object_view.view:
+            print(obj)
+            if isinstance(obj, vim.VirtualMachine):
+                vm.print_vm_info(obj)"""
+        print (object_about)
+        print(object_about.version)
+
+        #sacar nombres de maquina
+        object_view = conexion.viewManager.CreateContainerView(conexion.rootFolder, [], True)
+        for obj in object_view.view:
+            print(obj)
+            if isinstance(obj, vim.HostSystem):
+                    print("El host es: " + obj.name)
+
+        object_view.Destroy()
+
+
+
+
+        if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
         self.cargardatos_en_listctrl(self.tabla)
 
@@ -388,7 +415,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             #print ('key: ' + key + ' =>'+ str(getattr(item, 'value')))
             if key == 'VirtualCenter.FQDN':
                 vcenter_fqdn = getattr(item, 'value')
-            #if key == 'WebService.Ports.https':
+                #if key == 'WebService.Ports.https':
                 #console_port = str(getattr(item, 'value'))
 
         host = vcenter_fqdn
@@ -400,24 +427,29 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         vc_fingerprint = vc_pem.digest('sha1')
 
         if logger != None: logger.info("Open the following URL in your browser to access the " \
-              "Remote Console.\n" \
-              "You have 60 seconds to open the URL, or the session" \
-              "will be terminated.\n")
+                                       "Remote Console.\n" \
+                                       "You have 60 seconds to open the URL, or the session" \
+                                       "will be terminated.\n")
         print(str(vcenter_data))
+
+        # Locate the version of vcenter the object .version for locate the version of vcenter
+        object_about = conexion.about
         #For version vcenter 5.5
-        console_portv5 = '7331'
-        URL5 = "http://" + host + ":" + console_portv5 + "/console/?vmId=" \
-              + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
-              + "&sessionTicket=" + session + "&thumbprint=" + vc_fingerprint.decode('utf8')
-	
-	#For version vcenter 6.0 and 6.5
-        URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
-              + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
-              + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
-        if logger != None: logger.info(URL)
-        webbrowser.open(URL5, new=1, autoraise=True)
-        webbrowser.open(URL, new=1, autoraise=True)
-        if logger != None: logger.info ("Waiting for 60 seconds, then exit")
+        if object_about.version == '5.5.0':
+            console_portv5 = '7331'
+            URL5 = "http://" + host + ":" + console_portv5 + "/console/?vmId=" \
+                   + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
+                   + "&sessionTicket=" + session + "&thumbprint=" + vc_fingerprint.decode('utf8')
+            webbrowser.open(URL5, new=1, autoraise=True)
+
+        #For version vcenter 6.0 and 6.5
+        if object_about.version == '6.0.0' or object_about.version == '6.5.0':
+            URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
+                  + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
+                  + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
+            if logger != None: logger.info(URL)
+            webbrowser.open(URL, new=1, autoraise=True)
+            if logger != None: logger.info ("Waiting for 60 seconds, then exit")
 
     def onRdp(self, event):
         if sys.platform == 'darwin':
