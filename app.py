@@ -124,7 +124,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         print (object_about)
         print(object_about.version)
 
-        #sacar nombres de maquina
         object_view = conexion.viewManager.CreateContainerView(conexion.rootFolder, [], True)
         for obj in object_view.view:
             print(obj)
@@ -450,6 +449,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if logger != None: logger.info(URL)
             webbrowser.open(URL, new=1, autoraise=True)
             if logger != None: logger.info ("Waiting for 60 seconds, then exit")
+
 
     def onRdp(self, event):
         if sys.platform == 'darwin':

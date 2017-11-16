@@ -7,7 +7,7 @@ import py2app
 
 APP = ['app.py']
 APP_NAME = "vmWareClient"
-DATA_FILES = [('../Frameworks', ['/usr/local/lib/libwx_mac-2.4.0.rsrc',])'logging.conf', 'LICENSE', 'README.md']
+DATA_FILES = [('../Frameworks', ['/usr/local/lib/libwx_mac-2.4.0.rsrc',]), 'logging.conf', 'LICENSE', 'README.md']
 
 OPTIONS = {
     'argv_emulation': True,
