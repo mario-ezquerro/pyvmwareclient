@@ -172,7 +172,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         if not hasattr(self, "sshID"):
             self.info_vm = wx.NewId()
-            self.snapID = wx.NewId()
             self.sshID = wx.NewId()
             self.htmlID = wx.NewId()
             self.rdpID = wx.NewId()
@@ -184,7 +183,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.powerOff = wx.NewId()
             self.exitID = wx.NewId()
             self.Bind(wx.EVT_MENU, self.on_info_vm, id=self.info_vm)
-            self.Bind(wx.EVT_MENU, self.onSnap, id=self.snapID)
             self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
             self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
             self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
@@ -195,10 +193,21 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.Bind(wx.EVT_MENU, self.onpowerOff, id=self.powerOff)
             self.Bind(wx.EVT_MENU, self.onExit, id=self.exitID)
 
+        # build the submenu-snapshot
+        self.snapIDlist  = wx.NewId()
+        self.snapIDcreate  = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.onSnap_list, id=self.snapIDlist)
+        self.Bind(wx.EVT_MENU, self.onSnap_create, id=self.snapIDcreate)
+
+        self.snap_menu=wx.Menu()
+        item_snap_list = self.snap_menu.Append(self.snapIDlist, "List snapshot...")
+        item_snap_create = self.snap_menu.Append(self.snapIDcreate, "Create snapshot...")
+
+
         # build the menu
         self.menu = wx.Menu()
-        ietm_info_vm = self.menu.Append(self.info_vm, "Info VM...")
-        item_snap = self.menu.Append(self.snapID, "Snapshot...")
+        item_info_vm = self.menu.Append(self.info_vm, "Info VM...")
+        item_snap_menu = self.menu.Append(wx.ID_ANY,'Manager Snapshot', self.snap_menu)
         item_ssh = self.menu.Append(self.sshID, "Conexión ssh")
         item_html = self.menu.Append(self.htmlID, "Conexión html")
         item_rdp = self.menu.Append(self.rdpID, "conexión rdp")
@@ -210,6 +219,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         item_poweroff = self.menu.Append(self.powerOff, "PowerOff...")
         item_separador = self.menu.AppendSeparator()
         item_exit = self.menu.Append(self.exitID, "Exit")
+
+
 
         # show the popup menu
         self.PopupMenu(self.menu)
@@ -301,7 +312,39 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
         self.my_dialogo_texto.Destroy()
 
-    def onSnap(self, event):
+
+    def onSnap_list(self, event):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        
+        #listado de snapshot en una ventana emergente
+
+        self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de Snapshots')
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+        snap_info = vm.snapshot
+        self.my_dialogo_texto.salida_texto.SetValue('Maquna vm = ' + fila[1]  )
+        snaptexto = 'Listado de snapshot \n'
+        if not snap_info:
+            self.my_dialogo_texto.salida_texto.SetValue('No hay snapshot')
+            if logger != None: logger.info ('No hay snapshot')
+        else:
+            tree = snap_info.rootSnapshotList
+            while tree[0].childSnapshotList is not None:
+                snaptexto = snaptexto +  ("Nombre Snap: {0} = description> {1}  \n".format(tree[0].name, tree[0].description))
+                if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
+                if len(tree[0].childSnapshotList) < 1:
+                    break
+                tree = tree[0].childSnapshotList
+            self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
+
+        result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
+        self.my_dialogo_texto.Destroy()
+
+
+    def onSnap_create(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
@@ -363,6 +406,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
         self.my_dialogo_texto.Destroy()
+
 
 
 
