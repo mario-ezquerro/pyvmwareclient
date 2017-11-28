@@ -32,10 +32,10 @@ import subprocess
 
 import pyVmomi
 
-import pvc.widget.menu
-import pvc.widget.form
-import pvc.widget.checklist
-import pvc.widget.radiolist
+#import pvc.widget.menu
+#import pvc.widget.form
+#import pvc.widget.checklist
+#import pvc.widget.radiolist
 
 __all__ = [
     'PerformanceProviderWidget', 'PerformanceGroupWidget',
@@ -45,7 +45,7 @@ __all__ = [
 
 
 class PerformanceProviderWidget(object):
-    def __init__(self, agent, dialog, obj):
+    def __init__(self, agent, obj):
         """
         Performance Provider Widget
         Args:
@@ -54,71 +54,21 @@ class PerformanceProviderWidget(object):
             obj    (vim.ManagedEntity): A managed entity
         """
         self.agent = agent
-        self.dialog = dialog
+        #self.dialog = dialog
         self.obj = obj
         self.pm = self.agent.si.content.perfManager
         self.title = '{} ({})'.format(self.obj.name, self.obj.__class__.__name__)
         self.display()
 
     def display(self):
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag='Summary',
-                description='Performance provider summary',
-                on_select=self.summary
-            ),
-            pvc.widget.menu.MenuItem(
-                tag='Groups',
-                description='Performance counter groups',
-                on_select=PerformanceGroupWidget,
-                on_select_args=(self.agent, self.dialog, self.obj)
-            ),
-        ]
-
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text='Select an item from the menu',
-        )
-
+        
         menu.display()
 
     def summary(self):
         """
         Performance provider summary information
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
-
-        provider_summary = self.pm.QueryPerfProviderSummary(
-            entity=self.obj
-        )
-
-        elements = [
-            pvc.widget.form.FormElement(
-                label='Real-time statistics support',
-                item=str(provider_summary.currentSupported)
-            ),
-            pvc.widget.form.FormElement(
-                label='Historical statistics support',
-                item=str(provider_summary.summarySupported)
-            ),
-            pvc.widget.form.FormElement(
-                label='Refresh rate (seconds)',
-                item=str(provider_summary.refreshRate)
-            )
-        ]
-
-        form = pvc.widget.form.Form(
-            dialog=self.dialog,
-            form_elements=elements,
-            title=self.title,
-            text='Performance provider summary information'
-        )
-
+        
         form.display()
 
 
@@ -139,25 +89,7 @@ class PerformanceGroupWidget(object):
         self.display()
 
     def display(self):
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag='Real-time',
-                description='Real-time performance metrics',
-                on_select=self.realtime_counter_groups
-            ),
-            pvc.widget.menu.MenuItem(
-                tag='Historical',
-                description='Historical performance metrics',
-                on_select=self.historical_counter_groups
-            ),
-        ]
-
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text='Select an item from the menu',
-        )
+        
 
         menu.display()
 
@@ -197,21 +129,9 @@ class PerformanceGroupWidget(object):
         counters = [c for c in perf_counter for m in metric_id if c.key == m.counterId]
         groups = set([(c.groupInfo.key, c.groupInfo.label) for c in counters])
 
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag=key,
-                description=label,
-                on_select=PerformanceCounterInGroupWidget,
-                on_select_args=(self.agent, self.dialog, self.obj, metric_id, label, True)
-            ) for key, label in groups
-        ]
+        
 
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text='Select a performance counter group'
-        )
+       
 
         menu.display()
 
@@ -250,21 +170,7 @@ class PerformanceGroupWidget(object):
         counters = [c for c in perf_counter for m in metric_id if c.key == m.counterId]
         groups = set([(c.groupInfo.key, c.groupInfo.label) for c in counters])
 
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag=key,
-                description=label,
-                on_select=PerformanceCounterInGroupWidget,
-                on_select_args=(self.agent, self.dialog, self.obj, metric_id, label, False)
-            ) for key, label in groups
-        ]
-
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text='Select a performance counter group'
-        )
+        
 
         menu.display()
 
@@ -311,21 +217,7 @@ class PerformanceCounterInGroupWidget(object):
         perf_counter = self.pm.perfCounter
         counters = [c for c in perf_counter for m in unique_metrics if c.key == m and c.groupInfo.label == self.label]
 
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag='{0}.{1}.{2}'.format(c.groupInfo.key, c.nameInfo.key, c.unitInfo.key),
-                description=c.nameInfo.label,
-                on_select=PerformanceCounterWidget,
-                on_select_args=(self.agent, self.dialog, self.obj, c, self.realtime)
-            ) for c in counters
-        ]
-
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text="Performance counters in group '{}'".format(self.label)
-        )
+        
 
         menu.display()
 
@@ -356,19 +248,7 @@ class PerformanceCounterWidget(object):
         self.display()
 
     def display(self):
-        items = [
-            pvc.widget.menu.MenuItem(
-                tag='Info',
-                description='Counter information',
-                on_select=self.info
-            ),
-            pvc.widget.menu.MenuItem(
-                tag='Graph',
-                description='Display graph',
-                on_select=PerformanceCounterGraphWidget,
-                on_select_args=(self.agent, self.dialog, self.obj, self.counter, self.realtime)
-            ),
-        ]
+       
 
         title = 'Performance counter {0}.{1}.{2}'.format(
             self.counter.groupInfo.key,
@@ -376,12 +256,6 @@ class PerformanceCounterWidget(object):
             self.counter.unitInfo.key
         )
 
-        menu = pvc.widget.menu.Menu(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text=title
-        )
 
         menu.display()
 
@@ -401,44 +275,7 @@ class PerformanceCounterWidget(object):
         )
         intervals = [i.name for i in self.pm.historicalInterval if self.counter.level == i.level]
 
-        elements = [
-            pvc.widget.form.FormElement(
-                label='Key',
-                item=str(self.counter.key)
-            ),
-            pvc.widget.form.FormElement(
-                label='Counter',
-                item=counter_name
-            ),
-            pvc.widget.form.FormElement(
-                label='Label',
-                item=self.counter.nameInfo.label
-            ),
-            pvc.widget.form.FormElement(
-                label='Description',
-                item=self.counter.nameInfo.summary
-            ),
-            pvc.widget.form.FormElement(
-                label='Group',
-                item=self.counter.groupInfo.label
-            ),
-            pvc.widget.form.FormElement(
-                label='Unit',
-                item=self.counter.unitInfo.label
-            ),
-            pvc.widget.form.FormElement(
-                label='Intervals',
-                item=', '.join(intervals)
-            ),
-        ]
-
-        form = pvc.widget.form.Form(
-            dialog=self.dialog,
-            form_elements=elements,
-            title=self.title,
-            text='Performance counter information'
-        )
-
+        
         form.display()
 
 
@@ -629,22 +466,14 @@ class PerformanceCounterGraphWidget(object):
         )
         metrics = [m for m in metric_id if m.counterId == self.counter.key]
         instances = [m.instance if m.instance else self.obj.name for m in metrics]
-        items = [
-            pvc.widget.checklist.CheckListItem(tag=instance)
-            for instance in instances
-        ]
+        
         checklist_text = 'Select instances for counter {0}.{1}.{2}'.format(
             self.counter.groupInfo.key,
             self.counter.nameInfo.key,
             self.counter.unitInfo.key
         )
 
-        checklist = pvc.widget.checklist.CheckList(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text=checklist_text,
-        )
+        
         checklist.display()
 
         return checklist.selected()
@@ -659,16 +488,8 @@ class PerformanceCounterGraphWidget(object):
         )
 
         intervals = [i.name for i in self.pm.historicalInterval]
-        items = [
-            pvc.widget.radiolist.RadioListItem(tag=interval) for interval in intervals
-        ]
+        
 
-        radiolist = pvc.widget.radiolist.RadioList(
-            items=items,
-            dialog=self.dialog,
-            title=self.title,
-            text='Select a historical performance interval',
-        )
 
         return radiolist.display()
 

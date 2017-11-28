@@ -17,6 +17,7 @@ from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
 from tools import vm
+from tools import performance
 from pyVmomi import vim
 #from tools import virtual_machine_device_info as vminfo
 
@@ -200,6 +201,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # build the menu
         self.menu = wx.Menu()
         ietm_info_vm = self.menu.Append(self.info_vm, "Info VM...")
+        item_graf = self.menu.Append(self.grafID, "Graf...")
         item_snap = self.menu.Append(self.snapID, "Snapshot...")
         item_ssh = self.menu.Append(self.sshID, "Conexión ssh")
         item_html = self.menu.Append(self.htmlID, "Conexión html")
@@ -212,7 +214,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         item_poweroff = self.menu.Append(self.powerOff, "PowerOff...")
         item_separador = self.menu.AppendSeparator()
         item_exit = self.menu.Append(self.exitID, "Exit")
-        item_graf = self.menu.Append(self.grafID, "Graf...")
+        
 
         # show the popup menu
         self.PopupMenu(self.menu)
@@ -665,7 +667,18 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         sys.exit(0)
 
     def onGraf(self,event):
-        pass
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+
+        performance.PerformanceProviderWidget(conexion, vm)
+
+        
+
+
+
 
 
 
