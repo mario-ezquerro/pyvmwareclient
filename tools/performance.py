@@ -50,19 +50,17 @@ class PerformanceProviderWidget(object):
         Performance Provider Widget
         Args:
             agent         (VConnector): A VConnector instance
-            dialog     (dialog.Dialog): A Dialog instance
             obj    (vim.ManagedEntity): A managed entity
         """
         self.agent = agent
-        #self.dialog = dialog
         self.obj = obj
-        self.pm = self.agent.si.content.perfManager
+        self.pm = self.agent.perfManager
         self.title = '{} ({})'.format(self.obj.name, self.obj.__class__.__name__)
         self.display()
 
     def display(self):
         
-        menu.display()
+        pass
 
     def summary(self):
         """
@@ -73,57 +71,40 @@ class PerformanceProviderWidget(object):
 
 
 class PerformanceGroupWidget(object):
-    def __init__(self, agent, dialog, obj):
+    def __init__(self, agent, obj):
         """
         Displays a menu of available counter groups for the provider
         Args:
             agent         (VConnector): A VConnector instance
-            dialog     (dialog.Dialog): A Dialog instance
+            
             obj    (vim.ManagedEntity): A managed entity
         """
         self.agent = agent
-        self.dialog = dialog
         self.obj = obj
         self.pm = self.agent.si.content.perfManager
         self.title = '{} ({})'.format(self.obj.name, self.obj.__class__.__name__)
         self.display()
 
     def display(self):
-        
-
-        menu.display()
+        pass
 
     def realtime_counter_groups(self):
         """
         Available real-time counter groups
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+     
 
         provider_summary = self.pm.QueryPerfProviderSummary(
             entity=self.obj
         )
 
-        if not provider_summary.currentSupported:
-            self.dialog.msgbox(
-                title=self.title,
-                text='Provider does not support real-time statistics'
-            )
-            return
+      
 
         metric_id = self.pm.QueryAvailablePerfMetric(
             entity=self.obj,
             intervalId=provider_summary.refreshRate
         )
 
-        if not metric_id:
-            self.dialog.msgbox(
-                title=self.title,
-                text='Performance data is currently not available for entity'
-            )
-            return
 
         perf_counter = self.pm.perfCounter
         counters = [c for c in perf_counter for m in metric_id if c.key == m.counterId]
@@ -139,32 +120,19 @@ class PerformanceGroupWidget(object):
         """
         Available historical counter groups
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+    
 
         provider_summary = self.pm.QueryPerfProviderSummary(
             entity=self.obj
         )
 
-        if not provider_summary.summarySupported:
-            self.dialog.msgbox(
-                title=self.title,
-                text='Provider does not support historical statistics'
-            )
-            return
+     
 
         metric_id = self.pm.QueryAvailablePerfMetric(
             entity=self.obj
         )
 
-        if not metric_id:
-            self.dialog.msgbox(
-                title=self.title,
-                text='Performance data is currently not available for entity'
-            )
-            return
+       
 
         perf_counter = self.pm.perfCounter
         counters = [c for c in perf_counter for m in metric_id if c.key == m.counterId]
@@ -176,13 +144,12 @@ class PerformanceGroupWidget(object):
 
 
 class PerformanceCounterInGroupWidget(object):
-    def __init__(self, agent, dialog, obj, metric_id, label, realtime):
+    def __init__(self, agent, obj, metric_id, label, realtime):
         """
         Display a menu of available performance counters
         in specific performance group
         Args:
             agent         (VConnector): A VConnector instance
-            dialog     (dialog.Dialog): A Dialog instance
             obj    (vim.ManagedEntity): A managed entity
             metric_id           (list): A list of vim.PerformanceManager.MetricId instances,
                                         retrieved by a previous
@@ -193,7 +160,6 @@ class PerformanceCounterInGroupWidget(object):
                                         counters from this group as historical.
         """
         self.agent = agent
-        self.dialog = dialog
         self.obj = obj
         self.pm = self.agent.si.content.perfManager
         self.metric_id = metric_id
@@ -203,10 +169,7 @@ class PerformanceCounterInGroupWidget(object):
         self.display()
 
     def display(self):
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+        
 
         # Get the unique metrics so we don't get duplicate
         # entries in the resulting menu. Duplicate entries
@@ -219,16 +182,14 @@ class PerformanceCounterInGroupWidget(object):
 
         
 
-        menu.display()
 
 
 class PerformanceCounterWidget(object):
-    def __init__(self, agent, dialog, obj, counter, realtime):
+    def __init__(self, agent, obj, counter, realtime):
         """
         Performance Counter Widget
         Args:
             agent                           (VConnector): A VConnector instance
-            dialog                       (dialog.Dialog): A Dialog instance
             obj                      (vim.ManagedEntity): A managed entity
             counter (vim.PerformanceManager.CounterInfo): A CounterInfo instance
             realtime                              (bool): A flag indicating that this
@@ -239,7 +200,6 @@ class PerformanceCounterWidget(object):
                                                           historical counter group
         """
         self.agent = agent
-        self.dialog = dialog
         self.obj = obj
         self.counter = counter
         self.realtime = realtime
@@ -263,10 +223,7 @@ class PerformanceCounterWidget(object):
         """
         Display information about a counter
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+      
 
         counter_name = '{0}.{1}.{2}'.format(
             self.counter.groupInfo.key,
@@ -280,12 +237,11 @@ class PerformanceCounterWidget(object):
 
 
 class PerformanceCounterGraphWidget(object):
-    def __init__(self, agent, dialog, obj, counter, realtime):
+    def __init__(self, agent, obj, counter, realtime):
         """
         Widget to plot a gnuplot(1) graph of a performance counter
         Args:
             agent                           (VConnector): A VConnector instance
-            dialog                       (dialog.Dialog): A Dialog instance
             obj                      (vim.ManagedEntity): A managed entity
             counter (vim.PerformanceManager.CounterInfo): A CounterInfo instance
             realtime                              (bool): A flag indicating that this
@@ -296,11 +252,10 @@ class PerformanceCounterGraphWidget(object):
                                                           historical counter group
         """
         self.agent = agent
-        self.dialog = dialog
         self.obj = obj
         self.counter = counter
         self.realtime = realtime
-        self.pm = self.agent.si.content.perfManager
+        self.pm = self.agent.perfManager
         self.title = '{} ({})'.format(self.obj.name, self.obj.__class__.__name__)
         self.display()
 
@@ -312,18 +267,16 @@ class PerformanceCounterGraphWidget(object):
                 stderr=subprocess.PIPE
             )
         except OSError as e:
-            self.dialog.msgbox(
-                title=self.title,
-                text='Unable to find gnuplot(1): \n{}\n'.format(e)
-            )
+        
+            print ('Unable to find gnuplot(1): \n{}\n'.format(e))
+            
             return
 
         selected_instances = self.select_counter_instances()
         if not selected_instances:
-            self.dialog.msgbox(
-                title=self.title,
-                text='No counter instances selected'
-            )
+           
+            print('No counter instances selected')
+            
             return
 
         metric_id = [
@@ -447,10 +400,9 @@ class PerformanceCounterGraphWidget(object):
         """
         Prompts the user to select counter instances
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+
+        print('Retrieving information ...')
+        
 
         if self.realtime:
             provider_summary = self.pm.QueryPerfProviderSummary(
@@ -482,10 +434,7 @@ class PerformanceCounterGraphWidget(object):
         """
         Prompts the user to select an existing historical interval
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+       
 
         intervals = [i.name for i in self.pm.historicalInterval]
         
@@ -501,10 +450,7 @@ class PerformanceCounterGraphWidget(object):
             datafile   (str): Path to a datafile to store collected samples
             script     (str): Path to a gnuplot(1) script used to plot the graph
         """
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+        
 
         provider_summary = self.pm.QueryPerfProviderSummary(
             entity=self.obj
@@ -545,19 +491,8 @@ class PerformanceCounterGraphWidget(object):
 
         while True:
             data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
-            self.save_performance_samples(
-                path=datafile,
-                data=data
-            )
-            code = self.dialog.pause(
-                title=self.title,
-                text=text.format(interval_id),
-                height=15,
-                width=60,
-                seconds=interval_id
-            )
-            if code == self.dialog.CANCEL:
-                break
+            self.save_performance_samples(path=datafile,data=data)
+            break
 
         p.terminate()
 
@@ -570,13 +505,8 @@ class PerformanceCounterGraphWidget(object):
             script     (str): Path to a gnuplot(1) script used to plot the graph
         """
         code, interval = self.select_historical_interval()
-        if code in (self.dialog.CANCEL, self.dialog.ESC) or not interval:
-            return
-
-        self.dialog.infobox(
-            title=self.title,
-            text='Retrieving information ...'
-        )
+       
+        
 
         interval_id = [i.samplingPeriod for i in self.pm.historicalInterval if i.name == interval].pop()
         query_spec = pyVmomi.vim.PerformanceManager.QuerySpec(

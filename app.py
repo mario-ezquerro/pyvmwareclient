@@ -671,9 +671,23 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
         # El 9 elemento es el UUID
-        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+        vim.VirtualMachine = conexion.searchIndex.FindByUuid(None,fila[8], True)
 
-        performance.PerformanceProviderWidget(conexion, vm)
+        for obj in vim.VirtualMachine:
+            print(obj)
+            
+
+        """object_view = conexion.viewManager.CreateContainerView(conexion.rootFolder, [], True)
+                  
+        
+        for obj in object_view.view:
+            print(obj)
+            if isinstance(obj, vim.VirtualMachine):
+                #vm.print_vm_info(obj)
+                print(obj)
+        object_view.Destroy()"""
+
+        performance.PerformanceCounterGraphWidget(conexion, vim, vim.VirtualMachine, True)
 
         
 
