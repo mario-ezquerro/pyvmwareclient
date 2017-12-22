@@ -172,6 +172,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         if not hasattr(self, "sshID"):
             self.info_vm = wx.NewId()
+            self.set_note = wx.NewId()
             self.sshID = wx.NewId()
             self.htmlID = wx.NewId()
             self.rdpID = wx.NewId()
@@ -183,6 +184,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.powerOff = wx.NewId()
             self.exitID = wx.NewId()
             self.Bind(wx.EVT_MENU, self.on_info_vm, id=self.info_vm)
+            self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
             self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
             self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
             self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
@@ -207,6 +209,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # build the menu
         self.menu = wx.Menu()
         item_info_vm = self.menu.Append(self.info_vm, "Info VM...")
+        item_set_note = self.menu.Append(self.set_note, "Set Note...")
         item_snap_menu = self.menu.Append(wx.ID_ANY,'Manager Snapshot', self.snap_menu)
         item_ssh = self.menu.Append(self.sshID, "Conexión ssh")
         item_html = self.menu.Append(self.htmlID, "Conexión html")
@@ -311,6 +314,36 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
         result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
         self.my_dialogo_texto.Destroy()
+
+   
+
+
+
+    def on_set_note(self, event):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+        # At tree elemente are the name and the nine at the UUID
+
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+
+        self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'New Note in: {0}' .format(vm.name))
+        punteromaquina = vim.vm.ConfigSpec()
+
+        # the actual file 8 is the Note
+
+        self.my_dialogo_ssh.usuario.SetValue('{0}' .format(fila[7]) )
+
+
+        result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
+        if result == wx.ID_OK:
+                punteromaquina.annotation = str( self.my_dialogo_ssh.usuario.GetValue())
+                task = vm.ReconfigVM_Task(punteromaquina)
+                tasks.wait_for_tasks(conexion, [task])
+        self.my_dialogo_ssh.Destroy()
+
+
+
 
 
     def onSnap_list(self, event):
