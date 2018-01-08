@@ -316,3 +316,212 @@ def onHtml(self, event, conexion, logger):
 
 
 
+
+def onRdp(self, event, conexion, logger):
+        if sys.platform == 'darwin':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            ruta_fichero_config = os.getcwd()
+            archConfiguracion = open('conexion.rdp', 'w')
+            archConfiguracion.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' + '\n')
+            archConfiguracion.write('<plist version="1.0">' + '\n')
+            archConfiguracion.write('<dict>' + '\n')
+            archConfiguracion.write('<key>AddToKeychain</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>ApplicationPath</key>' + '\n')
+            archConfiguracion.write('<string></string>' + '\n')
+            archConfiguracion.write('<key>AudioRedirectionMode</key>' + '\n')
+            archConfiguracion.write('<integer>0</integer>' + '\n')
+            archConfiguracion.write('<key>AuthenticateLevel</key>' + '\n')
+            archConfiguracion.write('<integer>0</integer>' + '\n')
+            archConfiguracion.write('<key>AutoReconnect</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>BitmapCaching</key>' + '\n')
+            archConfiguracion.write('<true/>' + '\n')
+            archConfiguracion.write('<key>ColorDepth</key>' + '\n')
+            archConfiguracion.write('<integer>1</integer>' + '\n')
+            archConfiguracion.write('<key>ConnectionString</key>' + '\n')
+            archConfiguracion.write('<string>' + fila[2] + '</string>' + '\n')
+            archConfiguracion.write('<key>DesktopSize</key>' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('' + '\n')
+            archConfiguracion.write('</dict>' + '\n')
+            archConfiguracion.write('</plist>' + '\n')
+            archConfiguracion.close
+            comando = 'open -a \"Remote Desktop Connection.app\" ' + ruta_fichero_config +'/conexion.rdp' + ' &'
+            os.system(comando)
+
+        if os.name == 'nt':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            comando = 'mstsc ' +'/v:'+ fila[2]
+            os.system(comando)
+
+        if os.name == 'posix':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip osea la fila 2
+            ruta_fichero_config = os.getcwd()
+            archConfiguracion = open('remminaconfig.remmina','w')
+            archConfiguracion.write('[remmina]' + '\n')
+            archConfiguracion.write('disableclipboard=0' + '\n')
+            archConfiguracion.write('ssh_auth=0' + '\n')
+            archConfiguracion.write('clientname=' + '\n')
+            archConfiguracion.write('quality=0' + '\n')
+            archConfiguracion.write('ssh_charset=' + '\n')
+            archConfiguracion.write('ssh_privatekey=' + '\n')
+            archConfiguracion.write('sharesmartcard=0' + '\n')
+            archConfiguracion.write('resolution=' + '\n')
+            archConfiguracion.write('group=' + '\n')
+            archConfiguracion.write('password=' + '\n')
+            archConfiguracion.write('name=' + fila[1] + '\n')
+            archConfiguracion.write('ssh_loopback=0' + '\n')
+            archConfiguracion.write('sharelogger.infoer=0' + '\n')
+            archConfiguracion.write('ssh_username=' + '\n')
+            archConfiguracion.write('ssh_server=' + '\n')
+            archConfiguracion.write('security=' + '\n')
+            archConfiguracion.write('protocol=RDP' + '\n')
+            archConfiguracion.write('execpath=' + '\n')
+            archConfiguracion.write('sound=off' + '\n')
+            archConfiguracion.write('exec=' + '\n')
+            archConfiguracion.write('ssh_enabled=0' + '\n')
+            archConfiguracion.write('username=' + '\n')
+            archConfiguracion.write('sharefolder=' + '\n')
+            archConfiguracion.write('console=0' + '\n')
+            archConfiguracion.write('domain=' + '\n')
+            archConfiguracion.write('server=' +fila[2] + '\n')
+            archConfiguracion.write('colordepth=24' + '\n')
+            archConfiguracion.write('window_maximize=0' + '\n')
+            archConfiguracion.write('window_height=' + '\n')
+            archConfiguracion.write('window_width=' + '\n')
+            archConfiguracion.write('viewmode=1' + '\n')
+            archConfiguracion.write('scale=1' + '\n')
+            archConfiguracion.close
+            comando = 'remmina -c ' + ruta_fichero_config +'/remminaconfig.remmina' + ' &'
+            os.system(comando)
+
+
+
+# url del VMRC https://www.vmware.com/go/download-vmrc
+
+def onsoftreboot(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        #Pedimos confirmacion del reset de la mv con ventana dialogo
+        dlg_reset = wx.MessageDialog(self,
+                                     "Estas a punto de reiniciar \n " + fila[1] + " ",
+                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg_reset.ShowModal()
+        dlg_reset.Destroy()
+
+        if result == wx.ID_OK:
+            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+            if  vm  is not None:
+
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                TASK = vm.RebootGuest()
+                #Este da error tasks.wait_for_tasks(conexion, [TASK])
+                if logger != None: logger.info("Soft reboot its done.")
+
+
+def onsoftPowerOff(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        #Pedimos confirmacion del reset de la mv con ventana dialogo
+        dlg_reset = wx.MessageDialog(self,
+                                     "Estas a punto de Soft Apagar \n " + fila[1] + " ",
+                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg_reset.ShowModal()
+        dlg_reset.Destroy()
+
+        if result == wx.ID_OK:
+            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+            if  vm  is not None:
+
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                TASK = vm.ShutdownGuest()
+                #Este da error tasks.wait_for_tasks(conexion, [TASK])
+                if logger != None: logger.info("Soft poweroff its done.")
+
+
+    # Reiniciamos el ordenador seleccionado en el menu contextual
+def onreboot(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        #Pedimos confirmacion del reset de la mv con ventana dialogo
+        dlg_reset = wx.MessageDialog(self,
+                                     "Estas a punto de reiniciar \n " + fila[1] + " ",
+                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg_reset.ShowModal()
+        dlg_reset.Destroy()
+
+        if result == wx.ID_OK:
+            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+            if  vm  is not None:
+
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                TASK = vm.ResetVM_Task()
+                tasks.wait_for_tasks(conexion, [TASK])
+                if logger != None: logger.info("reboot its done.")
+
+def onpower_on(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        #Pedimos confirmacion del poweron de la mv con ventana dialogo
+        dlg_reset = wx.MessageDialog(self,
+                                     "Estas a punto de iniciar \n " + fila[1] + "\nAhora esta:  " + fila[3],
+                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg_reset.ShowModal()
+        dlg_reset.Destroy()
+
+        if result == wx.ID_OK:
+            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+            if  vm  is not None and not vm.runtime.powerState == 'poweredOn':
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                TASK = vm.PowerOn()
+                tasks.wait_for_tasks(conexion, [TASK])
+                if logger != None: logger.info("Power ON  its done.")
+
+
+def onpowerOff(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        #Pedimos confirmacion del reset de la mv con ventana dialogo
+        dlg_reset = wx.MessageDialog(self,
+                                     "Estas a punto de Apagar \n " + fila[1] + " ",
+                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        result = dlg_reset.ShowModal()
+        dlg_reset.Destroy()
+
+        if result == wx.ID_OK:
+            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+            if  vm  is not None and not vm.runtime.powerState == 'poweredOff':
+                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
+                TASK = vm.PowerOff()
+                tasks.wait_for_tasks(conexion, [TASK])
+                if logger != None: logger.info("Power OFF its done.")
+
+
+
