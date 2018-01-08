@@ -276,25 +276,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         
 
     def onpower_on(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        #Pedimos confirmacion del poweron de la mv con ventana dialogo
-        dlg_reset = wx.MessageDialog(self,
-                                     "Estas a punto de iniciar \n " + fila[1] + "\nAhora esta:  " + fila[3],
-                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()
-
-        if result == wx.ID_OK:
-            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-            if  vm  is not None and not vm.runtime.powerState == 'poweredOn':
-                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
-                TASK = vm.PowerOn()
-                tasks.wait_for_tasks(conexion, [TASK])
-                if logger != None: logger.info("Power ON  its done.")
+        action_vm.onpower_on(self, event, conexion, logger)
+        
+        
 
     def onpowerOff(self, event):
         fila = self.listadoVM
