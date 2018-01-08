@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
+import sys
+import os
 import wx
 import logging.config
 from wxgladegen import dialogos
@@ -224,6 +226,34 @@ def onSnap_create(self, event, conexion, logger):
 
         result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
         self.my_dialogo_texto.Destroy()
+
+
+def onSsh(self, event, conexion, logger):
+        if sys.platform == 'darwin':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+            self.my_dialogo_ssh.usuario.SetValue('root' )
+            result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
+            if result == wx.ID_OK:
+                comando = 'ssh ' + fila[2] +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                os.system(comando)
+            self.my_dialogo_ssh.Destroy()
+
+        if os.name == 'nt' or os.name == 'posix':
+            fila = self.listadoVM
+            for i in range(len(fila)):
+                if logger != None: logger.info(fila[i])
+            # El tercer elemento es la ip es decier la fila[2]
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+            self.my_dialogo_ssh.usuario.SetValue('root')
+            result = self.my_dialogo_ssh.ShowModal()  # pintamos la ventan con la informcion
+            if result == wx.ID_OK:
+                comando = 'putty ' + fila[2] + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                os.system(comando)
+            self.my_dialogo_ssh.Destroy()
 
 
 

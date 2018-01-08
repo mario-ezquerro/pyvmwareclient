@@ -237,49 +237,18 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def on_info(self, event):
         action_vm.on_info_vm(self, event, conexion, logger)
  
-
-
     def on_set_note(self, event):
         action_vm.on_set_note(self, event, conexion, logger)
  
-
-
     def onSnap_list(self, event):
         action_vm.onSnap_list(self, event, conexion, logger)
-
         
-
     def onSnap_create(self, event):
         action_vm.onSnap_create(self, event, conexion, logger)
 
 
-
     def onSsh(self, event):
-        if sys.platform == 'darwin':
-            fila = self.listadoVM
-            for i in range(len(fila)):
-                if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
-            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-            self.my_dialogo_ssh.usuario.SetValue('root' )
-            result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
-            if result == wx.ID_OK:
-                comando = 'ssh ' + fila[2] +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
-                os.system(comando)
-            self.my_dialogo_ssh.Destroy()
-
-        if os.name == 'nt' or os.name == 'posix':
-            fila = self.listadoVM
-            for i in range(len(fila)):
-                if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
-            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-            self.my_dialogo_ssh.usuario.SetValue('root')
-            result = self.my_dialogo_ssh.ShowModal()  # pintamos la ventan con la informcion
-            if result == wx.ID_OK:
-                comando = 'putty ' + fila[2] + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
-                os.system(comando)
-            self.my_dialogo_ssh.Destroy()
+         action_vm.onSsh(self, event, conexion, logger)
 
 
 
