@@ -7,6 +7,7 @@ import atexit
 import ssl
 import os
 import re
+import time
 import OpenSSL
 import webbrowser
 import logging.config
@@ -18,6 +19,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
 from tools import vm
 from pyVmomi import vim
+from menu_action import action_vm
 #from tools import virtual_machine_device_info as vminfo
 
 
@@ -183,7 +185,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.powerOn = wx.NewId()
             self.powerOff = wx.NewId()
             self.exitID = wx.NewId()
-            self.Bind(wx.EVT_MENU, self.on_info_vm, id=self.info_vm)
+            self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
             self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
             self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
             self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
@@ -232,9 +234,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     #########Evetnto del menu de contexto sobre maquina VM ######
 
 
+    def on_info(self, event):
+        action_vm.on_info_vm(self, event, conexion, logger)
 
-
-    def on_info_vm(self, event):
+    """def on_info_vm(self, event):
         fila = self.listadoVM
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
@@ -313,7 +316,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         snaptexto += "====================="
         self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
         result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
-        self.my_dialogo_texto.Destroy()
+        self.my_dialogo_texto.Destroy()"""
 
    
 
@@ -412,7 +415,14 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if  vm  is not None:
                 if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = task = vm.CreateSnapshot_Task(nombre, description = descricion, memory=checkbox_memory, quiesce=checkbox_quiesce)
-                tasks.wait_for_tasks(conexion, [TASK])
+                #contador de tareas
+                count = 0
+                #state_task= task.info.state
+                while task.info.state != vim.TaskInfo.State.success:
+                    if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
+                    count += 1
+
+                #tasks.wait_for_tasks(conexion, [TASK])
                 if logger != None: logger.info("Snapshot Completed.")
 
         #listado de snapshot en una ventana emergente
