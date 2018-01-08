@@ -251,7 +251,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
          action_vm.onSsh(self, event, conexion, logger)
 
 
-
     def onHtml(self, event):
         action_vm.onHtml(self, event, conexion, logger)
         
@@ -259,9 +258,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onRdp(self, event):
         action_vm.onRdp(self, event, conexion, logger)        
 
-
-
-# url del VMRC https://www.vmware.com/go/download-vmrc
 
     def onsoftreboot(self, event):
         action_vm.onsoftreboot(self, event, conexion, logger)
@@ -277,29 +273,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def onpower_on(self, event):
         action_vm.onpower_on(self, event, conexion, logger)
-        
-        
+                
 
     def onpowerOff(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        #Pedimos confirmacion del reset de la mv con ventana dialogo
-        dlg_reset = wx.MessageDialog(self,
-                                     "Estas a punto de Apagar \n " + fila[1] + " ",
-                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()
-
-        if result == wx.ID_OK:
-            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-            if  vm  is not None and not vm.runtime.powerState == 'poweredOff':
-                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
-                TASK = vm.PowerOff()
-                tasks.wait_for_tasks(conexion, [TASK])
-                if logger != None: logger.info("Power OFF its done.")
+        action_vm.onpowerOff(self, event, conexion, logger)
+        
 
     def onExit(self, event):
         """
