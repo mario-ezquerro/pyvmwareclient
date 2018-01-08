@@ -253,59 +253,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
 
     def onHtml(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El tercer elemento es la ip y el 9 es el UUID
-        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-        vm_name = vm.summary.config.name
-        vm_moid = vm._moId
-        if logger != None: logger.info('void= '.format(vm_moid))
-        vcenter_data = conexion.setting
-        vcenter_settings = vcenter_data.setting
-        console_port = '9443'
-        puerto_vcenter= '443'
-
-        for item in vcenter_settings:
-            key = getattr(item, 'key')
-            #print ('key: ' + key + ' =>'+ str(getattr(item, 'value')))
-            if key == 'VirtualCenter.FQDN':
-                vcenter_fqdn = getattr(item, 'value')
-                #if key == 'WebService.Ports.https':
-                #console_port = str(getattr(item, 'value'))
-
-        host = vcenter_fqdn
-
-        session_manager = conexion.sessionManager
-        session = session_manager.AcquireCloneTicket()
-        vc_cert = ssl.get_server_certificate((host, int(puerto_vcenter)))
-        vc_pem = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM,vc_cert)
-        vc_fingerprint = vc_pem.digest('sha1')
-
-        if logger != None: logger.info("Open the following URL in your browser to access the " \
-                                       "Remote Console.\n" \
-                                       "You have 60 seconds to open the URL, or the session" \
-                                       "will be terminated.\n")
-        print(str(vcenter_data))
-
-        # Locate the version of vcenter the object .version for locate the version of vcenter
-        object_about = conexion.about
-        #For version vcenter 5.5
-        if object_about.version == '5.5.0':
-            console_portv5 = '7331'
-            URL5 = "http://" + host + ":" + console_portv5 + "/console/?vmId=" \
-                   + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
-                   + "&sessionTicket=" + session + "&thumbprint=" + vc_fingerprint.decode('utf8')
-            webbrowser.open(URL5, new=1, autoraise=True)
-
-        #For version vcenter 6.0 and 6.5
-        if object_about.version == '6.0.0' or object_about.version == '6.5.0':
-            URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
-                  + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
-                  + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
-            if logger != None: logger.info(URL)
-            webbrowser.open(URL, new=1, autoraise=True)
-            if logger != None: logger.info ("Waiting for 60 seconds, then exit")
+        action_vm.onHtml(self, event, conexion, logger)
+        
 
 
     def onRdp(self, event):
