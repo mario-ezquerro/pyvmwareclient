@@ -264,48 +264,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 # url del VMRC https://www.vmware.com/go/download-vmrc
 
     def onsoftreboot(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        #Pedimos confirmacion del reset de la mv con ventana dialogo
-        dlg_reset = wx.MessageDialog(self,
-                                     "Estas a punto de reiniciar \n " + fila[1] + " ",
-                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()
+        action_vm.onsoftreboot(self, event, conexion, logger)
 
-        if result == wx.ID_OK:
-            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-            if  vm  is not None:
-
-                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
-                TASK = vm.RebootGuest()
-                #Este da error tasks.wait_for_tasks(conexion, [TASK])
-                if logger != None: logger.info("Soft reboot its done.")
 
     def onsoftPowerOff(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        #Pedimos confirmacion del reset de la mv con ventana dialogo
-        dlg_reset = wx.MessageDialog(self,
-                                     "Estas a punto de Soft Apagar \n " + fila[1] + " ",
-                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()
-
-        if result == wx.ID_OK:
-            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-            if  vm  is not None:
-
-                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
-                TASK = vm.ShutdownGuest()
-                #Este da error tasks.wait_for_tasks(conexion, [TASK])
-                if logger != None: logger.info("Soft poweroff its done.")
+        action_vm.onsoftPowerOff(self, event, conexion, logger)
 
     # Reiniciamos el ordenador seleccionado en el menu contextual
     def onreboot(self, event):
