@@ -272,26 +272,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     # Reiniciamos el ordenador seleccionado en el menu contextual
     def onreboot(self, event):
-        fila = self.listadoVM
-        for i in range(len(fila)):
-            if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        #Pedimos confirmacion del reset de la mv con ventana dialogo
-        dlg_reset = wx.MessageDialog(self,
-                                     "Estas a punto de reiniciar \n " + fila[1] + " ",
-                                     "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()
-
-        if result == wx.ID_OK:
-            vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
-            if  vm  is not None:
-
-                if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
-                TASK = vm.ResetVM_Task()
-                tasks.wait_for_tasks(conexion, [TASK])
-                if logger != None: logger.info("reboot its done.")
+        action_vm.onreboot(self, event, conexion, logger)
+        
 
     def onpower_on(self, event):
         fila = self.listadoVM
