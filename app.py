@@ -246,39 +246,30 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def onSnap_create(self, event):
         action_vm.onSnap_create(self, event, conexion, logger)
 
-
     def onSsh(self, event):
          action_vm.onSsh(self, event, conexion, logger)
-
 
     def onHtml(self, event):
         action_vm.onHtml(self, event, conexion, logger)
         
-
     def onRdp(self, event):
         action_vm.onRdp(self, event, conexion, logger)        
-
 
     def onsoftreboot(self, event):
         action_vm.onsoftreboot(self, event, conexion, logger)
 
-
     def onsoftPowerOff(self, event):
         action_vm.onsoftPowerOff(self, event, conexion, logger)
 
-    # Reiniciamos el ordenador seleccionado en el menu contextual
     def onreboot(self, event):
         action_vm.onreboot(self, event, conexion, logger)
         
-
     def onpower_on(self, event):
-        action_vm.onpower_on(self, event, conexion, logger)
-                
+        action_vm.onpower_on(self, event, conexion, logger)              
 
     def onpowerOff(self, event):
         action_vm.onpowerOff(self, event, conexion, logger)
         
-
     def onExit(self, event):
         """
         Exit program

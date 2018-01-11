@@ -1,6 +1,11 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
+"""
+Actions to maque the menu
+
+"""
+
 import sys
 import os
 import wx
@@ -13,8 +18,21 @@ from pyVmomi import vim
 
 __author__ = "Mario Ezquerro."
 
+__all__ = [
+    'on_info_vm', 'on_set_note', 'onSnap_list', 
+    'onSnap_create', 'onSsh', 'onHtml',
+    'onRdp', 'onsoftreboot', 'onsoftPowerOff', 
+    'onreboot', 'onpower_on', 'onpowerOff',
+]
+
 
 def on_info_vm(self, event, conexion, logger):
+        """
+        Arg:
+            event       (Var from menu)
+            conexion    (Var whit a conexion datacenter)
+            logger      (Var objet to pass the log)
+        """
         fila = self.listadoVM
         print (self, event, conexion)
         for i in range(len(fila)):
