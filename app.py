@@ -11,6 +11,7 @@ import time
 import OpenSSL
 import webbrowser
 import logging.config
+import humanize
 # import argparse
 import sys
 import wx.lib.inspection
@@ -84,6 +85,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
+
+        locatehost(conexion)
 
         # tools for search an debug (to use uncomment the next line, works only linux)
         # wx.lib.inspection.InspectionTool().Show()
@@ -388,9 +391,71 @@ def conectar_con_vcenter():
            else:
                dlgDialogo.OnDisConnect()
 
+# ----------------------------------------------------------------------
+# Locate list on host
+# ----------------------------------------------------------------------
+def locatehost(conexion):
+
+    
+    printHost = True
+
+    for datacenter in conexion.rootFolder.childEntity:
+            print ("##################################################")
+            print ("##################################################")
+            print ("### datacenter : " + datacenter.name)
+            print ("##################################################")
+
+            if printHost:
+                if hasattr(datacenter.vmFolder, 'childEntity'):
+                    hostFolder = datacenter.hostFolder
+                    computeResourceList = hostFolder.childEntity
+                    for computeResource in computeResourceList:
+                        printComputeResourceInformation(computeResource)
+
+def printComputeResourceInformation(computeResource):
+    try:
+        hostList = computeResource.host
+        print ("##################################################")
+        print ("Compute resource name: ", computeResource.name)
+        print ("##################################################")
+        for host in hostList:
+            printHostInformation(host)
+    except Exception as error:
+        print ("Unable to access information for compute resource: ", computeResource.name)
+        print (error)
+        pass
+
+def printHostInformation(host):
+    
+    MBFACTOR = float(1 << 20)
+
+    try:
+        summary = host.summary
+        stats = summary.quickStats
+        hardware = host.hardware
+        cpuUsage = stats.overallCpuUsage
+        memoryCapacity = hardware.memorySize
+        memoryCapacityInMB = hardware.memorySize/MBFACTOR
+        memoryUsage = stats.overallMemoryUsage
+        freeMemoryPercentage = 100 - (
+            (float(memoryUsage) / memoryCapacityInMB) * 100
+        )
+        print ("--------------------------------------------------")
+        print ("Host name: ", host.name)
+        print ("Host CPU usage: ", cpuUsage)
+        print ("Host memory capacity: ", humanize.naturalsize(memoryCapacity, binary=True))
+        print ("Host memory usage: ", memoryUsage / 1024, "GiB")
+        print ("Free memory percentage: " + str(freeMemoryPercentage) + "%")
+        print ("--------------------------------------------------")
+    except Exception as error:
+        print ("Unable to access information for host: ", host.name)
+        print (error)
+        pass
+
 
 # ----------------------------------------------------------------------
-# Sacar listado carpetas
+# Locate info about Machine MV
+# ----------------------------------------------------------------------
 
 def sacar_listado_capertas(conexion):
     listado_carpetas = []
