@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Actions to maque the menu
+Actions to make at the menu
 
 """
 

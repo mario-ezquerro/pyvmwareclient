@@ -46,10 +46,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # self.Bind(wx.EVT_BUTTON, self.OnSelectFont, btn)
 
         self.list_ctrl = theListCtrl(self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES | wx.SUNKEN_BORDER)
-        st1 = wx.StaticText(self, label=' Cadena Busqueda')
+        st1 = wx.StaticText(self, label='Find String VM: ')
         self.cadenaBusqueda = wx.TextCtrl(self)
-        btnbusqueda = wx.Button(self, label="Buscar")
-        btnrecargaVM = wx.Button(self, label="Actualizar VM")
+        btnbusqueda = wx.Button(self, label="Find")
+        btnrecargaVM = wx.Button(self, label="Update VM")
+        btnhost = wx.Button(self, label="host")
 
         name_rows = ['Carpeta', 'Nombre', 'IP', 'Estado', 'pregunta', 'Disco Path', 'Sistema', 'Notas', 'uuid']
 
@@ -78,19 +79,24 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         hbox1.Add(self.cadenaBusqueda, wx.ALL | wx.ALIGN_CENTER, 5)
         hbox1.Add(btnbusqueda, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btnrecargaVM, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btnhost, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(txtcontador, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
         self.Bind(wx.EVT_BUTTON, self.busquedadatos, btnbusqueda)
         self.Bind(wx.EVT_BUTTON, self.recarga_VM, btnrecargaVM)
+        self.Bind(wx.EVT_BUTTON, self.bntlocateHost, btnhost)
 
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         self.SetSizer(sizer)
 
-        locatehost(conexion)
+        #Call to function for locate the esxi
+        
 
         # tools for search an debug (to use uncomment the next line, works only linux)
         # wx.lib.inspection.InspectionTool().Show()
 
+    def bntlocateHost(self, event):
+        locatehost(conexion)
     # ----------------------------------------------------------------------
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
@@ -396,61 +402,78 @@ def conectar_con_vcenter():
 # ----------------------------------------------------------------------
 def locatehost(conexion):
 
-    
-    printHost = True
+    MBFACTOR = float(1 << 20)
+    index = 0
+
+    my_dialogo_host = dialogos.Dialogo_host(None, -1, 'Host en vcenter')
+    name_rows = ['Data center', 'Resorce Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
+    # cargamos los nombres de los elementos
+    for i in range(len(name_rows)):
+        my_dialogo_host.list_ctrl_host.InsertColumn(i, name_rows[i])
 
     for datacenter in conexion.rootFolder.childEntity:
-            print ("##################################################")
-            print ("##################################################")
-            print ("### datacenter : " + datacenter.name)
-            print ("##################################################")
-
-            if printHost:
-                if hasattr(datacenter.vmFolder, 'childEntity'):
+            #print ("##################################################")
+            #print ("##################################################")
+            #print ("### datacenter : " + datacenter.name)
+            #print ("##################################################")
+      
+            if hasattr(datacenter.vmFolder, 'childEntity'):
+         
                     hostFolder = datacenter.hostFolder
                     computeResourceList = hostFolder.childEntity
+                    
                     for computeResource in computeResourceList:
-                        printComputeResourceInformation(computeResource)
+                        hostList = computeResource.host
+                        for host in hostList:
 
-def printComputeResourceInformation(computeResource):
+                            summary = host.summary
+                            stats = summary.quickStats
+                            hardware = host.hardware
+                            cpuUsage = stats.overallCpuUsage
+                            memoryCapacity = hardware.memorySize
+                            memoryCapacityInMB = hardware.memorySize/MBFACTOR
+                            memoryUsage = stats.overallMemoryUsage
+                            freeMemoryPercentage = 100 - ((float(memoryUsage) / memoryCapacityInMB) * 100)
+
+                            #print ("--------------------------------------------------")
+                            #print ("Host name: ", host.name)
+                            #print ("Host CPU usage: ", cpuUsage)
+                            #print ("Host memory capacity: ", humanize.naturalsize(memoryCapacity, binary=True))
+                            #print ("Host memory usage: ", memoryUsage / 1024, "GiB")
+                            #print ("Free memory percentage: " + str(freeMemoryPercentage) + "%")
+                            #print ("--------------------------------------------------")
+
+                            my_dialogo_host.list_ctrl_host.InsertItem(index, datacenter.name)
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 1, str(computeResource.name))
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 2, str(host.name))
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 3, str(cpuUsage))
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 4, str(humanize.naturalsize(memoryCapacity, binary=True)))
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 5, str(memoryUsage / 1024) + " GiB")
+                            my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
+                            index += 1              
+
+    my_dialogo_host.ShowModal()
+
+
+
+def printComputeResourceInformation(computeResource, my_dialogo_host, index):
     try:
         hostList = computeResource.host
         print ("##################################################")
         print ("Compute resource name: ", computeResource.name)
         print ("##################################################")
-        for host in hostList:
-            printHostInformation(host)
+        
+        
+        
+        
+
+        
+
     except Exception as error:
         print ("Unable to access information for compute resource: ", computeResource.name)
         print (error)
         pass
 
-def printHostInformation(host):
-    
-    MBFACTOR = float(1 << 20)
-
-    try:
-        summary = host.summary
-        stats = summary.quickStats
-        hardware = host.hardware
-        cpuUsage = stats.overallCpuUsage
-        memoryCapacity = hardware.memorySize
-        memoryCapacityInMB = hardware.memorySize/MBFACTOR
-        memoryUsage = stats.overallMemoryUsage
-        freeMemoryPercentage = 100 - (
-            (float(memoryUsage) / memoryCapacityInMB) * 100
-        )
-        print ("--------------------------------------------------")
-        print ("Host name: ", host.name)
-        print ("Host CPU usage: ", cpuUsage)
-        print ("Host memory capacity: ", humanize.naturalsize(memoryCapacity, binary=True))
-        print ("Host memory usage: ", memoryUsage / 1024, "GiB")
-        print ("Free memory percentage: " + str(freeMemoryPercentage) + "%")
-        print ("--------------------------------------------------")
-    except Exception as error:
-        print ("Unable to access information for host: ", host.name)
-        print (error)
-        pass
 
 
 # ----------------------------------------------------------------------
