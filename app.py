@@ -411,11 +411,34 @@ def locatehost(conexion):
     for i in range(len(name_rows)):
         my_dialogo_host.list_ctrl_host.InsertColumn(i, name_rows[i])
 
+    #Calculamos el maximo de elementos a analizar
+    max = 0
+    for datacenter in conexion.rootFolder.childEntity:
+        max += 1
+        if hasattr(datacenter.vmFolder, 'childEntity'):
+            hostFolder = datacenter.hostFolder
+            computeResourceList = hostFolder.childEntity
+            for computeResource in computeResourceList:
+                max += 1
+                hostList = computeResource.host
+                max = max + len(hostList)
+    if logger != None: logger.info('el maximo es : {}'.format(max))
+    
+    keepGoing = True
+    count = 0
+    dlg = wx.ProgressDialog("Proceso cargando datos",
+                            "Cargando datos",
+                            maximum = max, )
+    keepGoing = dlg.Update(count)
+
+
     for datacenter in conexion.rootFolder.childEntity:
             #print ("##################################################")
             #print ("##################################################")
             #print ("### datacenter : " + datacenter.name)
             #print ("##################################################")
+            count += 1
+            keepGoing = dlg.Update(count, "Loading")
       
             if hasattr(datacenter.vmFolder, 'childEntity'):
          
@@ -423,8 +446,12 @@ def locatehost(conexion):
                     computeResourceList = hostFolder.childEntity
                     
                     for computeResource in computeResourceList:
+                        count += 1
+                        keepGoing = dlg.Update(count, "Loading")
                         hostList = computeResource.host
                         for host in hostList:
+                            count += 1
+                            keepGoing = dlg.Update(count, "Loading")
 
                             summary = host.summary
                             stats = summary.quickStats
@@ -452,6 +479,7 @@ def locatehost(conexion):
                             my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
                             index += 1              
 
+    dlg.Destroy()
     my_dialogo_host.ShowModal()
 
 
