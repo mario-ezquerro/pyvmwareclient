@@ -479,6 +479,9 @@ def locatehost(conexion):
                             my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
                             index += 1              
 
+    # para la ordenacion--- llama a Getlistctrl  
+    listmix.ColumnSorterMixin.__init__(len(name_rows))
+
     dlg.Destroy()
     my_dialogo_host.ShowModal()
 
