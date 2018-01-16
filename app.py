@@ -65,13 +65,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.cargardatos_en_listctrl(self.tabla)
 
-        # para la ordenacion--- llama a Getlistctrl
+        # For use to auto-orden --- Call to Getlistctrl
         self.itemDataMap = self.tabla
         listmix.ColumnSorterMixin.__init__(self, len(name_rows))
+
+        # Add menu to Click element in VM 
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.list_ctrl)
         # self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
 
-        # Metemos las cosas en le ventana en orden
+        # This code put items into window with orden.
         txtcontador = wx.StaticText(self, label='total VM: ' + str(len(self.tabla)))
         sizer = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -132,8 +134,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             print(obj)
             if isinstance(obj, vim.VirtualMachine):
                 vm.print_vm_info(obj)"""
-        print (object_about)
-        print(object_about.version)
+        #print (object_about)
+        #print(object_about.version)
 
         object_view = conexion.viewManager.CreateContainerView(conexion.rootFolder, [], True)
         for obj in object_view.view:
@@ -155,15 +157,16 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def cargardatos_en_listctrl(self, _tabla_paracargar):
         # cargamos las busquedas en el listado de tablas.
-        self.myRowDict = {}
+        #self.myRowDict = {}
         index = 0
         for elemen in _tabla_paracargar:
             self.list_ctrl.InsertItem(index, elemen[0])
             total_elemen = len(elemen)
             for i in range(total_elemen):
-                self.list_ctrl.SetItem(index, i, elemen[i])
+                self.list_ctrl.SetItem(index, i, str(elemen[i]))
+            # the nex line is for work the auto list
             self.list_ctrl.SetItemData(index, index)
-            self.myRowDict[index] = elemen
+            #self.myRowDict[index] = elemen
             index += 1
 
 
@@ -477,33 +480,14 @@ def locatehost(conexion):
                             my_dialogo_host.list_ctrl_host.SetItem(index, 4, str(humanize.naturalsize(memoryCapacity, binary=True)))
                             my_dialogo_host.list_ctrl_host.SetItem(index, 5, str(memoryUsage / 1024) + " GiB")
                             my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
+                            #for use to auto use for auto sort colum
+                            my_dialogo_host.list_ctrl_host.SetItemData(index, index)
                             index += 1              
-
-    # para la ordenacion--- llama a Getlistctrl  
-    listmix.ColumnSorterMixin.__init__(len(name_rows))
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
 
 
-
-def printComputeResourceInformation(computeResource, my_dialogo_host, index):
-    try:
-        hostList = computeResource.host
-        print ("##################################################")
-        print ("Compute resource name: ", computeResource.name)
-        print ("##################################################")
-        
-        
-        
-        
-
-        
-
-    except Exception as error:
-        print ("Unable to access information for compute resource: ", computeResource.name)
-        print (error)
-        pass
 
 
 
@@ -664,8 +648,8 @@ if __name__ == "__main__":
         # create logger
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
-      # logger.getLogger(__name__)
-      # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
+        # logger.getLogger(__name__)
+        # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
 
 
     app = wx.App(False)
