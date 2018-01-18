@@ -125,9 +125,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.tabla = []
         self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
-
-
-
         #sacar datos acerca de vcenter.
         object_about = conexion.about
         """for obj in object_view.view:
@@ -409,7 +406,7 @@ def locatehost(conexion):
     index = 0
 
     my_dialogo_host = dialogos.Dialogo_host(None, -1, 'Host en vcenter')
-    name_rows = ['Data center', 'Resorce Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
+    name_rows = ['Data center', 'Resource Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
     # cargamos los nombres de los elementos
     for i in range(len(name_rows)):
         my_dialogo_host.list_ctrl_host.InsertColumn(i, name_rows[i])
@@ -482,13 +479,13 @@ def locatehost(conexion):
                             my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
                             #for use to auto use for auto sort colum
                             my_dialogo_host.list_ctrl_host.SetItemData(index, index)
-                            index += 1              
+                            index += 1
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
-
-
-
+    # For use to auto-orden --- Call to Getlistctrl
+    #self.itemDataMap = self.tabla
+    #my_dialogo_host.list_ctrl_host.ColumnSorterMixin.__init__(self, len(name_rows))
 
 
 # ----------------------------------------------------------------------
