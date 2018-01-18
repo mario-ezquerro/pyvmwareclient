@@ -21,7 +21,7 @@ from tools import tasks
 from tools import vm
 from pyVmomi import vim
 from menu_action import action_vm
-#from tools import virtual_machine_device_info as vminfo
+
 
 
 class theListCtrl(wx.ListCtrl):
@@ -31,7 +31,7 @@ class theListCtrl(wx.ListCtrl):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
 
 
-########################################################################
+
 
 
 
@@ -168,7 +168,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
 
 
-    # Cuando selecionamos una fila activamos el menu de contexto##############
+    # Prepare menu about dialog click over VM machine in list ##############
     def onItemSelected(self, event):
 
         #localizamos el elemento seleccionado en el listado ordenado , y cargamos la fila
@@ -240,7 +240,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.PopupMenu(self.menu)
         self.menu.Destroy()
 
-    #########Evetnto del menu de contexto sobre maquina VM ######
+    #########ADD the command to the events in the display dilog ######
 
 
     def on_info(self, event):
@@ -301,7 +301,7 @@ class MyFrame(wx.Frame):
         # ----------------------------------------------------------------------
 
 
-# ######Pantalla para el Dialogo de acceso a vcenter######################
+# ######Display data for connet whit esxi an vcenter ######################
 
 class DialogAcceso():
     def __init__(self):
@@ -379,6 +379,9 @@ class DialogAcceso():
 # ----------------------------------------------------------------------
 # connect with Vcenter code and Dialog
 def conectar_con_vcenter():
+        '''
+            Present a dialog box to get the datas for conect to esxi or vcenter
+        '''
 
        dlgDialogo = DialogAcceso()
 
@@ -401,6 +404,10 @@ def conectar_con_vcenter():
 # Locate list on host
 # ----------------------------------------------------------------------
 def locatehost(conexion):
+    '''
+        Locate all host an  info about memory, CPU usasge an other
+        Need a conexion active to datecenter to locate data
+    '''
 
     MBFACTOR = float(1 << 20)
     index = 0
@@ -411,7 +418,7 @@ def locatehost(conexion):
     for i in range(len(name_rows)):
         my_dialogo_host.list_ctrl_host.InsertColumn(i, name_rows[i])
 
-    #Calculamos el maximo de elementos a analizar
+    #Find the all items host to checking
     max = 0
     for datacenter in conexion.rootFolder.childEntity:
         max += 1
@@ -433,10 +440,6 @@ def locatehost(conexion):
 
 
     for datacenter in conexion.rootFolder.childEntity:
-            #print ("##################################################")
-            #print ("##################################################")
-            #print ("### datacenter : " + datacenter.name)
-            #print ("##################################################")
             count += 1
             keepGoing = dlg.Update(count, "Loading")
       
