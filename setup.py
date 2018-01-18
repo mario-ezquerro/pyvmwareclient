@@ -10,7 +10,7 @@ import os.path
 from cx_Freeze import setup, Executable
 
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
-                                'packages': ['idna', 'cryptography', 'cffi'],
+                                'packages': ['idna', 'cryptography', 'cffi','humanize'],
                                 'includes': [],
                                 'excludes': []
                                 },
@@ -34,7 +34,7 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.06',
+      version='0.3.10',
       description='Client for Vcenter 6.0/6.5 VMware en python',
       options=build_options,
       maintainer="Mario Ezquerro",
