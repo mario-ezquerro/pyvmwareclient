@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
-# Usar python  en Macos
+# Usar python  en Macos bdist_dmg
 # Or in python setup.py bdist_rpm y en windows bdist_msi
 
 import sys
@@ -10,7 +10,7 @@ import os.path
 from cx_Freeze import setup, Executable
 
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
-                                'packages': ['idna', 'cryptography', 'cffi','humanize'],
+                                'packages': ['idna', 'cryptography', 'cffi','humanize','OpenSSL','webbrowser'],
                                 'includes': [],
                                 'excludes': []
                                 },

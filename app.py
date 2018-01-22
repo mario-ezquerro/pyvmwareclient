@@ -3,6 +3,7 @@
 
 import wx
 import wx.lib.mixins.listctrl as listmix
+import wx.lib.inspection
 import atexit
 import ssl
 import os
@@ -12,7 +13,6 @@ import OpenSSL
 import webbrowser
 import logging.config
 import humanize
-# import argparse
 import sys
 import wx.lib.inspection
 from wxgladegen import dialogos
@@ -20,6 +20,8 @@ from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
 from tools import vm
 from pyVmomi import vim
+from pyVim.connect import SmartConnect, Disconnect
+from wxgladegen import dialogos
 from menu_action import action_vm
 
 
@@ -364,7 +366,7 @@ class DialogAcceso():
 
 
     def OnDisConnect(self):
-        if logger != None: logger.info('desconecion')
+        if logger != None: logger.info('desconecction')
         dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?',
                                'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         # wx.MessageDialog()
@@ -639,18 +641,16 @@ if __name__ == "__main__":
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
     #parser.add_argument('--d', action="store_true", help='imprimir informacion  debug')
     #args     =    parser.parse_args()
+
     # Use logger to control the activate log.
     logger = None
     #read inital config file
-    # log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logging.conf')
-    if os.name == 'posix':
-        logging.config.fileConfig('logging.conf')
-        # create logger
-        logger = logging.getLogger('pyvmwareclient')
-        logger.info("# Start here a new loggin now")
-        # logger.getLogger(__name__)
-        # logger.basicConfig(filename='pyVMwareClient.log',format='%(asctime)s %(name)-5s %(levelname)-5s %(message)s', level=logger.DEBUG)
 
+    if os.name == 'posix':
+        #logging.config.fileConfig('logging.conf')
+        #logger = logging.getLogger('pyvmwareclient')
+        #logger.info("# Start here a new loggin now")
+        pass
 
     app = wx.App(False)
     conexion = conectar_con_vcenter()

@@ -1,9 +1,10 @@
 #!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 # Use http://sveinbjorn.org/platypus
+# python3.5 setup_mac.py  py2app usar el otroooo
 
-from setuptools import setup
-#from distutils.core import setup
+#from setuptools import setup
+from distutils.core import setup
 import py2app
 
 APP = ['app.py']
