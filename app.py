@@ -379,13 +379,13 @@ class DialogAcceso():
 # ----------------------------------------------------------------------
 # connect with Vcenter code and Dialog
 def conectar_con_vcenter():
-        '''
+        """
             Present a dialog box to get the datas for conect to esxi or vcenter
-        '''
+        """
 
-       dlgDialogo = DialogAcceso()
+        dlgDialogo = DialogAcceso()
 
-       while not dlgDialogo.si:
+        while not dlgDialogo.si:
            result = dlgDialogo.my_dialog_acceso_vcenter.ShowModal()
            if result == wx.ID_OK:
                dlgDialogo.OnConnect()
@@ -404,10 +404,10 @@ def conectar_con_vcenter():
 # Locate list on host
 # ----------------------------------------------------------------------
 def locatehost(conexion):
-    '''
+    """
         Locate all host an  info about memory, CPU usasge an other
         Need a conexion active to datecenter to locate data
-    '''
+    """
 
     MBFACTOR = float(1 << 20)
     index = 0
