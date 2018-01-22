@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
-# Usar python setup.py bdist_dmg en Macos
+# Usar python  en Macos
 # Or in python setup.py bdist_rpm y en windows bdist_msi
 
 import sys

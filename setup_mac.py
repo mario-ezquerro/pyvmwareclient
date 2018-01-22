@@ -3,6 +3,7 @@
 # Use http://sveinbjorn.org/platypus
 
 from setuptools import setup
+#from distutils.core import setup
 import py2app
 
 APP = ['app.py']
@@ -11,16 +12,16 @@ DATA_FILES = [('../Frameworks', ['/usr/local/lib/libwx_mac-2.4.0.rsrc',]), 'logg
 
 OPTIONS = {
     'argv_emulation': True,
-    'packages': ['idna', 'cryptography', 'cffi'],
+    'packages': ['idna', 'cryptography', 'cffi','humanize'],
     'iconfile': './icons/vmwareclient.icns',
     'plist': {
         'CFBundleName': APP_NAME,
         'CFBundleDisplayName': APP_NAME,
-        'CFBundleGetInfoString': "Cliente VMWare fabricado en python",
+        'CFBundleGetInfoString': "Client VMWare make with python",
         'CFBundleIdentifier': "com.ezquerro.mario",
-        'CFBundleVersion': "0.3.0a",
-        'CFBundleShortVersionString': "0.3.0a",
-        'NSHumanReadableCopyright': u"Copyright © 2017, Mario Ezquerro, All Rights Reserved"
+        'CFBundleVersion': "0.3.10",
+        'CFBundleShortVersionString': "0.3.10",
+        'NSHumanReadableCopyright': u"Copyright © 2018, Mario Ezquerro, All Rights Reserved"
     }
 }
 
