@@ -647,10 +647,10 @@ if __name__ == "__main__":
     #read inital config file
 
     if os.name == 'posix':
-        #logging.config.fileConfig('logging.conf')
-        #logger = logging.getLogger('pyvmwareclient')
-        #logger.info("# Start here a new loggin now")
-        pass
+        logging.config.fileConfig('logging.conf')
+        logger = logging.getLogger('pyvmwareclient')
+        logger.info("# Start here a new loggin now")
+        #pass
 
     app = wx.App(False)
     conexion = conectar_con_vcenter()
