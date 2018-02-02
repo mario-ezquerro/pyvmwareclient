@@ -26,6 +26,8 @@ __all__ = [
 ]
 
 
+
+
 def on_info_vm(self, event, conexion, logger):
         """
         Arg:
@@ -147,34 +149,43 @@ def on_set_note(self, event, conexion, logger):
 
 
 def onSnap_list(self, event, conexion, logger):
+
+
+        self.my_dialogo_list = dialogos.Dialog_list(None, -1, 'Snapshots List')
+        name_rows = ['VM Name', 'Name Snap', 'Description', 'Snap']
+        # cargamos los nombres de los elementos
+        for i in range(len(name_rows)):
+            self.my_dialogo_list.list_ctrl.InsertColumn(i, name_rows[i])
+
         fila = self.listadoVM
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
-        # El 9 elemento es el UUID
-        if logger != None: logger.info (fila[8])
-        
-        #listado de snapshot en una ventana emergente
-
-        self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de Snapshots')
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
         snap_info = vm.snapshot
-        self.my_dialogo_texto.salida_texto.SetValue('Maquna vm = ' + fila[1]  )
-        snaptexto = 'Listado de snapshot \n'
+
+        index = 0
+        
+           
         if not snap_info:
-            self.my_dialogo_texto.salida_texto.SetValue('No hay snapshot')
+            self.my_dialogo_list.list_ctrl.InsertItem(index, fila[1])
+            self.my_dialogo_list.list_ctrl.SetItem(index, 1, 'No hay snapshot')
             if logger != None: logger.info ('No hay snapshot')
         else:
             tree = snap_info.rootSnapshotList
             while tree[0].childSnapshotList is not None:
-                snaptexto = snaptexto +  ("Nombre Snap: {0} = description> {1}  \n".format(tree[0].name, tree[0].description))
+                self.my_dialogo_list.list_ctrl.InsertItem(index, fila[1])
+                self.my_dialogo_list.list_ctrl.SetItem(index, 1, str(tree[0].name))
+                self.my_dialogo_list.list_ctrl.SetItem(index, 2, str(tree[0].description))
+                self.my_dialogo_list.list_ctrl.SetItem(index, 3, 'xxxxxx')
                 if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
                 if len(tree[0].childSnapshotList) < 1:
                     break
                 tree = tree[0].childSnapshotList
-            self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
+                index += 1
 
-        result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
-        self.my_dialogo_texto.Destroy()
+        result = self.my_dialogo_list.ShowModal() # pintamos la ventana con la informcion
+        self.my_dialogo_list.Destroy()
+
 
 
 def onSnap_create(self, event, conexion, logger):

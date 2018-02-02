@@ -14,7 +14,6 @@ import webbrowser
 import logging.config
 import humanize
 import sys
-import wx.lib.inspection
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
@@ -24,23 +23,25 @@ from pyVim.connect import SmartConnect, Disconnect
 from wxgladegen import dialogos
 from menu_action import action_vm
 
+import datetime
+import tempfile
+import subprocess
+
 
 
 class theListCtrl(wx.ListCtrl):
     # ----------------------------------------------------------------------
-    def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0):
+    def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
 
 
 
-
-
-
 class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
-    """"""
+    """
+        Create the center window 
+    
+    """
 
-    # ----------------------------------------------------------------------
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
@@ -405,6 +406,7 @@ def conectar_con_vcenter():
 # ----------------------------------------------------------------------
 # Locate list on host
 # ----------------------------------------------------------------------
+
 def locatehost(conexion):
     """
         Locate all host an  info about memory, CPU usasge an other
@@ -488,6 +490,183 @@ def locatehost(conexion):
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
+    #display_plot(conexion)
+
+######################################
+# New code to create plot draw about #
+######################################
+
+def save_performance_samples(path, data):
+        """
+        Save performance samples to a file
+
+        New samples are appended to the file
+
+        NOTE: If the performance counter unit is percentage we need
+              to make sure that the sample value is divided by
+              a hundred, as the returned sample value
+              represents a 1/100th of the percent.
+
+        Args:
+            path                                      (str): Path to the datafile
+            data  (vim.PerformanceManager.EntityMetricBase): The data to be saved
+
+        """
+        all_values = [v.value for v in data.value]
+        samples = zip(data.sampleInfo, *all_values)
+
+        with open(path, 'a') as f:
+            for sample in samples:
+                timestamp, values = sample[0].timestamp, sample[1:]
+                if self.counter.unitInfo.key == 'percent':
+                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v / 100) for v in values])))
+                else:
+                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v) for v in values])))
+
+
+def display_plot(conexion):
+
+    print(" The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
+
+    try:
+            subprocess.Popen(
+                args=['gnuplot', '--version'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+                
+    except OSError as e:
+
+            if logger != None: logger.info('Error no gnunplot or not path to gnuplot')
+
+            dlg = wx.MessageDialog(self.my_dialog, 'Unable to find gnuplot(1): \n{}\n'.format(e), style = wx.OK  | wx.ICON_QUESTION)
+            dlg.ShowModal()
+            dlg.Destroy()
+
+            return
+
+    script_template = (
+            "# gnuplot(1) script created by pyvmware\n"
+            "set title '{name} - {title}'\n"
+            "set term {term}\n"
+            "set grid\n"
+            "set xdata time\n"
+            "set timefmt '%Y-%m-%d %H:%M:%S+00:00'\n"
+            "# set format x '%H:%M:%S'\n"
+            "set xlabel 'Time'\n"
+            "set ylabel '{unit}'\n"
+            "set key outside right center\n"
+            "set datafile separator ','\n"
+            "set autoscale fix\n"
+            "set yrange [{yrange}]\n"
+            #"plot {lines}\n"
+            "plot\n"
+            "pause {pause}\n"
+            'reread\n'
+        )
+
+     # Set a yrange for counters which unit is percentage
+    yrange = '0:100' 
+    gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
+
+    lines = []
+    """for index, instance in enumerate(instances):
+            l = '"{datafile}" using 1:{index} title "{instance}" with lines'.format(
+                datafile=datafile,
+                index=index+2,
+                instance=instance
+            )
+            lines.append(l)"""
+
+    gnuplot_script = script_template.format(
+            name='Name',
+            title='titulo',
+            term=gnuplot_term,
+            unit=5,
+            lines=', '.join(lines),
+            pause='pause',
+            yrange=yrange
+    )
+
+    fd, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
+
+    fd, datafile = tempfile.mkstemp(prefix='pvcgnuplot-data-')
+    #script = create_gnuplot_script(
+    #        datafile=datafile,
+    #        instances=conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage
+    #)
+
+    with open(path, 'w') as f:
+           f.write(gnuplot_script)
+
+    p = subprocess.Popen(
+            args=['gnuplot', path]
+        )
+
+    while True:
+            #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
+            save_performance_samples(
+                path=datafile,
+                data=conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage
+            )
+
+            dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?','Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+            
+               
+            if result == wx.ID_OK:
+                dlg.Destroy()
+                break
+            
+
+    p.terminate()
+
+
+    
+
+
+    """ metric_id = [
+            pyVmomi.vim.PerformanceManager.MetricId(
+                counterId=self.counter.key,
+                instance='' if instance == self.obj.name else instance
+            ) for instance in selected_instances
+        ]
+
+     query_spec = pyVmomi.vim.PerformanceManager.QuerySpec(
+            maxSample=1,
+            entity=self.obj,
+            metricId=metric_id,
+            intervalId=interval_id
+        )
+
+        p = subprocess.Popen(
+            args=['gnuplot', script]
+        )
+
+        text = (
+            'Graph updates every {} seconds.\n\n'
+            'Press CANCEL in order to stop plotting the '
+            'graph and exit.\n'
+        )
+
+        while True:
+            data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
+            self.save_performance_samples(
+                path=datafile,
+                data=data
+            )
+            code = self.dialog.pause(
+                title=self.title,
+                text=text.format(interval_id),
+                height=15,
+                width=60,
+                seconds=interval_id
+            )
+            if code == self.dialog.CANCEL:
+                break
+
+        p.terminate()
+
+    my_dialogo_host.ShowModal()"""
     # For use to auto-orden --- Call to Getlistctrl
     #self.itemDataMap = self.tabla
     #my_dialogo_host.list_ctrl_host.ColumnSorterMixin.__init__(self, len(name_rows))
@@ -580,10 +759,9 @@ def sacar_listado_capertas(conexion):
 # Sacar listado carpetas
 
 def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
-    """
-   Print information for a particular virtual machine or recurse into a folder
+    """Print information for a particular virtual machine or recurse into a folder
     with depth protection
-   """
+    """
     maxdepth = 50
 
     # if this is a group it will have children. if it does, recurse into them
