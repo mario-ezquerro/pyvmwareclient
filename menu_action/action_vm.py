@@ -198,18 +198,18 @@ def onSnap_create(self, event, conexion, logger):
         if logger != None: logger.info (fila[8])
         #Dialogo para pedir datos para el snapshop......
 
-        self.my_dialogo_sanshot = dialogos.Dialog_snapshot(None, -1, 'Propiedades Snapshot')
+        self.my_dialogo_snapshot = dialogos.Dialog_snapshot(None, -1, 'Propiedades Snapshot')
 
-        self.my_dialogo_sanshot.nombre_snap.SetValue(fila[1] + ' Razon del snapshot? ...' )
-        result = self.my_dialogo_sanshot.ShowModal()
+        self.my_dialogo_snapshot.nombre_snap.SetValue(fila[1] + ' Razon del snapshot? ...' )
+        result = self.my_dialogo_snapshot.ShowModal()
 
-        nombre = str(self.my_dialogo_sanshot.nombre_snap.GetValue())
-        descricion = str(self.my_dialogo_sanshot.descripcion_snap.GetValue())
-        checkbox_memory=self.my_dialogo_sanshot.checkbox_memory.GetValue()
-        checkbox_quiesce=self.my_dialogo_sanshot.checkbox_quiesce.GetValue()
+        nombre = str(self.my_dialogo_snapshot.nombre_snap.GetValue())
+        descricion = str(self.my_dialogo_snapshot.descripcion_snap.GetValue())
+        checkbox_memory=self.my_dialogo_snapshot.checkbox_memory.GetValue()
+        checkbox_quiesce=self.my_dialogo_snapshot.checkbox_quiesce.GetValue()
 
 
-        self.my_dialogo_sanshot.Destroy()
+        self.my_dialogo_snapshot.Destroy()
         #if logger != None: logger.info ('resultado = ' + str(result))
         #if logger != None: logger.info('wx.ID_OK = ' + str(wx.ID_OK))
 
@@ -242,23 +242,12 @@ def onSnap_create(self, event, conexion, logger):
         del vm
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
         snap_info = vm.snapshot
-        self.my_dialogo_texto.salida_texto.SetValue('Maquna vm = ' + fila[1]  )
-        snaptexto = 'Listado de snapshot \n'
-        if not snap_info:
-            self.my_dialogo_texto.salida_texto.SetValue('No hay snapshot')
-            if logger != None: logger.info ('No hay snapshot')
-        else:
-            tree = snap_info.rootSnapshotList
-            while tree[0].childSnapshotList is not None:
-                snaptexto = snaptexto +  ("Nombre Snap: {0} = description> {1}  \n".format(tree[0].name, tree[0].description))
-                if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
-                if len(tree[0].childSnapshotList) < 1:
-                    break
-                tree = tree[0].childSnapshotList
-            self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
 
-        result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
-        self.my_dialogo_texto.Destroy()
+
+        #Show the actual state snapshot
+        onSnap_list(self, event, conexion, logger)
+
+
 
 
 def onSsh(self, event, conexion, logger):
