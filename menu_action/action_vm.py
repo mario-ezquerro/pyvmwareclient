@@ -152,7 +152,7 @@ def onSnap_list(self, event, conexion, logger):
 
 
         self.my_dialogo_list = dialogos.Dialog_list(None, -1, 'Snapshots List')
-        name_rows = ['VM Name', 'Name Snap', 'Description', 'Snap']
+        name_rows = ['VM Name', 'Name Snap', 'Description', 'Create time', 'State']
         # cargamos los nombres de los elementos
         for i in range(len(name_rows)):
             self.my_dialogo_list.list_ctrl.InsertColumn(i, name_rows[i])
@@ -176,7 +176,8 @@ def onSnap_list(self, event, conexion, logger):
                 self.my_dialogo_list.list_ctrl.InsertItem(index, fila[1])
                 self.my_dialogo_list.list_ctrl.SetItem(index, 1, str(tree[0].name))
                 self.my_dialogo_list.list_ctrl.SetItem(index, 2, str(tree[0].description))
-                self.my_dialogo_list.list_ctrl.SetItem(index, 3, 'xxxxxx')
+                self.my_dialogo_list.list_ctrl.SetItem(index, 3, str(tree[0].createTime))
+                self.my_dialogo_list.list_ctrl.SetItem(index, 4, str(tree[0].state))
                 if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
                 if len(tree[0].childSnapshotList) < 1:
                     break
