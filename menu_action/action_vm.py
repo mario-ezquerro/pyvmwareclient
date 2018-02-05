@@ -155,7 +155,7 @@ def onSnap_list(self, event, conexion, logger):
         name_rows = ['VM Name', 'Name Snap', 'Description', 'Create time', 'State']
         # cargamos los nombres de los elementos
         for i in range(len(name_rows)):
-            self.my_dialogo_list.list_ctrl.InsertColumn(i, name_rows[i])
+            self.my_dialogo_list.list_ctrl_basic.InsertColumn(i, name_rows[i])
 
         fila = self.listadoVM
         for i in range(len(fila)):
@@ -167,17 +167,17 @@ def onSnap_list(self, event, conexion, logger):
         
            
         if not snap_info:
-            self.my_dialogo_list.list_ctrl.InsertItem(index, fila[1])
-            self.my_dialogo_list.list_ctrl.SetItem(index, 1, 'No hay snapshot')
+            self.my_dialogo_list.list_ctrl_basic.InsertItem(index, fila[1])
+            self.my_dialogo_list.list_ctrl_basic.SetItem(index, 1, 'No hay snapshot')
             if logger != None: logger.info ('No hay snapshot')
         else:
             tree = snap_info.rootSnapshotList
             while tree[0].childSnapshotList is not None:
-                self.my_dialogo_list.list_ctrl.InsertItem(index, fila[1])
-                self.my_dialogo_list.list_ctrl.SetItem(index, 1, str(tree[0].name))
-                self.my_dialogo_list.list_ctrl.SetItem(index, 2, str(tree[0].description))
-                self.my_dialogo_list.list_ctrl.SetItem(index, 3, str(tree[0].createTime))
-                self.my_dialogo_list.list_ctrl.SetItem(index, 4, str(tree[0].state))
+                self.my_dialogo_list.list_ctrl_basic.InsertItem(index, fila[1])
+                self.my_dialogo_list.list_ctrl_basic.SetItem(index, 1, str(tree[0].name))
+                self.my_dialogo_list.list_ctrl_basic.SetItem(index, 2, str(tree[0].description))
+                self.my_dialogo_list.list_ctrl_basic.SetItem(index, 3, str(tree[0].createTime))
+                self.my_dialogo_list.list_ctrl_basic.SetItem(index, 4, str(tree[0].state))
                 if logger != None: logger.info("Snap: {0} => {1}".format(tree[0].name, tree[0].description))
                 if len(tree[0].childSnapshotList) < 1:
                     break

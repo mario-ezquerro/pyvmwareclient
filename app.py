@@ -73,8 +73,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         listmix.ColumnSorterMixin.__init__(self, len(name_rows))
 
         # Add menu to Click element in VM 
-        self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.list_ctrl)
-        # self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
+        self.list_ctrl.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onItemSelected, self.list_ctrl)
+        #self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelected, self.list_ctrl)
+        #self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
 
         # This code put items into window with orden.
         txtcontador = wx.StaticText(self, label='total VM: ' + str(len(self.tabla)))
@@ -88,14 +89,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         hbox1.Add(txtcontador, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
         self.Bind(wx.EVT_BUTTON, self.busquedadatos, btnbusqueda)
-        self.Bind(wx.EVT_BUTTON, self.recarga_VM, btnrecargaVM)
+        self.Bind(wx.EVT_BUTTON, self.recarga_VM, btnrecargaVM)#onItemSelected
         self.Bind(wx.EVT_BUTTON, self.bntlocateHost, btnhost)
 
-        sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.list_ctrl, 1, wx.EXPAND)
         self.SetSizer(sizer)
+        sizer.Layout()
 
         #Call to function for locate the esxi
-        
+        #onItemSelected
 
         # tools for search an debug (to use uncomment the next line, works only linux)
         # wx.lib.inspection.InspectionTool().Show()
