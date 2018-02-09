@@ -228,12 +228,14 @@ def onSnap_create(self, event, conexion, logger):
                 #contador de tareas
                 count = 0
                 #state_task= task.info.state
+                wait_cursor = wx.BusyCursor()
                 while task.info.state != vim.TaskInfo.State.success:
                     if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
                     count += 1
 
                 #tasks.wait_for_tasks(conexion, [TASK])
                 if logger != None: logger.info("Snapshot Completed.")
+                del wait_cursor
 
         #listado de snapshot en una ventana emergente
 

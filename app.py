@@ -55,7 +55,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btnrecargaVM = wx.Button(self, label="Update VM")
         btnhost = wx.Button(self, label="host")
 
-        name_rows = ['Carpeta', 'Nombre', 'IP', 'Estado', 'pregunta', 'Disco Path', 'Sistema', 'Notas', 'uuid']
+        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid']
 
         # cargamos los nombres de los elementos
         for x in range(len(name_rows)):
@@ -492,7 +492,7 @@ def locatehost(conexion):
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
-    #display_plot(conexion)
+    display_plot(conexion)
 
 ######################################
 # New code to create plot draw about #
@@ -547,6 +547,32 @@ def display_plot(conexion):
 
             return
 
+
+     # Set a yrange for counters which unit is percentage
+    yrange = '0:100' 
+    gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
+
+    
+
+    fd, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
+
+    fd, datafile = tempfile.mkstemp(prefix='pvcgnuplot-data-')
+    #script = create_gnuplot_script(
+    #        datafile=datafile,
+    #        instances=conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage
+    #)
+
+    lines = []
+    l = '"{datafile}" using 1:0 title "INSTANCIALL" with lines'
+    lines.append(l)
+    """for index, instance in enumerate(instances):
+            l = '"{datafile}" using 1:{index} title "{instance}" with lines'.format(
+                datafile=datafile,
+                index=index+2,
+                instance=instance
+            )
+            lines.append(l)"""
+
     script_template = (
             "# gnuplot(1) script created by pyvmware\n"
             "set title '{name} - {title}'\n"
@@ -561,24 +587,11 @@ def display_plot(conexion):
             "set datafile separator ','\n"
             "set autoscale fix\n"
             "set yrange [{yrange}]\n"
-            #"plot {lines}\n"
-            "plot\n"
+            "plot {lines}\n"
+            #"plot\n"
             "pause {pause}\n"
             'reread\n'
         )
-
-     # Set a yrange for counters which unit is percentage
-    yrange = '0:100' 
-    gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
-
-    lines = []
-    """for index, instance in enumerate(instances):
-            l = '"{datafile}" using 1:{index} title "{instance}" with lines'.format(
-                datafile=datafile,
-                index=index+2,
-                instance=instance
-            )
-            lines.append(l)"""
 
     gnuplot_script = script_template.format(
             name='Name',
@@ -590,13 +603,6 @@ def display_plot(conexion):
             yrange=yrange
     )
 
-    fd, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
-
-    fd, datafile = tempfile.mkstemp(prefix='pvcgnuplot-data-')
-    #script = create_gnuplot_script(
-    #        datafile=datafile,
-    #        instances=conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage
-    #)
 
     with open(path, 'w') as f:
            f.write(gnuplot_script)
@@ -609,7 +615,7 @@ def display_plot(conexion):
             #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
             save_performance_samples(
                 path=datafile,
-                data=conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage
+                data=str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage)
             )
 
             dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?','Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
@@ -691,6 +697,8 @@ def sacar_listado_capertas(conexion):
 
 
     #Calculamos el maximo de elementos a analizar
+
+    wait_cursor = wx.BusyCursor()
     max = 0
     for child in conexion.rootFolder.childEntity:
         max += 1
@@ -754,6 +762,7 @@ def sacar_listado_capertas(conexion):
     # if logger != None: logger.info (tabulate(tabla, headers, tablefmt="fancy_grid"))
 
     dlg.Destroy()
+    del wait_cursor
     return (tabla)
 
 
