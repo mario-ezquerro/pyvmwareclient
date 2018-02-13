@@ -124,6 +124,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                     self.list_ctrl.DeleteItem(i)
                 i -= 1
         else:
+            self.list_ctrl.DeleteAllItems()
             self.cargardatos_en_listctrl(self.tabla)
 
     def recarga_VM(self, event):
@@ -147,9 +148,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                     print("El host es: " + obj.name)
 
         object_view.Destroy()
-
-
-
 
         if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
