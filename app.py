@@ -114,10 +114,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def busquedadatos(self, event):
 
         parabuscar = self.cadenaBusqueda.GetValue()
+        parabuscar_ignorecase = re.compile(parabuscar, re.IGNORECASE)
         if parabuscar:
             i = self.list_ctrl.GetItemCount() - 1
             while i >= 0 :
-                if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
+                if re.search(parabuscar_ignorecase, self.list_ctrl.GetItemText(i, col=1) ):
                     self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
                 else:
                     self.list_ctrl.DeleteItem(i)
