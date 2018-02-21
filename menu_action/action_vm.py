@@ -207,9 +207,8 @@ def onSnap_create(self, event, conexion, logger):
         descricion = str(self.my_dialogo_snapshot.descripcion_snap.GetValue())
         checkbox_memory=self.my_dialogo_snapshot.checkbox_memory.GetValue()
         checkbox_quiesce=self.my_dialogo_snapshot.checkbox_quiesce.GetValue()
-
-
         self.my_dialogo_snapshot.Destroy()
+
         #if logger != None: logger.info ('resultado = ' + str(result))
         #if logger != None: logger.info('wx.ID_OK = ' + str(wx.ID_OK))
 
@@ -236,6 +235,8 @@ def onSnap_create(self, event, conexion, logger):
                 #tasks.wait_for_tasks(conexion, [TASK])
                 if logger != None: logger.info("Snapshot Completed.")
                 del wait_cursor
+
+       
 
         #listado de snapshot en una ventana emergente
 

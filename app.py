@@ -55,11 +55,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btnrecargaVM = wx.Button(self, label="Update VM")
         btnhost = wx.Button(self, label="host")
 
-        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid']
+        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Data', 'Path Disk', 'System', 'Note', 'uuid']
 
         # cargamos los nombres de los elementos
         for x in range(len(name_rows)):
             self.list_ctrl.InsertColumn(x, name_rows[x])
+            self.list_ctrl.SetColumnWidth(x, 120)
 
         # conexion = conectar_con_vcenter(self, id)
         self.tabla = []
