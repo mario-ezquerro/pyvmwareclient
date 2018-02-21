@@ -55,12 +55,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btnrecargaVM = wx.Button(self, label="Update VM")
         btnhost = wx.Button(self, label="host")
 
-        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Data', 'Path Disk', 'System', 'Note', 'uuid']
+        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid']
 
         # cargamos los nombres de los elementos
         for x in range(len(name_rows)):
             self.list_ctrl.InsertColumn(x, name_rows[x])
-            self.list_ctrl.SetColumnWidth(x, 120)
 
         # conexion = conectar_con_vcenter(self, id)
         self.tabla = []
@@ -115,17 +114,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def busquedadatos(self, event):
 
         parabuscar = self.cadenaBusqueda.GetValue()
-        parabuscar_ignorecase = re.compile(parabuscar, re.IGNORECASE)
         if parabuscar:
             i = self.list_ctrl.GetItemCount() - 1
             while i >= 0 :
-                if re.search(parabuscar_ignorecase, self.list_ctrl.GetItemText(i, col=1) ):
+                if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
                     self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
                 else:
                     self.list_ctrl.DeleteItem(i)
                 i -= 1
         else:
-            self.list_ctrl.DeleteAllItems()
             self.cargardatos_en_listctrl(self.tabla)
 
     def recarga_VM(self, event):
@@ -149,6 +146,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                     print("El host es: " + obj.name)
 
         object_view.Destroy()
+
+
+
 
         if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
@@ -492,7 +492,7 @@ def locatehost(conexion):
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
-    display_plot(conexion)
+    #display_plot(conexion)
 
 ######################################
 # New code to create plot draw about #

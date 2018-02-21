@@ -220,23 +220,38 @@ def onSnap_create(self, event, conexion, logger):
         dlg_reset.Destroy()"""
 
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+        # Window progress task
+        keepGoing = True
+        dlg_process = wx.ProgressDialog("Process task snapshot ",
+                            "Task process",
+                            maximum = 100, )
+        keepGoing = dlg_process.Update(0)
+
         if result == wx.ID_OK:
             if  vm  is not None:
                 if logger != None: logger.info ("The current powerState is: {0}".format(vm.runtime.powerState))
                 TASK = task = vm.CreateSnapshot_Task(nombre, description = descricion, memory=checkbox_memory, quiesce=checkbox_quiesce)
                 #contador de tareas
-                count = 0
+                #count = 0
                 #state_task= task.info.state
                 wait_cursor = wx.BusyCursor()
                 while task.info.state != vim.TaskInfo.State.success:
-                    if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
-                    count += 1
+                    #if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
+                    #if logger != None: logger.info('Running => {0}  %'.format(task.info.progress))
+                    #count += 1
+                    try:
+                        porcentage = int(task.info.progress)
+                    except:
+                        pass
+
+                    else:
+                        keepGoing = dlg_process.Update(porcentage, "Snapshot {}%".format(porcentage))
 
                 #tasks.wait_for_tasks(conexion, [TASK])
                 if logger != None: logger.info("Snapshot Completed.")
                 del wait_cursor
 
-       
+        dlg_process.Destroy()
 
         #listado de snapshot en una ventana emergente
 
