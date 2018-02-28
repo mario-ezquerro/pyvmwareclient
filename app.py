@@ -22,6 +22,7 @@ from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 from wxgladegen import dialogos
 from menu_action import action_vm
+from menu_action import manager_snap
 
 import datetime
 import tempfile
@@ -186,40 +187,43 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if logger != None: logger.info( 'el otro ' + self.list_ctrl.GetItemText( self.posicionLista,1))
         if logger != None: logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listadoVM))
 
-        if not hasattr(self, "sshID"):
-            self.info_vm = wx.NewId()
-            self.set_note = wx.NewId()
-            self.sshID = wx.NewId()
-            self.htmlID = wx.NewId()
-            self.rdpID = wx.NewId()
-            self.separador = wx.NewId()
-            self.softreboot = wx.NewId()
-            self.softpoweroff = wx.NewId()
-            self.reboot = wx.NewId()
-            self.powerOn = wx.NewId()
-            self.powerOff = wx.NewId()
-            self.exitID = wx.NewId()
-            self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
-            self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
-            self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
-            self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
-            self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
-            self.Bind(wx.EVT_MENU, self.onsoftreboot, id=self.softreboot)
-            self.Bind(wx.EVT_MENU, self.onsoftPowerOff, id=self.softpoweroff)
-            self.Bind(wx.EVT_MENU, self.onreboot, id=self.reboot)
-            self.Bind(wx.EVT_MENU, self.onpower_on, id=self.powerOn)
-            self.Bind(wx.EVT_MENU, self.onpowerOff, id=self.powerOff)
-            self.Bind(wx.EVT_MENU, self.onExit, id=self.exitID)
+        #if not hasattr(self, "sshID"):
+        self.info_vm = wx.NewId()
+        self.set_note = wx.NewId()
+        self.sshID = wx.NewId()
+        self.htmlID = wx.NewId()
+        self.rdpID = wx.NewId()
+        self.separador = wx.NewId()
+        self.softreboot = wx.NewId()
+        self.softpoweroff = wx.NewId()
+        self.reboot = wx.NewId()
+        self.powerOn = wx.NewId()
+        self.powerOff = wx.NewId()
+        self.exitID = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
+        self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
+        self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
+        self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
+        self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
+        self.Bind(wx.EVT_MENU, self.onsoftreboot, id=self.softreboot)
+        self.Bind(wx.EVT_MENU, self.onsoftPowerOff, id=self.softpoweroff)
+        self.Bind(wx.EVT_MENU, self.onreboot, id=self.reboot)
+        self.Bind(wx.EVT_MENU, self.onpower_on, id=self.powerOn)
+        self.Bind(wx.EVT_MENU, self.onpowerOff, id=self.powerOff)
+        self.Bind(wx.EVT_MENU, self.onExit, id=self.exitID)
 
         # build the submenu-snapshot
         self.snapIDlist  = wx.NewId()
         self.snapIDcreate  = wx.NewId()
+        self.snapIDmanager  = wx.NewId()
         self.Bind(wx.EVT_MENU, self.onSnap_list, id=self.snapIDlist)
         self.Bind(wx.EVT_MENU, self.onSnap_create, id=self.snapIDcreate)
+        self.Bind(wx.EVT_MENU, self.onSnap_manager, id=self.snapIDmanager)
 
         self.snap_menu=wx.Menu()
         item_snap_list = self.snap_menu.Append(self.snapIDlist, "List snapshot...")
         item_snap_create = self.snap_menu.Append(self.snapIDcreate, "Create snapshot...")
+        item_snap_manager = self.snap_menu.Append(self.snapIDmanager, "Manager snapshot...")
 
 
         # build the menu
@@ -259,6 +263,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         
     def onSnap_create(self, event):
         action_vm.onSnap_create(self, event, conexion, logger)
+
+    def onSnap_manager(self, event):
+        menu = manager_snap.ManagerSnap(self, event, conexion, logger)
+        del menu
 
     def onSsh(self, event):
          action_vm.onSsh(self, event, conexion, logger)

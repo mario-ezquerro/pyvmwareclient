@@ -212,12 +212,6 @@ def onSnap_create(self, event, conexion, logger):
         #if logger != None: logger.info ('resultado = ' + str(result))
         #if logger != None: logger.info('wx.ID_OK = ' + str(wx.ID_OK))
 
-        """dlg_reset = wx.MessageDialog(self,
-                                     "¿Hacer snapshot de : ? \n " + fila[1] + " ",
-                                     "Confirm Exit",
-                                     wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-        result = dlg_reset.ShowModal()
-        dlg_reset.Destroy()"""
 
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
         # Window progress task
