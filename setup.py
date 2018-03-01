@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
@@ -10,7 +10,7 @@ import os.path
 from cx_Freeze import setup, Executable
 
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
-                                'packages': ['idna', 'cryptography', 'cffi','humanize','OpenSSL','webbrowser'],
+                                'packages': ['idna', 'cryptography', 'cffi', 'humanize', 'OpenSSL', 'webbrowser'],
                                 'includes': [],
                                 'excludes': []
                                 },
@@ -34,11 +34,32 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.10',
+      version='0.3.15.dev',
       description='Client for Vcenter 6.0/6.5 VMware en python',
+      author='Mario Ezquerro',
+      author_email='mario.ezquerro@gmail.com',
       options=build_options,
       maintainer="Mario Ezquerro",
       maintainer_email="mario.ezquerro@gmail.com",
-      url="http://gdglarioja.blogspot.com.es/",
+      url="https://github.com/wbugbofh/pyvmwareclient",
+      license='GNU',
+      classifiers=[
+        'Development Status :: 3 - BETA',
+        'License :: OSI Approved :: GNU',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: System Administrators',
+        'Intended Audience :: Developers',
+        'Environment :: No Input/Output (Daemon)',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Distributed Computing',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Operating System :: Unix',
+        'Operating System :: MacOS',
+      ],
+      #long_description=read('README.md'),
+      platforms=['Windows', 'Linux', 'Solaris', 'Mac OS-X', 'Unix'],
+      zip_safe=True,
       executables=[exe], requires=['cx_Freeze']
       )

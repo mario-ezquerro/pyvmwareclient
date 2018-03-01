@@ -18,10 +18,14 @@ OPTIONS = {
     'plist': {
         'CFBundleName': APP_NAME,
         'CFBundleDisplayName': APP_NAME,
+        'CFBundlePackageType': 'APPL',
+        'CFBundleSignature'='????',
+        'CFBundleDevelopmentRegion': 'English',
         'CFBundleGetInfoString': "Client VMWare make with python",
         'CFBundleIdentifier': "com.ezquerro.mario",
-        'CFBundleVersion': "0.3.10",
+        'CFBundleVersion': "0.3.15.dev",
         'CFBundleShortVersionString': "0.3.10",
+        'NSAppleScriptEnabled'=False,
         'NSHumanReadableCopyright': u"Copyright © 2018, Mario Ezquerro, All Rights Reserved"
     }
 }
