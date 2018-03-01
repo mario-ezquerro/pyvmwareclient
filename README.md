@@ -7,13 +7,13 @@ Works in linux using putty (If also the putty in linux) an the Remminia. And wor
 
 Available Options for a VM:
 
-  01. Snapshot make and display (not delete)
-  02. Connection ssh using putty to Unix/Linux
+  01. Snapshot make and display delete, delete all and Revert
+  02. Connection ssh using putty to VM Unix/Linux
   03. Connection RDP using client Remminia(linux) or Windows Client (Windows MacOS)
   04. Connection console wiht HTML Client
-  05. Power ON
+  05. Power on
   06. Reset hard y soft
-  07. Power OFF hard y soft
+  07. Power off hard y soft
   08. Change or Add Notes
   09. Display tecnicla Info about VM
   10. Display Infor about host (when connection vcenter)

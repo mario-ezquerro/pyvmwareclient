@@ -6,21 +6,21 @@ Actions to make at the menu
 
 """
 
-import sys
-import os
+#import sys
+#import os
 import wx
 import ssl
 import OpenSSL
-import webbrowser
 import logging.config
 #import wx.lib.mixins.listctrl as listmix
 from wxgladegen import dialogos
 from pyVmomi import vim
+from tools import tasks
 
 __author__ = "Mario Ezquerro."
 
 __all__ = [
-    'onSnap_manager',
+    'ManagerSnap',
 ]
 
 
@@ -86,25 +86,36 @@ class ManagerSnap():
         #print(self.my_dialogo_list.list_ctrl_basic.GetItemText(list_position, 1))
         self.separador = wx.NewId()
         self.delete_snap = wx.NewId()
+        self.delete_snap_all = wx.NewId()
         self.rebert_snap = wx.NewId()
         self.my_dialogo_list.Bind(wx.EVT_MENU, self.on_delete_snap, id=self.delete_snap)
+        self.my_dialogo_list.Bind(wx.EVT_MENU, self.on_delete_all_snap, id=self.delete_snap_all)
         self.my_dialogo_list.Bind(wx.EVT_MENU, self.on_rebert_snap, id=self.rebert_snap)
         # build the menu
         self.menu_snap = wx.Menu()
-        item_snap_delete = self.menu_snap.Append(self.delete_snap, "Delete_snap...")
-        item_snap_delete = self.menu_snap.Append(self.rebert_snap, "Rebert_snap...")
+        item_snap_delete = self.menu_snap.Append(self.delete_snap, "Delete snap...")
+        item_snap_all_delete = self.menu_snap.Append(self.delete_snap_all, "Delete ALL snap...")
+        item_snap_delete = self.menu_snap.Append(self.rebert_snap, "Rebert snap...")
         self.my_dialogo_list.PopupMenu(self.menu_snap)
         self.menu_snap.Destroy()
 
     def on_delete_snap(self, event3):
+        self.removeChildren = False
+        self.finish_delete(event3, self.removeChildren)
 
+    def on_delete_all_snap(self, event3):
+        self.removeChildren = True
+        self.finish_delete(event3, self.removeChildren)
+
+    def finish_delete(self, event3, removeChildren):
         #print( 'eliminando snapshot')
         #print(str(self.vm))
         #print('Mv name {}'.format(self.fila[1]))
 
         list_position1 = self.list_position
         snapshot_name = self.my_dialogo_list.list_ctrl_basic.GetItemText(list_position1, 1)
-        tree_snapshot = self.tree
+        #tree_snapshot = self.tree
+        
         #print(str(list_position1))
         #print(snapshot_name)
 
@@ -144,9 +155,11 @@ class ManagerSnap():
 
                                 if  snapshot_name == locate_snap_in_tree[0].name:
                                     snapshot_eliminar = locate_snap_in_tree[0].snapshot
-                                    print (snapshot_eliminar)
+                                
                                     if self.logger != None: self.logger.info ("The current powerState is: {0}".format(self.vm.runtime.powerState))
-                                    TASK = task = snapshot_eliminar.RemoveSnapshot_Task(removeChildren=False, consolidate=False)
+                                    if self.logger != None: self.logger.info ("Start RemoveSnapshot: {0}".format(snapshot_eliminar))
+                                    # Mirar (vm.RemoveAllSnapshots())
+                                    TASK = task = snapshot_eliminar.RemoveSnapshot_Task(self.removeChildren, consolidate=False)
                                     state_task= task.info.state
                                     while task.info.state != vim.TaskInfo.State.success:
                                         #if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
@@ -171,16 +184,75 @@ class ManagerSnap():
 
                 dlg_process.Destroy()
 
+       
+       
     def on_rebert_snap(self, event3):
-        pass
-        #listado de snapshot en una ventana emergente
-
-        #self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de Snapshots')
-
         
-        #self.vm = self.conexion.searchIndex.FindByUuid(None,self.fila[8], True)
-        #snap_info = self.vm.snapshot
+
+        list_position1 = self.list_position
+        snapshot_name = self.my_dialogo_list.list_ctrl_basic.GetItemText(list_position1, 1)
 
 
-        #Show the actual state snapshot
-        #onSnap_list(self, event, self.conexion, self.logger)
+        if self.my_dialogo_list.list_ctrl_basic.GetItemText(list_position1, 1 ) == 'Not snapshot':
+                self.dlg_info = wx.MessageDialog(None,
+                                     'Not sanpshot at: {} \n'.format(self.fila[1]) +'Snapshot name: {}'.format(snapshot_name),
+                                     'Snapshot name: {}'.format(snapshot_name),
+                                     wx.OK )
+                self.result_dlg_info= self.dlg_info.ShowModal()
+                self.dlg_info.Destroy()
+
+        else:
+
+                self.dlg_reset = wx.MessageDialog(None,
+                                     'Delete Snapshot from VM: {} \n'.format(self.fila[1]) +'Snapshot name: {}'.format(snapshot_name),
+                                     'Snapshot name: {}'.format(snapshot_name),
+                                     wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+                self.result = self.dlg_reset.ShowModal()
+                self.dlg_reset.Destroy()
+
+                # Window progress task
+                keepGoing = True
+                dlg_process = wx.ProgressDialog("Process Delete snapshot ",
+                            "Task process",
+                            maximum = 100, )
+                keepGoing = dlg_process.Update(0)
+
+                if self.result == wx.ID_OK:
+                    if  self.vm  is not None:
+                       
+                        wait_cursor = wx.BusyCursor()
+                        #print(self.vm.snapshot.rootSnapshotList)
+                        locate_snap_in_tree = self.vm.snapshot.rootSnapshotList    
+                        while locate_snap_in_tree[0].childSnapshotList is not None:    
+                                if self.logger != None: self.logger.info('locate name snapshot to delete:' + locate_snap_in_tree[0].name )  
+                                if self.logger != None: self.logger.info('ID snapshot delete {}'.format(locate_snap_in_tree[0].snapshot))
+
+                                if  snapshot_name == locate_snap_in_tree[0].name:
+                                    snapshot_eliminar = locate_snap_in_tree[0].snapshot
+                                    
+                                    if self.logger != None: self.logger.info ("The current powerState is: {0}".format(self.vm.runtime.powerState))
+                                    if self.logger != None: self.logger.info ("Revert to: {0}".format(snapshot_eliminar))
+                                    TASK = task = snapshot_eliminar.RevertToSnapshot_Task()
+                                    state_task= task.info.state
+                                    while task.info.state != vim.TaskInfo.State.success:
+                                        #if logger != None: logger.info('Running => {0}  state: {1} info.result = {2}'.format(count, task.info.state, task.info.result))
+                                        #if logger != None: logger.info('Running => {0}  %'.format(task.info.progress))
+                                        try:
+                                            porcentage = int(task.info.progress)
+                                        except:
+                                            pass
+
+                                        else:   
+                                            keepGoing = dlg_process.Update(porcentage, "Snapshot {}%".format(porcentage))
+
+                                if len(locate_snap_in_tree[0].childSnapshotList) < 1:
+                                    break
+                                locate_snap_in_tree = locate_snap_in_tree[0].childSnapshotList
+
+                        #tasks.wait_for_tasks(conexion, [TASK])
+                    if self.logger != None: self.logger.info("Snapshot Delete Completed.")
+                    del wait_cursor
+                    del self.vm
+                    self.my_dialogo_list.Destroy()
+
+                dlg_process.Destroy()

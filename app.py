@@ -114,20 +114,26 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     # si habia antes algo de amarillo lo ponemos blanco
     def busquedadatos(self, event):
 
-        parabuscar = self.cadenaBusqueda.GetValue()
-        if parabuscar:
-            i = self.list_ctrl.GetItemCount() - 1
-            while i >= 0 :
-                if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1)):
-                    self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
-                else:
-                    self.list_ctrl.DeleteItem(i)
-                i -= 1
-        else:
             self.cargardatos_en_listctrl(self.tabla)
+            
+            parabuscar = self.cadenaBusqueda.GetValue()
+        
+            #parabuscar = re.comp(parabuscar, re.IGNORECASE)
+            if parabuscar:
+                i = self.list_ctrl.GetItemCount() - 1
+                while i >= 0 :
+                    if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1),re.IGNORECASE):
+                        self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
+                    else:
+                        self.list_ctrl.DeleteItem(i)
+                    i -= 1
+            else:
+                self.cargardatos_en_listctrl(self.tabla)
 
     def recarga_VM(self, event):
         # conexion = conectar_con_vcenter(self, id)
+        #for i in range(self.list_ctrl.GetItemCount() - 1):
+        #   self.list_ctrl.DeleteItem(i)
         self.tabla = []
         self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
@@ -136,7 +142,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         """for obj in object_view.view:
             print(obj)
             if isinstance(obj, vim.VirtualMachine):
-                vm.print_vm_info(obj)"""
+                vm.print_vm_info(obj)
         #print (object_about)
         #print(object_about.version)
 
@@ -146,10 +152,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if isinstance(obj, vim.HostSystem):
                     print("El host es: " + obj.name)
 
-        object_view.Destroy()
-
-
-
+        object_view.Destroy()"""
 
         if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
@@ -161,6 +164,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     def cargardatos_en_listctrl(self, _tabla_paracargar):
         # cargamos las busquedas en el listado de tablas.
         #self.myRowDict = {}
+        self.list_ctrl.DeleteAllItems()
         index = 0
         for elemen in _tabla_paracargar:
             self.list_ctrl.InsertItem(index, elemen[0])

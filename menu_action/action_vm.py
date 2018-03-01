@@ -15,6 +15,7 @@ import webbrowser
 import logging.config
 from wxgladegen import dialogos
 from pyVmomi import vim
+from tools import tasks
 
 __author__ = "Mario Ezquerro."
 
@@ -36,7 +37,7 @@ def on_info_vm(self, event, conexion, logger):
             logger      (Var objet to pass the log)
         """
         fila = self.listadoVM
-        print (self, event, conexion)
+        #print (self, event, conexion)
         for i in range(len(fila)):
             if logger != None: logger.info(fila[i])
             
@@ -324,7 +325,7 @@ def onHtml(self, event, conexion, logger):
                                        "Remote Console.\n" \
                                        "You have 60 seconds to open the URL, or the session" \
                                        "will be terminated.\n")
-        print(str(vcenter_data))
+        #print(str(vcenter_data))
 
         # Locate the version of vcenter the object .version for locate the version of vcenter
         object_about = conexion.about
