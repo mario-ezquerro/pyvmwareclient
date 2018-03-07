@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include logging.conf
+include CODE_OF_CONDUCT.md
+include CONTRIBUTING.md
+#include icons/*

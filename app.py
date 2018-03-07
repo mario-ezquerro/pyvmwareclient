@@ -60,7 +60,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         # cargamos los nombres de los elementos
         for x in range(len(name_rows)):
-            self.list_ctrl.InsertColumn(x, name_rows[x])
+            self.list_ctrl.InsertColumn(x, name_rows[x],format=wx.LIST_FORMAT_LEFT, width=150)
 
         # conexion = conectar_con_vcenter(self, id)
         self.tabla = []
@@ -134,11 +134,14 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # conexion = conectar_con_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
+
         self.tabla = []
+        ###print( 'La conexion esta: {}'.format(conexion))
         self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
+
         #sacar datos acerca de vcenter.
-        object_about = conexion.about
+        #object_about = conexion.about
         """for obj in object_view.view:
             print(obj)
             if isinstance(obj, vim.VirtualMachine):
@@ -154,7 +157,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         object_view.Destroy()"""
 
-        if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
+        #if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
         self.cargardatos_en_listctrl(self.tabla)
 
@@ -173,6 +176,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                 self.list_ctrl.SetItem(index, i, str(elemen[i]))
             # the nex line is for work the auto list
             self.list_ctrl.SetItemData(index, index)
+            
             #self.myRowDict[index] = elemen
             index += 1
 
@@ -367,7 +371,8 @@ class DialogAcceso():
                                        user=self.login,
                                        pwd=self.pwd,
                                        port=int(self.port),
-                                       sslContext=self.context)
+                                       sslContext=self.context,
+                                       connectionPoolTimeout=0)
                 #self.Close(True)
 
         except:
