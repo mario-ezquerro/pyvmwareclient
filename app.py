@@ -104,6 +104,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # wx.lib.inspection.InspectionTool().Show()
 
     def bntlocateHost(self, event):
+
         locatehost(conexion)
     # ----------------------------------------------------------------------
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
@@ -134,6 +135,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # conexion = conectar_con_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
+
 
         self.tabla = []
         ###print( 'La conexion esta: {}'.format(conexion))
@@ -346,6 +348,7 @@ class DialogAcceso():
         self.si = None
 
 
+
     def OnConnect(self):
         self.vcenter = self.my_dialog_acceso_vcenter.nombre_vcenter.GetValue()
         self.login = self.my_dialog_acceso_vcenter.login_vcenter.GetValue()
@@ -373,6 +376,7 @@ class DialogAcceso():
                                        port=int(self.port),
                                        sslContext=self.context,
                                        connectionPoolTimeout=0)
+
                 #self.Close(True)
 
         except:
@@ -384,6 +388,7 @@ class DialogAcceso():
             dlgexcept.Destroy()
             if logger != None: logger.warning('Error en el acceso a vcenter')
 
+   
 
     def OnDisConnect(self):
         if logger != None: logger.info('desconecction')
@@ -431,6 +436,14 @@ def locatehost(conexion):
         Locate all host an  info about memory, CPU usasge an other
         Need a conexion active to datecenter to locate data
     """
+
+    try:
+        if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
+        if logger != None: logger.info('connecting')
+
+    except:
+        if logger != None: logger.info('NOT connecting')
+        conexion = conectar_con_vcenter()
 
     MBFACTOR = float(1 << 20)
     index = 0
@@ -509,7 +522,7 @@ def locatehost(conexion):
 
     dlg.Destroy()
     my_dialogo_host.ShowModal()
-    #display_plot(conexion)
+    display_plot(conexion)
 
 ######################################
 # New code to create plot draw about #
@@ -531,16 +544,22 @@ def save_performance_samples(path, data):
             data  (vim.PerformanceManager.EntityMetricBase): The data to be saved
 
         """
-        all_values = [v.value for v in data.value]
-        samples = zip(data.sampleInfo, *all_values)
+        #all_values = [v.value for v in data.value]
+        #samples = zip(data.sampleInfo, *all_values)
+        samples = data
 
         with open(path, 'a') as f:
+            timestamp = time.time()
+            f.write('{},{}\n'.format(str(timestamp), data))
+
+
+        """with open(path, 'a') as f:
             for sample in samples:
                 timestamp, values = sample[0].timestamp, sample[1:]
                 if self.counter.unitInfo.key == 'percent':
                     f.write('{},{}\n'.format(str(timestamp), ','.join([str(v / 100) for v in values])))
                 else:
-                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v) for v in values])))
+                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v) for v in values])))"""
 
 
 def display_plot(conexion):
@@ -567,11 +586,12 @@ def display_plot(conexion):
 
      # Set a yrange for counters which unit is percentage
     yrange = '0:100' 
-    gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
+    #gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
+    gnuplot_term = 'default'
 
     
 
-    fd, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
+    fs, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
 
     fd, datafile = tempfile.mkstemp(prefix='pvcgnuplot-data-')
     #script = create_gnuplot_script(
@@ -580,7 +600,9 @@ def display_plot(conexion):
     #)
 
     lines = []
-    l = '"{datafile}" using 1:0 title "INSTANCIALL" with lines'
+    #l = '"{datafile}" using 1:0 title "INSTANCIALL" with lines'
+    l = '"{}" using 0:1 title "INSTANCIALL" with lines'.format(datafile)
+    
     lines.append(l)
     """for index, instance in enumerate(instances):
             l = '"{datafile}" using 1:{index} title "{instance}" with lines'.format(
@@ -597,7 +619,7 @@ def display_plot(conexion):
             "set grid\n"
             "set xdata time\n"
             "set timefmt '%Y-%m-%d %H:%M:%S+00:00'\n"
-            "# set format x '%H:%M:%S'\n"
+            "set format x '%H:%M:%S'\n"
             "set xlabel 'Time'\n"
             "set ylabel '{unit}'\n"
             "set key outside right center\n"
@@ -605,9 +627,8 @@ def display_plot(conexion):
             "set autoscale fix\n"
             "set yrange [{yrange}]\n"
             "plot {lines}\n"
-            #"plot\n"
             "pause {pause}\n"
-            'reread\n'
+            '#reread\n'
         )
 
     gnuplot_script = script_template.format(
@@ -616,31 +637,30 @@ def display_plot(conexion):
             term=gnuplot_term,
             unit=5,
             lines=', '.join(lines),
-            pause='pause',
+            pause='mouse',
             yrange=yrange
     )
 
-
     with open(path, 'w') as f:
-           f.write(gnuplot_script)
+          f.write(gnuplot_script)
+    
 
-    p = subprocess.Popen(
-            args=['gnuplot', path]
-        )
-
+    p = subprocess.Popen(args=['cat', path])
+  
     while True:
             #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
+            #print("que hay en data: " + str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
             save_performance_samples(
                 path=datafile,
                 data=str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage)
             )
 
-            dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?','Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-            
+            """dlg = wx.MessageDialog(None, "Do you really want to close this application?",'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+            dlg.ShowModal()
                
-            if result == wx.ID_OK:
+            if dlg == wx.ID_OK:
                 dlg.Destroy()
-                break
+                break"""
             
 
     p.terminate()
