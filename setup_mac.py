@@ -9,7 +9,7 @@ import py2app
 
 APP = ['app.py']
 APP_NAME = "vmWareClient"
-DATA_FILES = [('../Frameworks', ['/usr/local/lib/libwx_mac-2.4.0.rsrc',]), 'logging.conf', 'LICENSE', 'README.md']
+DATA_FILES = [ 'logging.conf', 'LICENSE', 'README.md']
 
 OPTIONS = {
     'argv_emulation': True,
@@ -19,13 +19,13 @@ OPTIONS = {
         'CFBundleName': APP_NAME,
         'CFBundleDisplayName': APP_NAME,
         'CFBundlePackageType': 'APPL',
-        'CFBundleSignature'='????',
+        #'CFBundleSignature'='????',
         'CFBundleDevelopmentRegion': 'English',
         'CFBundleGetInfoString': "Client VMWare make with python",
         'CFBundleIdentifier': "com.ezquerro.mario",
         'CFBundleVersion': "0.3.15.dev",
         'CFBundleShortVersionString': "0.3.10",
-        'NSAppleScriptEnabled'=False,
+        'NSAppleScriptEnabled':False,
         'NSHumanReadableCopyright': u"Copyright © 2018, Mario Ezquerro, All Rights Reserved"
     }
 }
