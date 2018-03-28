@@ -627,7 +627,7 @@ def display_plot(conexion):
             "set autoscale fix\n"
             "set yrange [{yrange}]\n"
             "plot {lines}\n"
-            "pause {pause}\n"
+            "#pause {pause}\n"
             '#reread\n'
         )
 
