@@ -135,7 +135,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # conexion = conectar_con_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
+        
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        try:
+            if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
+            if logger != None: logger.info('connecting')
 
+        except:
+            if logger != None: logger.info('NOT connecting')
+            conexion = conectar_con_vcenter()
 
         self.tabla = []
         ###print( 'La conexion esta: {}'.format(conexion))
@@ -436,7 +444,7 @@ def locatehost(conexion):
         Locate all host an  info about memory, CPU usasge an other
         Need a conexion active to datecenter to locate data
     """
-
+    # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
     try:
         if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
         if logger != None: logger.info('connecting')
