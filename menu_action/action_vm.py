@@ -13,6 +13,7 @@ import ssl
 import OpenSSL
 import webbrowser
 import logging.config
+import subprocess
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
@@ -21,7 +22,7 @@ __author__ = "Mario Ezquerro."
 
 __all__ = [
     'on_info_vm', 'on_set_note', 'onSnap_list', 
-    'onSnap_create', 'onSsh', 'onHtml',
+    'onSnap_create', 'onSsh', 'onHtml', 'on_vmrc',
     'onRdp', 'onsoftreboot', 'onsoftPowerOff', 
     'onreboot', 'onpower_on', 'onpowerOff',
 ]
@@ -290,6 +291,57 @@ def onSsh(self, event, conexion, logger):
                 os.system(comando)
             self.my_dialogo_ssh.Destroy()
 
+# url del VMRC https://www.vmware.com/go/download-vmrc
+def on_vmrc(self, event, conexion, logger):
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El tercer elemento es la ip y el 9 es el UUID
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+        vm_name = vm.summary.config.name
+        vm_moid = vm._moId
+        if logger != None: logger.info('void= '.format(vm_moid))
+        vcenter_data = conexion.setting
+        vcenter_settings = vcenter_data.setting
+        console_port = '9443'
+        puerto_vcenter= '443'
+
+        for item in vcenter_settings:
+            key = getattr(item, 'key')
+            #print ('key: ' + key + ' =>'+ str(getattr(item, 'value')))
+            if key == 'VirtualCenter.FQDN':
+                vcenter_fqdn = getattr(item, 'value')
+                #if key == 'WebService.Ports.https':
+                #console_port = str(getattr(item, 'value'))
+
+        host = vcenter_fqdn
+
+        session_manager = conexion.sessionManager
+        session = session_manager.AcquireCloneTicket()
+        vc_cert = ssl.get_server_certificate((host, int(puerto_vcenter)))
+        vc_pem = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM,vc_cert)
+        vc_fingerprint = vc_pem.digest('sha1')
+
+        if logger != None: logger.info("Open the following URL in your browser to access the " \
+                                       "Remote Console.\n" \
+                                       "You have 60 seconds to open the URL, or the session" \
+                                       "will be terminated.\n")
+  
+        # Locate the version of vcenter the object .version for locate the version of vcenter
+        object_about = conexion.about
+    
+        #subprocess.call('nohup ' + executable + vmplayerargs + ' &', shell=True)
+
+	#vmrc://clone:[TICKET]@[HOST]:[PORT]/?moid=[VM-MOREF]
+        URL_vmrc = 'vmrc://clone:{}@{}:{}/?moid={}'.format(session, host, puerto_vcenter, vm_moid)
+        if logger != None: logger.info(URL_vmrc)
+        comando_vmrc = 'vmrc ' + URL_vmrc  + ' &'
+        os.system(comando_vmrc)
+        #subprocess.call('nohup ' + comando_vmrc + URL_vmrc + ' &', shell=True)
+
+
+
+
 
 def onHtml(self, event, conexion, logger):
         fila = self.listadoVM
@@ -439,9 +491,6 @@ def onRdp(self, event, conexion, logger):
             comando = 'remmina -c ' + ruta_fichero_config +'/remminaconfig.remmina' + ' &'
             os.system(comando)
 
-
-
-# url del VMRC https://www.vmware.com/go/download-vmrc
 
 def onsoftreboot(self, event, conexion, logger):
         fila = self.listadoVM

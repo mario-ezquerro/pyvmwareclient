@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+﻿#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
 import wx
@@ -209,8 +209,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.info_vm = wx.NewId()
         self.set_note = wx.NewId()
         self.sshID = wx.NewId()
-        self.htmlID = wx.NewId()
         self.rdpID = wx.NewId()
+        self.vmrcID = wx.NewId()
+        self.htmlID = wx.NewId()
         self.separador = wx.NewId()
         self.softreboot = wx.NewId()
         self.softpoweroff = wx.NewId()
@@ -221,8 +222,9 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
         self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
         self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
-        self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
         self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
+        self.Bind(wx.EVT_MENU, self.on_vmrc, id=self.vmrcID)
+        self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
         self.Bind(wx.EVT_MENU, self.onsoftreboot, id=self.softreboot)
         self.Bind(wx.EVT_MENU, self.onsoftPowerOff, id=self.softpoweroff)
         self.Bind(wx.EVT_MENU, self.onreboot, id=self.reboot)
@@ -249,9 +251,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         item_info_vm = self.menu.Append(self.info_vm, "Info VM...")
         item_set_note = self.menu.Append(self.set_note, "Set Note...")
         item_snap_menu = self.menu.Append(wx.ID_ANY,'Manager Snapshot', self.snap_menu)
-        item_ssh = self.menu.Append(self.sshID, "Conexión ssh")
-        item_html = self.menu.Append(self.htmlID, "Conexión html")
-        item_rdp = self.menu.Append(self.rdpID, "conexión rdp")
+        item_ssh = self.menu.Append(self.sshID, "Connection ssh")
+        item_rdp = self.menu.Append(self.rdpID, "Connection rdp")
+        item_vmrc = self.menu.Append(self.vmrcID, "Connection vmrc")
+        item_html = self.menu.Append(self.htmlID, "Connection html")
         item_separador = self.menu.AppendSeparator()
         item_soft_rebbot = self.menu.Append(self.softreboot, "Soft-reboot...")
         item_soft_rebbot = self.menu.Append(self.softpoweroff, "Soft-PowerOff...")
@@ -288,12 +291,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def onSsh(self, event):
          action_vm.onSsh(self, event, conexion, logger)
-
-    def onHtml(self, event):
-        action_vm.onHtml(self, event, conexion, logger)
         
     def onRdp(self, event):
-        action_vm.onRdp(self, event, conexion, logger)        
+        action_vm.onRdp(self, event, conexion, logger)       
+
+    def on_vmrc(self, event):
+        action_vm.on_vmrc(self, event, conexion, logger) 
+ 
+    def onHtml(self, event):
+        action_vm.onHtml(self, event, conexion, logger)
 
     def onsoftreboot(self, event):
         action_vm.onsoftreboot(self, event, conexion, logger)
