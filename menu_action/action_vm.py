@@ -332,12 +332,29 @@ def on_vmrc(self, event, conexion, logger):
     
         #subprocess.call('nohup ' + executable + vmplayerargs + ' &', shell=True)
 
-	#vmrc://clone:[TICKET]@[HOST]:[PORT]/?moid=[VM-MOREF]
+	    #vmrc://clone:[TICKET]@[HOST]:[PORT]/?moid=[VM-MOREF]
         URL_vmrc = 'vmrc://clone:{}@{}:{}/?moid={}'.format(session, host, puerto_vcenter, vm_moid)
         if logger != None: logger.info(URL_vmrc)
-        comando_vmrc = 'vmrc ' + URL_vmrc  + ' &'
-        os.system(comando_vmrc)
-        #subprocess.call('nohup ' + comando_vmrc + URL_vmrc + ' &', shell=True)
+        
+        #If you intall vmplayer workstation you need use vmplayer, if not you nee intall vmrc
+        #The code detec if you intall vmplayer or vmrc and use the fist (the vmplayer it is at worstation instalation)
+        estaelprograma = os.system('which vmplayer')
+        # This value is  0 if it is correct
+        
+        if  estaelprograma == 0 :
+            comando_vmrc = 'vmplayer ' + URL_vmrc  + ' &'
+        else:    
+            estaelprograma = os.system('which vmrc')
+            if estaelprograma == 0 :
+                comando_vmrc = 'vmrc ' + URL_vmrc  + ' &'
+            else:
+                if logger != None: logger.info('Can not find the vrmc or vmplayer') 
+        
+        # Locate system to execute comand
+        if os.name == 'nt':
+            os.system(comando_vmrc)
+        else: 
+            subprocess.call(comando_vmrc, shell=True)
 
 
 
