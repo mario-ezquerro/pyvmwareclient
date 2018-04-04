@@ -1,9 +1,11 @@
 # pyvmwareclient
-#
+
+Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version ;-)
 
 Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
 
 Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path and work MacOs too
+
 You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
 Note: The vmplayer it instaler with vmware-workstation, vmware does not allow simultaneos installation of vrmc and  vmplayer)
 
