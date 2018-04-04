@@ -17,6 +17,7 @@ import subprocess
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
+from distutils.spawn import find_executable
 
 __author__ = "Mario Ezquerro."
 
@@ -338,14 +339,13 @@ def on_vmrc(self, event, conexion, logger):
         
         #If you intall vmplayer workstation you need use vmplayer, if not you nee intall vmrc
         #The code detec if you intall vmplayer or vmrc and use the fist (the vmplayer it is at worstation instalation)
-        estaelprograma = os.system('which vmplayer')
-        # This value is  0 if it is correct
-        
-        if  estaelprograma == 0 :
+        estaelprograma = find_executable("vmplayer")
+              
+        if   estaelprograma:
             comando_vmrc = 'vmplayer ' + URL_vmrc  + ' &'
         else:    
-            estaelprograma = os.system('which vmrc')
-            if estaelprograma == 0 :
+            estaelprograma = find_executable('vmrc')
+            if  estaelprograma:
                 comando_vmrc = 'vmrc ' + URL_vmrc  + ' &'
             else:
                 if logger != None: logger.info('Can not find the vrmc or vmplayer') 
