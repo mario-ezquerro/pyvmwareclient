@@ -1,22 +1,25 @@
 # pyvmwareclient
-##
+#
 
-Vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
+Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
 
-Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path.
+Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path and work MacOs too
+You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
+Note: The vmplayer it instaler with vmware-workstation, vmware does not allow simultaneos installation of vrmc and  vmplayer)
 
 Available Options for a VM:
 
   01. Snapshot make and display delete, delete all and Revert
   02. Connection ssh using putty to VM Unix/Linux
   03. Connection RDP using client Remminia(linux) or Windows Client (Windows MacOS)
-  04. Connection console wiht HTML Client
-  05. Power on
-  06. Reset hard y soft
-  07. Power off hard y soft
-  08. Change or Add Notes
-  09. Display tecnicla Info about VM
-  10. Display Infor about host (when connection vcenter)
+  04. Connection VRMC add to menu.
+  05. Connection console wiht HTML Client
+  06. Power on
+  07. Reset hard y soft
+  08. Power off hard y soft
+  09. Change or Add Notes
+  10. Display tecnicla Info about VM
+  11. Display Infor about host (when connection vcenter)
 
 # Example of  screenshots the are made with wx-windows
 
