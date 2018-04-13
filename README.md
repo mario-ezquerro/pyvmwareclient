@@ -9,7 +9,7 @@ Works in linux using putty (If also the putty in linux) an the Remminia. And wor
 You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
 Note: The vmplayer it instaler with vmware-workstation, vmware does not allow simultaneos installation of vrmc and  vmplayer)
 
-Available Options for a VM:
+## Available Options for a VM:
 
   01. Snapshot make and display delete, delete all and Revert
   02. Connection ssh using putty to VM Unix/Linux
@@ -23,7 +23,7 @@ Available Options for a VM:
   10. Display tecnicla Info about VM
   11. Display Infor about host (when connection vcenter)
 
-# Example of  screenshots the are made with wx-windows
+## Example of  screenshots the are made with wx-windows
 
 At start you must put your user and domain an name of esxi or vcenter:
 
