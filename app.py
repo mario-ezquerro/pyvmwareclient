@@ -43,6 +43,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         Create the center window 
     
     """
+    global conexion
 
     def __init__(self, parent):
         """Constructor"""
@@ -277,16 +278,26 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def on_info(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
-        __main__.conexion = self.checking_conexion()
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.on_info_vm(self, event, conexion, logger)
  
     def on_set_note(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.on_set_note(self, event, conexion, logger)
  
     def onSnap_list(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onSnap_list(self, event, conexion, logger)
         
     def onSnap_create(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onSnap_create(self, event, conexion, logger)
 
     def onSnap_manager(self, event):
@@ -294,30 +305,57 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         del menu
 
     def onSsh(self, event):
-         action_vm.onSsh(self, event, conexion, logger)
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
+        action_vm.onSsh(self, event, conexion, logger)
         
     def onRdp(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onRdp(self, event, conexion, logger)       
 
     def on_vmrc(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.on_vmrc(self, event, conexion, logger) 
  
     def onHtml(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onHtml(self, event, conexion, logger)
 
     def onsoftreboot(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onsoftreboot(self, event, conexion, logger)
 
     def onsoftPowerOff(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onsoftPowerOff(self, event, conexion, logger)
 
     def onreboot(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onreboot(self, event, conexion, logger)
         
     def onpower_on(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onpower_on(self, event, conexion, logger)              
 
     def onpowerOff(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
         action_vm.onpowerOff(self, event, conexion, logger)
         
     def onExit(self, event):
@@ -327,14 +365,16 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.Close()
         sys.exit(0)
 
-    def checking_conexion(self):
+    def checking_conexion(self, conexion):
         try:
             if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
             if logger != None: logger.info('connecting')
+            return conexion
             
         except:
             if logger != None: logger.info('NOT connecting')
-            conectar_con_vcenter()
+            conexion = conectar_con_vcenter()
+            return conexion
 
 
 # #######################################################################
@@ -470,7 +510,7 @@ def locatehost(conexion):
 
     except:
         if logger != None: logger.info('NOT connecting')
-        __main__.conexion = conectar_con_vcenter()
+        conexion = conectar_con_vcenter()
 
     MBFACTOR = float(1 << 20)
     index = 0
