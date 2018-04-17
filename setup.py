@@ -3,7 +3,7 @@
 # Dependencies are automatically detected, but it might need
 # Fine tuning . python3.5 setup.py build
 # Usar python  en Macos bdist_dmg
-# Or in python sudo pip3.5 setup.py bdist_rpm y en windows bdist_msi
+# Or in python sudo python3.5 setup.py bdist_rpm y en windows bdist_msi
 # Error subsane with :
 #pip install --upgrade setuptools
 #pip install --upgrade distribute
