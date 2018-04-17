@@ -44,7 +44,7 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.15.dev0',
+      version='0.3.20.dev0',
       description='Client for Vcenter 6.0/6.5 VMware en python',
       author='Mario Ezquerro',
       author_email='mario.ezquerro@gmail.com',
