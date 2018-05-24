@@ -429,7 +429,20 @@ def onRdp(self, event, conexion, logger):
             fila = self.listadoVM
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
+            # El tercer elemento es la ip osea la fila 2 
+            ips = fila[2].split() # but now are a list
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Select a ip to connect')
+            for ip in ips:
+                self.my_dialogo_ssh.combo_box_ip.Append(ip)
+            
+            self.my_dialogo_ssh.label_user.Show(False)
+            self.my_dialogo_ssh.usuario.Show(False)
+
+            result = self.my_dialogo_ssh.ShowModal()  # show the ask window about ip
+            if result == wx.ID_OK:
+                ip_selecction = self.my_dialogo_ssh.combo_box_ip.GetStringSelection() 
+            self.my_dialogo_ssh.Destroy()
+            
             ruta_fichero_config = os.getcwd()
             archConfiguracion = open('conexion.rdp', 'w')
             archConfiguracion.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' + '\n')
@@ -450,7 +463,7 @@ def onRdp(self, event, conexion, logger):
             archConfiguracion.write('<key>ColorDepth</key>' + '\n')
             archConfiguracion.write('<integer>1</integer>' + '\n')
             archConfiguracion.write('<key>ConnectionString</key>' + '\n')
-            archConfiguracion.write('<string>' + fila[2] + '</string>' + '\n')
+            archConfiguracion.write('<string>' + ip_selecction + '</string>' + '\n')
             archConfiguracion.write('<key>DesktopSize</key>' + '\n')
             archConfiguracion.write('' + '\n')
             archConfiguracion.write('' + '\n')
@@ -466,15 +479,41 @@ def onRdp(self, event, conexion, logger):
             fila = self.listadoVM
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
-            comando = 'mstsc ' +'/v:'+ fila[2]
+            # El tercer elemento es la ip osea la fila 2 
+            ips = fila[2].split() # but now are a list
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Select a ip to connect')
+            for ip in ips:
+                self.my_dialogo_ssh.combo_box_ip.Append(ip)
+            
+            self.my_dialogo_ssh.label_user.Show(False)
+            self.my_dialogo_ssh.usuario.Show(False)
+
+            result = self.my_dialogo_ssh.ShowModal()  # show the ask window about ip
+            if result == wx.ID_OK:
+                ip_selecction = self.my_dialogo_ssh.combo_box_ip.GetStringSelection() 
+            self.my_dialogo_ssh.Destroy()
+
+            comando = 'mstsc ' +'/v:'+ ip_selecction
             os.system(comando)
 
         if os.name == 'posix':
             fila = self.listadoVM
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip osea la fila 2
+            # El tercer elemento es la ip osea la fila 2 
+            ips = fila[2].split() # but now are a list
+            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Select a ip to connect')
+            for ip in ips:
+                self.my_dialogo_ssh.combo_box_ip.Append(ip)
+            
+            self.my_dialogo_ssh.label_user.Show(False)
+            self.my_dialogo_ssh.usuario.Show(False)
+
+            result = self.my_dialogo_ssh.ShowModal()  # show the ask window about ip
+            if result == wx.ID_OK:
+                ip_selecction = self.my_dialogo_ssh.combo_box_ip.GetStringSelection() 
+            self.my_dialogo_ssh.Destroy()
+
             ruta_fichero_config = os.getcwd()
             archConfiguracion = open('remminaconfig.remmina','w')
             archConfiguracion.write('[remmina]' + '\n')
@@ -503,7 +542,7 @@ def onRdp(self, event, conexion, logger):
             archConfiguracion.write('sharefolder=' + '\n')
             archConfiguracion.write('console=0' + '\n')
             archConfiguracion.write('domain=' + '\n')
-            archConfiguracion.write('server=' +fila[2] + '\n')
+            archConfiguracion.write('server=' + ip_selecction + '\n')
             archConfiguracion.write('colordepth=24' + '\n')
             archConfiguracion.write('window_maximize=0' + '\n')
             archConfiguracion.write('window_height=' + '\n')
