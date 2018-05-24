@@ -175,8 +175,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.cargardatos_en_listctrl(self.tabla)
 
 
-
-
     def cargardatos_en_listctrl(self, _tabla_paracargar):
         # cargamos las busquedas en el listado de tablas.
         #self.myRowDict = {}
@@ -724,8 +722,13 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
-            dirip.append(summary.guest.ipAddress)
-
+            ips = ''
+            for nic in vm.guest.net:
+                #print(nic.macAddress)            
+                for ipAddress in nic.ipConfig.ipAddress:
+                    ips= ips + ipAddress.ipAddress + ' '
+            dirip.append(ips)
+            #dirip.append(summary.guest.ipAddress)
         else:
             dirip.append('ip?')
 

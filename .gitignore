@@ -105,5 +105,7 @@ ENV/
 # autogenerados
 *.log
 *.remmina
+*.wxg~
+*.py~
 
 .idea/

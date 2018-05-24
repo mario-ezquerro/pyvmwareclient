@@ -271,11 +271,14 @@ def onSsh(self, event, conexion, logger):
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
             # El tercer elemento es la ip es decier la fila[2]
+            ips = fila[2].split(',')
             self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-            self.my_dialogo_ssh.usuario.SetValue('root' )
+            for ip in ips:
+                self.my_dialogo_ssh.combo_box_ip.Append(ip)
+            self.my_dialogo_ssh.usuario.SetValue('root')
             result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
             if result == wx.ID_OK:
-                comando = 'ssh ' + fila[2] +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                comando = 'ssh ' + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &' 
                 os.system(comando)
             self.my_dialogo_ssh.Destroy()
 
@@ -284,11 +287,14 @@ def onSsh(self, event, conexion, logger):
             for i in range(len(fila)):
                 if logger != None: logger.info(fila[i])
             # El tercer elemento es la ip es decier la fila[2]
+            ips = fila[2].split()
             self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+            for ip in ips:
+                self.my_dialogo_ssh.combo_box_ip.Append(ip)
             self.my_dialogo_ssh.usuario.SetValue('root')
             result = self.my_dialogo_ssh.ShowModal()  # pintamos la ventan con la informcion
             if result == wx.ID_OK:
-                comando = 'putty ' + fila[2] + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                comando = 'putty ' + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
                 os.system(comando)
             self.my_dialogo_ssh.Destroy()
 

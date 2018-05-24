@@ -12,6 +12,10 @@ import wx
 import ssl
 import OpenSSL
 import logging.config
+import subprocess
+import datetime
+import time
+import tempfile
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
@@ -24,47 +28,10 @@ __all__ = [
 
 
 
-######################################
-# New code to create plot draw about #
-######################################
-
-def save_performance_samples(path, data):
-        """
-        Save performance samples to a file
-
-        New samples are appended to the file
-
-        NOTE: If the performance counter unit is percentage we need
-              to make sure that the sample value is divided by
-              a hundred, as the returned sample value
-              represents a 1/100th of the percent.
-
-        Args:
-            path                                      (str): Path to the datafile
-            data  (vim.PerformanceManager.EntityMetricBase): The data to be saved
-
-        """
-        #all_values = [v.value for v in data.value]
-        #samples = zip(data.sampleInfo, *all_values)
-        samples = data
-
-        with open(path, 'a') as f:
-            timestamp = time.time()
-            f.write('{},{}\n'.format(str(timestamp), data))
-
-
-        """with open(path, 'a') as f:
-            for sample in samples:
-                timestamp, values = sample[0].timestamp, sample[1:]
-                if self.counter.unitInfo.key == 'percent':
-                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v / 100) for v in values])))
-                else:
-                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v) for v in values])))"""
-
 
 def display_plot(conexion):
 
-    print(" The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
+    print(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
 
     try:
             subprocess.Popen(
@@ -128,7 +95,7 @@ def display_plot(conexion):
             "set yrange [{yrange}]\n"
             "plot {lines}\n"
             "pause {pause}\n"
-            '#reread\n'
+            'reread\n'
         )
 
     gnuplot_script = script_template.format(
@@ -145,8 +112,13 @@ def display_plot(conexion):
           f.write(gnuplot_script)
     
 
-    p = subprocess.Popen(args=['cat', path])
-    p = subprocess.Popen(args=['gnuplot', gnuplot_script])
+    #p = subprocess.Popen(args=['cat', path])
+    data=str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage)
+    with open(datafile, 'w') as fd:
+            timestamp = time.time()
+            fd.write('{},{}\n'.format(str(timestamp), data))  
+
+    p = subprocess.Popen(args=['gnuplot', path])
     while True:
             #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
             #print("que hay en data: " + str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
@@ -167,10 +139,42 @@ def display_plot(conexion):
     p.terminate()
 
 
-    
+def save_performance_samples(path, data):
+        """
+        Save performance samples to a file
+
+        New samples are appended to the file
+
+        NOTE: If the performance counter unit is percentage we need
+              to make sure that the sample value is divided by
+              a hundred, as the returned sample value
+              represents a 1/100th of the percent.
+
+        Args:
+            path                                      (str): Path to the datafile
+            data  (vim.PerformanceManager.EntityMetricBase): The data to be saved
+
+        """
+        #all_values = [v.value for v in data.value]
+        #samples = zip(data.sampleInfo, *all_values)
+        samples = data
+
+        with open(path, 'a') as f:
+            timestamp = time.time()
+            f.write('{},{}\n'.format(str(timestamp), data))
 
 
-    """ metric_id = [
+        """with open(path, 'a') as f:
+            for sample in samples:
+                timestamp, values = sample[0].timestamp, sample[1:]
+                if self.counter.unitInfo.key == 'percent':
+                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v / 100) for v in values])))
+                else:
+                    f.write('{},{}\n'.format(str(timestamp), ','.join([str(v) for v in values])))"""
+
+
+
+""" metric_id = [
             pyVmomi.vim.PerformanceManager.MetricId(
                 counterId=self.counter.key,
                 instance='' if instance == self.obj.name else instance
