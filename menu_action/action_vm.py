@@ -266,37 +266,27 @@ def onSnap_create(self, event, conexion, logger):
 
 
 def onSsh(self, event, conexion, logger):
-        if sys.platform == 'darwin':
-            fila = self.listadoVM
-            for i in range(len(fila)):
-                if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
-            ips = fila[2].split(',')
-            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-            for ip in ips:
-                self.my_dialogo_ssh.combo_box_ip.Append(ip)
-            self.my_dialogo_ssh.usuario.SetValue('root')
-            result = self.my_dialogo_ssh.ShowModal() # pintamos la ventan con la informcion
-            if result == wx.ID_OK:
+        fila = self.listadoVM
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+        # El tercer elemento es la ip es decier la fila[2]
+        ips = fila[2].split()
+        self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
+        for ip in ips:
+            self.my_dialogo_ssh.combo_box_ip.Append(ip)
+        # Load from file config the user to use with login to ssh
+        cfg = wx.Config('appconfig')
+        self.my_dialogo_ssh.usuario.SetValue(cfg.Read('login'))
+        #self.my_dialogo_ssh.usuario.SetValue('root')
+        result = self.my_dialogo_ssh.ShowModal()  # show the dialog window with the information
+        if result == wx.ID_OK:
+            if os.name == 'nt' or os.name == 'posix': #If I have windwos or linux with putty in the path cmd
+                comando = 'putty ' + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
+                os.system(comando)    
+            if sys.platform == 'darwin': # If I have a Macos
                 comando = 'ssh ' + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() +'@'+ str(self.my_dialogo_ssh.usuario.GetValue()) + ' &' 
                 os.system(comando)
-            self.my_dialogo_ssh.Destroy()
-
-        if os.name == 'nt' or os.name == 'posix':
-            fila = self.listadoVM
-            for i in range(len(fila)):
-                if logger != None: logger.info(fila[i])
-            # El tercer elemento es la ip es decier la fila[2]
-            ips = fila[2].split()
-            self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Ususario y password')
-            for ip in ips:
-                self.my_dialogo_ssh.combo_box_ip.Append(ip)
-            self.my_dialogo_ssh.usuario.SetValue('root')
-            result = self.my_dialogo_ssh.ShowModal()  # pintamos la ventan con la informcion
-            if result == wx.ID_OK:
-                comando = 'putty ' + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() + ' -l ' + str(self.my_dialogo_ssh.usuario.GetValue()) + ' &'
-                os.system(comando)
-            self.my_dialogo_ssh.Destroy()
+        self.my_dialogo_ssh.Destroy()
 
 # url del VMRC https://www.vmware.com/go/download-vmrc
 def on_vmrc(self, event, conexion, logger):
