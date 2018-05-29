@@ -276,7 +276,9 @@ def onSsh(self, event, conexion, logger):
             self.my_dialogo_ssh.combo_box_ip.Append(ip)
         # Load from file config the user to use with login to ssh
         cfg = wx.Config('appconfig')
-        self.my_dialogo_ssh.usuario.SetValue(cfg.Read('login'))
+        user_dominio = cfg.Read('login')
+        user=user_dominio.split('@')
+        self.my_dialogo_ssh.usuario.SetValue(user[0])
         #self.my_dialogo_ssh.usuario.SetValue('root')
         result = self.my_dialogo_ssh.ShowModal()  # show the dialog window with the information
         if result == wx.ID_OK:
