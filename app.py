@@ -604,7 +604,7 @@ def sacar_listado_capertas(conexion):
     guest = []
     anotacion = []
     estado = []
-    macs = []
+    dirmacs = []
     dirip = []
     pregunta = []
     uuid = []
@@ -651,7 +651,7 @@ def sacar_listado_capertas(conexion):
                 keepGoing= dlg.Update(count, "Loading")
                 # if logger != None: logger.info (vm.name) # imprime todo el listado de carpetas
                 carpeta = vm.name
-                PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas)
+                PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas)
 
     # salida tabulada----------------------------------------
     if logger != None: logger.info('###############################')
@@ -669,7 +669,7 @@ def sacar_listado_capertas(conexion):
         elemento.append(guest[i])
         elemento.append(anotacion[i])
         elemento.append(uuid[i])
-        elemento.append(macs[i])
+        elemento.append(dirmacs[i])
         tabla.append(elemento)
         elemento = []
 
@@ -684,7 +684,7 @@ def sacar_listado_capertas(conexion):
 # ----------------------------------------------------------------------
 # Sacar listado carpetas
 
-def PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
+def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
     """Print information for a particular virtual machine or recurse into a folder
     with depth protection
     """
@@ -699,7 +699,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta,
         vmList = vm.childEntity
 
         for c in vmList:
-            PrintVmInfo(c, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas,
+            PrintVmInfo(c, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas,
                         depth + 1)
         return
 
@@ -723,18 +723,21 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta,
         anotacion.append('sin anotacion')
 
     # If logger != None: logger.info("State      : ", summary.runtime.powerState)
-    # Load the NIC's and locate all ipś
+    # Load the NIC's and locate all ip's
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
+            macs = ''
             ips = ''
-            for nic in vm.guest.net:
-                macs.append(nic.macAddress)            
+            for nic in vm.guest.net:            
                 for ipAddress in nic.ipConfig.ipAddress:
-                    ips= ips + ipAddress.ipAddress + ' '
+                    macs = macs + nic.macAddress + ' '
+                    ips = ips + ipAddress.ipAddress + ' '
+            dirmacs.append(macs)
             dirip.append(ips)
             #dirip.append(summary.guest.ipAddress)
         else:
+            dirmacs.append('mac?')
             dirip.append('ip?')
 
     if summary.runtime.question is not None:
