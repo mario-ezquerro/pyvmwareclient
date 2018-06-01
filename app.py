@@ -59,7 +59,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btnrecargaVM = wx.Button(self, label="Update VM")
         btnhost = wx.Button(self, label="host")
 
-        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid']
+        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
 
         # cargamos los nombres de los elementos
         for x in range(len(name_rows)):
@@ -125,8 +125,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             #parabuscar = re.comp(parabuscar, re.IGNORECASE)
             if parabuscar:
                 i = self.list_ctrl.GetItemCount() - 1
-                while i >= 0 :
-                    if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1),re.IGNORECASE):
+                while i >= 0 : # find data in name col=1, ip col=2 and mac col=9
+                    if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1),re.IGNORECASE) or \
+                    re.search(parabuscar, self.list_ctrl.GetItemText(i, col=2),re.IGNORECASE) or \
+                    re.search(parabuscar, self.list_ctrl.GetItemText(i, col=9),re.IGNORECASE):
                         self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
                     else:
                         self.list_ctrl.DeleteItem(i)
@@ -602,6 +604,7 @@ def sacar_listado_capertas(conexion):
     guest = []
     anotacion = []
     estado = []
+    macs = []
     dirip = []
     pregunta = []
     uuid = []
@@ -648,7 +651,7 @@ def sacar_listado_capertas(conexion):
                 keepGoing= dlg.Update(count, "Loading")
                 # if logger != None: logger.info (vm.name) # imprime todo el listado de carpetas
                 carpeta = vm.name
-                PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid, carpeta, listado_carpetas)
+                PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas)
 
     # salida tabulada----------------------------------------
     if logger != None: logger.info('###############################')
@@ -666,6 +669,7 @@ def sacar_listado_capertas(conexion):
         elemento.append(guest[i])
         elemento.append(anotacion[i])
         elemento.append(uuid[i])
+        elemento.append(macs[i])
         tabla.append(elemento)
         elemento = []
 
@@ -680,7 +684,7 @@ def sacar_listado_capertas(conexion):
 # ----------------------------------------------------------------------
 # Sacar listado carpetas
 
-def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
+def PrintVmInfo(vm, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
     """Print information for a particular virtual machine or recurse into a folder
     with depth protection
     """
@@ -695,7 +699,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
         vmList = vm.childEntity
 
         for c in vmList:
-            PrintVmInfo(c, name, path, guest, anotacion, estado, dirip, pregunta, uuid, carpeta, listado_carpetas,
+            PrintVmInfo(c, name, path, guest, anotacion, estado, macs, dirip, pregunta, uuid, carpeta, listado_carpetas,
                         depth + 1)
         return
 
@@ -718,13 +722,14 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirip, pregunta, uuid,
     else:
         anotacion.append('sin anotacion')
 
-    # if logger != None: logger.info("State      : ", summary.runtime.powerState)
+    # If logger != None: logger.info("State      : ", summary.runtime.powerState)
+    # Load the NIC's and locate all ipś
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
             ips = ''
             for nic in vm.guest.net:
-                #print(nic.macAddress)            
+                macs.append(nic.macAddress)            
                 for ipAddress in nic.ipConfig.ipAddress:
                     ips= ips + ipAddress.ipAddress + ' '
             dirip.append(ips)
