@@ -14,6 +14,7 @@ import webbrowser
 import logging.config
 import humanize
 import sys
+#from threading import Thread #The snapshot is crating in a tread to not stop the app
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
@@ -299,6 +300,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         global conexion
         conexion = self.checking_conexion(conexion)
         action_vm.onSnap_create(self, event, conexion, logger)
+        #subproceso_snap = Thread(name='hilo', target=action_vm.onSnap_create, args=(self, event, conexion, logger,))
+        #subproceso_snap.start()
 
     def onSnap_manager(self, event):
         menu = manager_snap.ManagerSnap(self, event, conexion, logger)

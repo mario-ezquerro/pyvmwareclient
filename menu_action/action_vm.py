@@ -133,7 +133,7 @@ def on_set_note(self, event, conexion, logger):
 
         vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
 
-        self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'New Note in: {0}' .format(vm.name))
+        self.my_dialogo_ssh = dialogos.DialogNote(None, -1, 'New Note in: {0}' .format(vm.name))
         punteromaquina = vim.vm.ConfigSpec()
 
         # the actual file 8 is the Note
