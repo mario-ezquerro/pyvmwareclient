@@ -23,6 +23,7 @@ from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 from wxgladegen import dialogos
 from menu_action import action_vm
+from menu_action import action_host
 from menu_action import manager_snap
 from menu_action import manager_graf
 
@@ -36,6 +37,7 @@ class theListCtrl(wx.ListCtrl):
     # ----------------------------------------------------------------------
     def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
+        
 
 
 
@@ -108,8 +110,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # wx.lib.inspection.InspectionTool().Show()
 
     def bntlocateHost(self, event):
-
-        locatehost(conexion)
+        
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
+        action_host.locatehost(self, conexion, logger)
     # ----------------------------------------------------------------------
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
@@ -496,103 +501,6 @@ def conectar_con_vcenter():
                     sys.exit(0)
            else:
                dlgDialogo.OnDisConnect()
-
-# ----------------------------------------------------------------------
-# Locate list on host
-# ----------------------------------------------------------------------
-
-def locatehost(conexion):
-    """
-        Locate all host an  info about memory, CPU usasge an other
-        Need a conexion active to datecenter to locate data
-    """
-    # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
-    try:
-        if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
-        if logger != None: logger.info('connecting')
-
-    except:
-        if logger != None: logger.info('NOT connecting')
-        conexion = conectar_con_vcenter()
-
-    MBFACTOR = float(1 << 20)
-    index = 0
-
-    my_dialogo_host = dialogos.Dialogo_host(None, -1, 'Host en vcenter')
-    name_rows = ['Data center', 'Resource Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
-    # cargamos los nombres de los elementos
-    for i in range(len(name_rows)):
-        my_dialogo_host.list_ctrl_host.InsertColumn(i, name_rows[i])
-
-    #Find the all items host to checking
-    max = 0
-    for datacenter in conexion.rootFolder.childEntity:
-        max += 1
-        if hasattr(datacenter.vmFolder, 'childEntity'):
-            hostFolder = datacenter.hostFolder
-            computeResourceList = hostFolder.childEntity
-            for computeResource in computeResourceList:
-                max += 1
-                hostList = computeResource.host
-                max = max + len(hostList)
-    if logger != None: logger.info('el maximo es : {}'.format(max))
-    
-    keepGoing = True
-    count = 0
-    dlg = wx.ProgressDialog("Proceso cargando datos",
-                            "Cargando datos",
-                            maximum = max, )
-    keepGoing = dlg.Update(count)
-
-
-    for datacenter in conexion.rootFolder.childEntity:
-            count += 1
-            keepGoing = dlg.Update(count, "Loading")
-      
-            if hasattr(datacenter.vmFolder, 'childEntity'):
-         
-                    hostFolder = datacenter.hostFolder
-                    computeResourceList = hostFolder.childEntity
-                    
-                    for computeResource in computeResourceList:
-                        count += 1
-                        keepGoing = dlg.Update(count, "Loading")
-                        hostList = computeResource.host
-                        for host in hostList:
-                            count += 1
-                            keepGoing = dlg.Update(count, "Loading")
-
-                            summary = host.summary
-                            stats = summary.quickStats
-                            hardware = host.hardware
-                            cpuUsage = stats.overallCpuUsage
-                            memoryCapacity = hardware.memorySize
-                            memoryCapacityInMB = hardware.memorySize/MBFACTOR
-                            memoryUsage = stats.overallMemoryUsage
-                            freeMemoryPercentage = 100 - ((float(memoryUsage) / memoryCapacityInMB) * 100)
-
-                            #print ("--------------------------------------------------")
-                            #print ("Host name: ", host.name)
-                            #print ("Host CPU usage: ", cpuUsage)
-                            #print ("Host memory capacity: ", humanize.naturalsize(memoryCapacity, binary=True))
-                            #print ("Host memory usage: ", memoryUsage / 1024, "GiB")
-                            #print ("Free memory percentage: " + str(freeMemoryPercentage) + "%")
-                            #print ("--------------------------------------------------")
-
-                            my_dialogo_host.list_ctrl_host.InsertItem(index, datacenter.name)
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 1, str(computeResource.name))
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 2, str(host.name))
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 3, str(cpuUsage))
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 4, str(humanize.naturalsize(memoryCapacity, binary=True)))
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 5, str(memoryUsage / 1024) + " GiB")
-                            my_dialogo_host.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
-                            #for use to auto use for auto sort colum
-                            my_dialogo_host.list_ctrl_host.SetItemData(index, index)
-                            index += 1
-
-    dlg.Destroy()
-    my_dialogo_host.ShowModal()
-    #manager_graf.display_plot(conexion)
 
 
 
