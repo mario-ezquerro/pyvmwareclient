@@ -117,7 +117,7 @@ def locatehost(self, conexion, logger):
 
     dlg.Destroy()
 
-    my_dialogo_host.sizer_main.Add(self.list_ctrl_host,  0, wx.ALL | wx.EXPAND)
+    my_dialogo_host.sizer_main.Add(self.list_ctrl_host,  1, wx.ALL | wx.EXPAND, 0)
     #my_dialogo_host.sizer_main.Replace(self, my_dialogo_host.sizer_main.list_ctrl_host_old, self.list_ctrl_host, recursive=False)
     
     my_dialogo_host.SetSizer(my_dialogo_host.sizer_main)
