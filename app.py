@@ -635,15 +635,20 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
 
     # If logger != None: logger.info("State      : ", summary.runtime.powerState)
     # Load the NIC's and locate all ip's
+    #print(summary.guest)
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
+            print('#########  primer-if'+ summary.guest.ipAddress)
             macs = ''
             ips = ''
-            for nic in vm.guest.net:            
-                for ipAddress in nic.ipConfig.ipAddress:
-                    macs = macs + nic.macAddress + ' '
-                    ips = ips + ipAddress.ipAddress + ' '
+            for nic in vm.guest.net:                         
+                if  hasattr(nic.ipConfig, 'ipAddress'):
+                    for ipAddress in nic.ipConfig.ipAddress:
+                        print(nic.macAddress)
+                        print(ipAddress)
+                        macs = macs + nic.macAddress + ' '
+                        ips = ips + ipAddress.ipAddress + ' '
             dirmacs.append(macs)
             dirip.append(ips)
             #dirip.append(summary.guest.ipAddress)

@@ -47,7 +47,7 @@ def locatehost(self, conexion, logger):
     # cargamos los nombres de los elementos
     
     for i in range(len(name_rows)):
-        self.list_ctrl_host.InsertColumn(i, name_rows[i])
+        self.list_ctrl_host.InsertColumn(i, name_rows[i], format=wx.LIST_FORMAT_LEFT, width=150)
 
     #Find the all items host to checking
     max = 0
@@ -117,8 +117,8 @@ def locatehost(self, conexion, logger):
 
     dlg.Destroy()
 
-    my_dialogo_host.sizer_main.Add(self.list_ctrl_host,  1, wx.ALL | wx.EXPAND, 0)
-    #my_dialogo_host.sizer_main.Replace(self, my_dialogo_host.sizer_main.list_ctrl_host_old, self.list_ctrl_host, recursive=False)
+    my_dialogo_host.sizer_main.Add(self.list_ctrl_host,  -1, wx.ALL | wx.EXPAND, 5)
+    #my_dialogo_host.sizer_main.Replace(my_dialogo_host.sizer_main.list_ctrl_host_old, my_dialogo_host.sizer_main.self.list_ctrl_host, recursive=False)
     
     my_dialogo_host.SetSizer(my_dialogo_host.sizer_main)
 

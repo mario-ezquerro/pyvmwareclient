@@ -396,6 +396,7 @@ def onHtml(self, event, conexion, logger):
 
         # Locate the version of vcenter the object .version for locate the version of vcenter
         object_about = conexion.about
+        print(object_about)
         #For version vcenter 5.5
         if object_about.version == '5.5.0':
             console_portv5 = '7331'
