@@ -639,14 +639,11 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
     if summary.guest != None:
         ip = summary.guest.ipAddress
         if ip is not None and ip != "":
-            print('#########  primer-if'+ summary.guest.ipAddress)
             macs = ''
             ips = ''
             for nic in vm.guest.net:                         
                 if  hasattr(nic.ipConfig, 'ipAddress'):
                     for ipAddress in nic.ipConfig.ipAddress:
-                        print(nic.macAddress)
-                        print(ipAddress)
                         macs = macs + nic.macAddress + ' '
                         ips = ips + ipAddress.ipAddress + ' '
             dirmacs.append(macs)
@@ -671,6 +668,7 @@ if __name__ == "__main__":
     #parser.add_argument('--d', action="store_true", help='imprimir informacion  debug')
     #args     =    parser.parse_args()
 
+
     # Use logger to control the activate log.
     logger = None
     #read inital config file
@@ -680,6 +678,25 @@ if __name__ == "__main__":
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
         #pass
+    
+
+    #Update to last version pyvmwareclient
+    try:
+        from git import Repo
+        repo_path = os.getcwd()
+        repo = Repo(repo_path)
+        print('Repo at {} successfully loaded.'.format(repo_path))
+        if logger != None: logger.info('Repo at {} successfully loaded.'.format(repo_path))
+        result=repo.git.pull()
+        print(result)
+        if not result == 'Already up-to-date.':
+            print('Program update, need rexecute program')
+            if logger != None: logger.info('Program update, need rexecute program')
+            sys.exit(0)
+            
+    except ValueError:
+        print('Error: Can not update pyvmwareclient...')
+        if logger != None: logger.info('Error: Can not update pyvmwareclient...')
 
     app = wx.App(False)
     conexion = conectar_con_vcenter()
