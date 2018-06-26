@@ -684,9 +684,11 @@ if __name__ == "__main__":
         from git import Repo
         repo_path = os.getcwd()
         repo = Repo(repo_path)
+        print('Repo at {} Start loaded.'.format(repo_path))
+        if logger != None: logger.info('Repo at {} Start loaded.'.format(repo_path))
+        result=repo.git.pull()
         print('Repo at {} successfully loaded.'.format(repo_path))
         if logger != None: logger.info('Repo at {} successfully loaded.'.format(repo_path))
-        result=repo.git.pull()
         print(result)
         if not result == 'Already up-to-date.':
             print('Program update, need rexecute program')
