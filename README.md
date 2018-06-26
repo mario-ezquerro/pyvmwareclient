@@ -1,8 +1,10 @@
 # pyvmwareclient
 
-Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version ;-)
-'$ pip install -r requirements.txt'
-'$ python app.py'
+Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version.
+```bash
+$ pip install -r requirements.txt
+$ python app.py
+```
 
 Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
 
