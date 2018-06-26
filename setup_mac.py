@@ -24,7 +24,7 @@ OPTIONS = {
         'CFBundleGetInfoString': "Client VMWare make with python",
         'CFBundleIdentifier': "com.ezquerro.mario",
         'CFBundleVersion': "0.3.20.dev",
-        'CFBundleShortVersionString': "0.3.20",
+        'CFBundleShortVersionString': "0.3.25",
         'NSAppleScriptEnabled':False,
         'NSHumanReadableCopyright': u"Copyright © 2018, Mario Ezquerro, All Rights Reserved"
     }

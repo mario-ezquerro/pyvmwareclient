@@ -694,7 +694,7 @@ if __name__ == "__main__":
             if logger != None: logger.info('Program update, need rexecute program')
             sys.exit(0)
             
-    except ValueError:
+    except:
         print('Error: Can not update pyvmwareclient...')
         if logger != None: logger.info('Error: Can not update pyvmwareclient...')
 
