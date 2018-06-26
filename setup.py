@@ -5,8 +5,8 @@
 # Usar python  en Macos bdist_dmg
 # Or in python sudo python3.5 setup.py bdist_rpm y en windows bdist_msi
 # Error subsane with :
-#pip install --upgrade setuptools
-#pip install --upgrade distribute
+# pip install --upgrade setuptools
+# pip install --upgrade distribute
 
 import sys
 import os.path

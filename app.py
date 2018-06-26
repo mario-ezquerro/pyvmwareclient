@@ -25,7 +25,6 @@ from wxgladegen import dialogos
 from menu_action import action_vm
 from menu_action import action_host
 from menu_action import manager_snap
-from menu_action import manager_graf
 
 import datetime
 import tempfile
