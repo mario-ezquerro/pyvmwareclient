@@ -1,6 +1,8 @@
 # pyvmwareclient
 
 Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version ;-)
+'$ pip install -r requirements.txt'
+'$ python app.py'
 
 Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
 
@@ -27,16 +29,16 @@ Note: The vmplayer it instaler with vmware-workstation, vmware does not allow si
 
 At start you must put your user and domain an name of esxi or vcenter:
 
-![GitHub Logo](/images/user_pass.png)
+![Image user an password window](/images/user_pass.png)
 
 Then you can see the "LOAD" of datacente data:
 
-![GitHub Logo](/images/loading_data.png)
+![Image window lading data](/images/loading_data.png)
 
 The list of VM that are in your system:
 
-![GitHub Logo](/images/list_vm.png)
+![Window list VM](/images/list_vm.png)
 
 And you can make a lot of commands in your VM:
 
-![GitHub Logo](/images/menu.png)
+![Exampe window Menu (not the update version)](/images/menu.png)
