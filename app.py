@@ -663,6 +663,39 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
 ########################### Start the program  ####################
 if __name__ == "__main__":
 
+    def yes_no(answer):
+        yes = set(['yes','y', 'ye', ''])
+        no = set(['no','n'])
+
+        while True:
+            choice = input(answer).lower()
+            if choice in yes:
+               return True
+            elif choice in no:
+               return False
+            else:
+               print("Please respond with 'yes' or 'no'\n")
+
+    def update_pyvmwareclient():
+        try:
+            from git import Repo
+            repo_path = os.getcwd()
+            repo = Repo(repo_path)
+            print('Repo at {} Start loaded.'.format(repo_path))
+            if logger != None: logger.info('Repo at {} Start loaded.'.format(repo_path))
+            result=repo.git.pull()
+            print('Repo at {} successfully loaded.'.format(repo_path))
+            if logger != None: logger.info('Repo at {} successfully loaded.'.format(repo_path))
+            print(result)
+            if not result == 'Already up-to-date.':
+                print('Program update, need rexecute program')
+                if logger != None: logger.info('Program update, need rexecute program')
+                sys.exit(0)
+                
+        except:
+            print('Error: Can not update pyvmwareclient...')
+            if logger != None: logger.info('Error: Can not update pyvmwareclient...')
+
     #parser    = argparse.ArgumentParser ( description= 'si pasamos a al aplicación --d tendremos debug' )
     #parser.add_argument('--d', action="store_true", help='imprimir informacion  debug')
     #args     =    parser.parse_args()
@@ -678,28 +711,15 @@ if __name__ == "__main__":
         logger.info("# Start here a new loggin now")
         #pass
     
-
-    #Update to last version pyvmwareclient
-    try:
-        from git import Repo
-        repo_path = os.getcwd()
-        repo = Repo(repo_path)
-        print('Repo at {} Start loaded.'.format(repo_path))
-        if logger != None: logger.info('Repo at {} Start loaded.'.format(repo_path))
-        result=repo.git.pull()
-        print('Repo at {} successfully loaded.'.format(repo_path))
-        if logger != None: logger.info('Repo at {} successfully loaded.'.format(repo_path))
-        print(result)
-        if not result == 'Already up-to-date.':
-            print('Program update, need rexecute program')
-            if logger != None: logger.info('Program update, need rexecute program')
-            sys.exit(0)
-            
-    except:
-        print('Error: Can not update pyvmwareclient...')
-        if logger != None: logger.info('Error: Can not update pyvmwareclient...')
-
+        #Update to last version pyvmwareclient
+        answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
+        if answer_yes_no == True:
+            update_pyvmwareclient()
+ 
+        
     app = wx.App(False)
     conexion = conectar_con_vcenter()
     frame = MyFrame()
     app.MainLoop()
+
+    

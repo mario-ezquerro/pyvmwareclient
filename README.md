@@ -10,6 +10,14 @@ Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMwar
 
 Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path and work MacOs too
 
+What programs do yo need in your path?
+
+|**Linux**        |**Windows**      |**MacOs**            |
+|:----------------|:----------------|:--------------------|
+|putty            |putty            |shell (on system)    |
+|remminia         |mstsc            |mstsc (By Microsoft) |
+|vmrc or vmplayer |vmrc or vmplayer |vmrc or vmplayer     |
+
 You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
 Note: The vmplayer it instaler with vmware-workstation, vmware does not allow simultaneos installation of vrmc and  vmplayer)
 
@@ -41,6 +49,6 @@ The list of VM that are in your system:
 
 ![Window list VM](/images/list_vm.png)
 
-And you can make a lot of commands in your VM:
+And you can make a lot of commands in your VM (this image is not the ultimate menu options:
 
 ![Exampe window Menu (not the update version)](/images/menu.png)
