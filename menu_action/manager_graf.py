@@ -29,9 +29,9 @@ __all__ = [
 
 
 
-def display_plot(conexion):
+def display_plot(self, event, logger, conexion):
 
-    print(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
+    if logger != None: logger.info(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
 
     try:
             subprocess.Popen(

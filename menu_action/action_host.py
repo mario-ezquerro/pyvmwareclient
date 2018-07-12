@@ -18,6 +18,7 @@ from wxgladegen import dialogos
 import wx.lib.mixins.listctrl as listmix
 from pyVmomi import vim
 from tools import tasks
+from menu_action import manager_graf
 from distutils.spawn import find_executable
 
 __author__ = "Mario Ezquerro."
@@ -35,13 +36,15 @@ def locatehost(self, conexion, logger):
             conexion    (Var whit a conexion datacenter)
             logger      (Var objet to pass the log)
     """
-    
+
     MBFACTOR = float(1 << 20)
     index = 0
   
     my_dialogo_host = dialogos.Dialogo_host(None, -1, 'Host en vcenter')
 
     self.list_ctrl_host = theListCtrlHost(my_dialogo_host, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES | wx.SUNKEN_BORDER)
+    self.list_ctrl_host.logger = logger
+    self.list_ctrl_host.conexion = conexion
 
     name_rows = ['Data center', 'Resource Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
     # cargamos los nombres de los elementos
@@ -123,12 +126,12 @@ def locatehost(self, conexion, logger):
     my_dialogo_host.SetSizer(my_dialogo_host.sizer_main)
 
     # For use to auto-orden --- Call to Getlistctrl
-    self.list_ctrl_host.data_to_orden(self.list_ctrl_host, name_rows)
-    
+    self.list_ctrl_host.data_to_orden(self.list_ctrl_host, name_rows)  
     my_dialogo_host.ShowModal()
-    #manager_graf.display_plot(conexion)
+
 
 class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
+  global conexion
 
   def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
@@ -147,7 +150,43 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
     self.itemDataMap = self.tabla_host
     listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
 
+    # Add menu to Click element in VM 
+    self.list_ctrl_host.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.on_iten_host_selected, self.list_ctrl_host)
+
 
   # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
   def GetListCtrl(self):
        return self.list_ctrl_host
+
+
+  # Prepare menu about dialog click over VM machine in list ##############
+  def on_iten_host_selected(self, event):
+        #localizamos el elemento seleccionado en el listado ordenado , y cargamos la fila
+        if self.logger != None: self.logger.info('evento= '+ str(event.Index))
+        self.posicionLista = event.Index
+        self.listado_host = []
+        if self.logger != None: self.logger.info('datos en la fila= '+ str(self.list_ctrl_host.GetColumnCount()))
+        for item_comlum in range(self.list_ctrl_host.GetColumnCount()):
+            self.listado_host.append(self.list_ctrl_host.GetItemText( self.posicionLista,item_comlum))
+        if self.logger != None: self.logger.info( 'el otro ' + self.list_ctrl_host.GetItemText( self.posicionLista,1))
+        if self.logger != None: self.logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listado_host))
+
+        #if not hasattr(self, "sshID"):
+        self.graf_host = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.on_graf_host, id=self.graf_host)
+        
+        # build the menu
+        self.menu_host = wx.Menu()
+        item_separador = self.menu_host.AppendSeparator()
+        item_info_vm = self.menu_host.Append(self.graf_host, "Grafic Host...")
+        item_separador = self.menu_host.AppendSeparator()
+        
+        # show the popup menu
+        self.PopupMenu(self.menu_host)
+        self.menu_host.Destroy()
+
+    #########ADD the command to the events in the display dilog ######
+  def on_graf_host(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        """conexion = self.checking_conexion(conexion)"""
+        manager_graf.display_plot(self, event, self.logger, self.conexion)
