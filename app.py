@@ -391,7 +391,7 @@ class MyFrame(wx.Frame):
     # ----------------------------------------------------------------------
     def __init__(self):
         """Constructor"""
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Maquinas VM")
+        wx.Frame.__init__(self, None, wx.ID_ANY, "Intances VM")
         panel = MyPanel(self)
         self.Show()
 
@@ -403,7 +403,7 @@ class MyFrame(wx.Frame):
 class DialogAcceso():
     def __init__(self):
 
-        self.my_dialog_acceso_vcenter = dialogos.Dialogo_acceso_vcenter(None, -1, 'Datos de conexión')
+        self.my_dialog_acceso_vcenter = dialogos.Dialogo_acceso_vcenter(None, -1, 'Data to connect')
 
         # precarga de fichero config
         self.cfg = wx.Config('appconfig')
@@ -414,8 +414,8 @@ class DialogAcceso():
             self.my_dialog_acceso_vcenter.puert_vcenter.SetValue(self.cfg.Read('port'))
 
         else:
-            self.my_dialog_acceso_vcenter.nombre_vcenter.SetValue(self.cfg.Read('vcenter.host.com'))
-            self.my_dialog_acceso_vcenter.login_vcenter.SetValue(self.cfg.Read('usuario@dominio.es'))
+            self.my_dialog_acceso_vcenter.nombre_vcenter.SetValue(self.cfg.Read('Vcenter-name.host.com'))
+            self.my_dialog_acceso_vcenter.login_vcenter.SetValue(self.cfg.Read('user@demo.local'))
             self.my_dialog_acceso_vcenter.passwor_vcenter.SetValue(self.cfg.Read('estanoes'))
             self.my_dialog_acceso_vcenter.puert_vcenter.SetValue(self.cfg.Read('443'))
 
@@ -429,7 +429,7 @@ class DialogAcceso():
         self.pwd = self.my_dialog_acceso_vcenter.passwor_vcenter.GetValue()
         self.port = self.my_dialog_acceso_vcenter.puert_vcenter.GetValue()
 
-        # grabamos datos en el fichero config
+        # wirte data  at config file fichero
         self.cfg.WriteInt('version', 1)
         self.cfg.Write('vcenter', self.vcenter)
         self.cfg.Write('login', self.login)
@@ -437,7 +437,7 @@ class DialogAcceso():
         self.cfg.Write('port', self.port)
 
 
-        # accedemos al vcenter
+        # Acces to vcenter
         try:
             if not self.si:
                 self.context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -705,7 +705,7 @@ if __name__ == "__main__":
     logger = None
     #read inital config file
 
-    if os.name == 'posix':
+    """if os.name == 'posix':
         logging.config.fileConfig('logging.conf')
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
@@ -714,7 +714,7 @@ if __name__ == "__main__":
         #Update to last version pyvmwareclient
         answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
-            update_pyvmwareclient()
+            update_pyvmwareclient()"""
  
         
     app = wx.App(False)
