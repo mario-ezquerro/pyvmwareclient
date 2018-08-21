@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Actions to make at the menu
-
+Actions to make graf about host
 """
 
 #import sys
@@ -26,13 +25,24 @@ __all__ = [
     'display_plot'
 ]
 
-
-
-
 def display_plot(self, event, logger, conexion):
 
-    if logger != None: logger.info(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
+    if logger != None: logger.info(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host))
+    posicion=self.posicionLista
+    list_data_host=self.listado_host
+    #Find the OID HOST for read data  to checking
+    for datacenter in conexion.rootFolder.childEntity:
+        if hasattr(datacenter.vmFolder, 'childEntity'):
+            hostFolder = datacenter.hostFolder
+            computeResourceList = hostFolder.childEntity
+            for computeResource in computeResourceList:
+                hostList = computeResource.host
+                for host in hostList:
+                   if list_data_host[7]==str(datacenter) and list_data_host[8]==str(computeResource) and list_data_host[9]==str(host):
+                       oui_host_data = host
+                       break
 
+    if logger != None: logger.info('The OUI is : {}'.format(oui_host_data))    
     try:
             subprocess.Popen(
                 args=['gnuplot', '--version'],
@@ -50,13 +60,13 @@ def display_plot(self, event, logger, conexion):
 
             return
 
-
-     # Set a yrange for counters which unit is percentage
+    #Locate metric on host
+    print("{}".format(oui_host_data.summary.quickStats))
+    #print("{}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].hardware))
+    # Set a yrange for counters which unit is percentage
     yrange = '0:100' 
     #gnuplot_term = os.environ['GNUPLOT_TERM'] if os.environ.get('GNUPLOT_TERM') else 'dumb'
     gnuplot_term = 'qt'
-
-    
 
     fs, path = tempfile.mkstemp(prefix='pvcgnuplot-script-')
 
@@ -68,7 +78,14 @@ def display_plot(self, event, logger, conexion):
 
     lines = []
     #l = '"{datafile}" using 1:0 title "INSTANCIALL" with lines'
-    l = '"{}" using 0:1 title "INSTANCIALL" with lines'.format(datafile)
+    formating_template = (
+        '"{0}" using 1:2 title "CPU-Usage" with lines, '
+        '"{0}" using 1:3 title "Memory-Usage" with lines, '
+        '"{0}" using 1:4 title "CPU-Fairness" with lines, '
+        '"{0}" using 1:4 title "Memory-Fairness" with lines, '
+        '"{0}" using 1:6 title "Uptime" with lines'
+        )
+    l = formating_template.format(datafile)
     
     lines.append(l)
     """for index, instance in enumerate(instances):
@@ -85,26 +102,26 @@ def display_plot(self, event, logger, conexion):
             "set term {term}\n"
             "set grid\n"
             "set xdata time\n"
-            "set timefmt '%Y-%m-%d %H:%M:%S+00:00'\n"
+            "set timefmt '%s'\n"
             "set format x '%H:%M:%S'\n"
             "set xlabel 'Time'\n"
             "set ylabel '{unit}'\n"
             "set key outside right center\n"
-            "set datafile separator ','\n"
+            "set datafile separator comma\n"
             "set autoscale fix\n"
-            "set yrange [{yrange}]\n"
+            "#set yrange [{yrange}]\n"
             "plot {lines}\n"
             "pause {pause}\n"
-            'reread\n'
+            "reread\n"
         )
 
     gnuplot_script = script_template.format(
-            name='Name',
-            title='titulo',
+            name=list_data_host[0],
+            title=list_data_host[2],
             term=gnuplot_term,
             unit=5,
             lines=', '.join(lines),
-            pause='mouse',
+            pause = 5,
             yrange=yrange
     )
 
@@ -113,30 +130,37 @@ def display_plot(self, event, logger, conexion):
     
 
     #p = subprocess.Popen(args=['cat', path])
-    data=str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage)
+    data=str(oui_host_data.summary.quickStats.overallCpuUsage)
     with open(datafile, 'w') as fd:
             timestamp = time.time()
             fd.write('{},{}\n'.format(str(timestamp), data))  
 
     p = subprocess.Popen(args=['gnuplot', path])
+    """dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK | wx.ICON_INFORMATION)
+    dlg_draw.ShowModal()"""
     while True:
             #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
             #print("que hay en data: " + str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
-            
+            metric=[]
+            metric.append(host.summary.quickStats.overallCpuUsage)
+            metric.append(host.summary.quickStats.overallMemoryUsage)
+            metric.append(host.summary.quickStats.distributedCpuFairness)
+            metric.append(host.summary.quickStats.distributedMemoryFairness)
+            metric.append(host.summary.quickStats.uptime)
             save_performance_samples(
                 path=datafile,
-                data=str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage)
+                data=metric
             )
 
-            """dlg = wx.MessageDialog(None, "Do you really want to close this application?",'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
-            dlg.ShowModal()
-               
-            if dlg == wx.ID_OK:
-                dlg.Destroy()
-                break"""
-            
+            dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK  | wx.ICON_INFORMATION)
+            result = dlg_draw.ShowModal()
+   
+            if result == wx.ID_OK:
+                p.terminate()
+                dlg_draw.Destroy()
+                break
 
-    p.terminate()
+    
 
 
 def save_performance_samples(path, data):
@@ -161,7 +185,7 @@ def save_performance_samples(path, data):
 
         with open(path, 'a') as f:
             timestamp = time.time()
-            f.write('{},{}\n'.format(str(timestamp), data))
+            f.write('{},{}\n'.format(str(timestamp), ','.join([str(one_data) for one_data in data])))
 
 
         """with open(path, 'a') as f:
@@ -192,11 +216,7 @@ def save_performance_samples(path, data):
             args=['gnuplot', script]
         )
 
-        text = (
-            'Graph updates every {} seconds.\n\n'
-            'Press CANCEL in order to stop plotting the '
-            'graph and exit.\n'
-        )
+        
 
         while True:
             data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
@@ -204,17 +224,7 @@ def save_performance_samples(path, data):
                 path=datafile,
                 data=data
             )
-            code = self.dialog.pause(
-                title=self.title,
-                text=text.format(interval_id),
-                height=15,
-                width=60,
-                seconds=interval_id
-            )
-            if code == self.dialog.CANCEL:
-                break
-
-        p.terminate()
+            
 
     my_dialogo_host.ShowModal()"""
     # For use to auto-orden --- Call to Getlistctrl

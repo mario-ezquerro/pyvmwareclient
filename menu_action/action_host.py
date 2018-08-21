@@ -46,7 +46,16 @@ def locatehost(self, conexion, logger):
     self.list_ctrl_host.logger = logger
     self.list_ctrl_host.conexion = conexion
 
-    name_rows = ['Data center', 'Resource Name', 'Host Name', 'CPU usage', 'Host memory capacity', 'Host memory usag', 'Free memory percentage']
+    name_rows = ['Data center',
+                 'Resource Name',
+                 'Host Name',
+                 'CPU usage',
+                 'Host memory capacity',
+                 'Host memory usag',
+                 'Free memory percentage',
+                 'datacenter',
+                 'computeResource',
+                 'host']
     # cargamos los nombres de los elementos
     
     for i in range(len(name_rows)):
@@ -114,6 +123,9 @@ def locatehost(self, conexion, logger):
                             self.list_ctrl_host.SetItem(index, 4, str(humanize.naturalsize(memoryCapacity, binary=True)))
                             self.list_ctrl_host.SetItem(index, 5, str(memoryUsage / 1024) + " GiB")
                             self.list_ctrl_host.SetItem(index, 6, str(freeMemoryPercentage) + " %")
+                            self.list_ctrl_host.SetItem(index, 7, str(datacenter))
+                            self.list_ctrl_host.SetItem(index, 8, str(computeResource))
+                            self.list_ctrl_host.SetItem(index, 9, str(host))
                             #for use to auto use for auto sort colum
                             self.list_ctrl_host.SetItemData(index, index)
                             index += 1
@@ -169,7 +181,7 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
         for item_comlum in range(self.list_ctrl_host.GetColumnCount()):
             self.listado_host.append(self.list_ctrl_host.GetItemText( self.posicionLista,item_comlum))
         if self.logger != None: self.logger.info( 'el otro ' + self.list_ctrl_host.GetItemText( self.posicionLista,1))
-        if self.logger != None: self.logger.info( 'posicionlista= {} listadovm= {}'.format(self.posicionLista, self.listado_host))
+        if self.logger != None: self.logger.info( 'posicionlista= {} listado host= {}'.format(self.posicionLista, self.listado_host))
 
         #if not hasattr(self, "sshID"):
         self.graf_host = wx.NewId()
