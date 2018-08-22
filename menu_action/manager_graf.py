@@ -15,6 +15,7 @@ import subprocess
 import datetime
 import time
 import tempfile
+import threading
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
