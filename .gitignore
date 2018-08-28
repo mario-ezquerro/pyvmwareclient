@@ -104,6 +104,7 @@ ENV/
 
 # autogenerados
 *.log
+*.csv
 *.remmina
 *.wxg~
 *.py~
