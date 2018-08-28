@@ -14,6 +14,7 @@ import webbrowser
 import logging.config
 import humanize
 import sys
+import csv
 #from threading import Thread #The snapshot is crating in a tread to not stop the app
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
@@ -56,9 +57,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.list_ctrl = theListCtrl(self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES | wx.SUNKEN_BORDER)
         st1 = wx.StaticText(self, label='Find String VM: ')
-        self.cadenaBusqueda = wx.TextCtrl(self)
-        btnbusqueda = wx.Button(self, label="Find")
-        btnrecargaVM = wx.Button(self, label="Update VM")
+        self.strind_search = wx.TextCtrl(self)
+        btn_find_vm = wx.Button(self, label="Find")
+        btn_load_vm = wx.Button(self, label="Update VM")
+        btn_save_vm = wx.Button(self, label="Save VM")
         btnhost = wx.Button(self, label="host")
 
         name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
@@ -84,18 +86,20 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         #self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
 
         # This code put items into window with orden.
-        txtcontador = wx.StaticText(self, label='total VM: ' + str(len(self.tabla)))
+        count_str_vm = wx.StaticText(self, label='All VM: ' + str(len(self.tabla)))
         sizer = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox1.Add(st1, wx.ALL | wx.ALIGN_CENTER, 5)
-        hbox1.Add(self.cadenaBusqueda, wx.ALL | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btnbusqueda, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btnrecargaVM, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(self.strind_search, wx.ALL | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_find_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_load_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_save_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btnhost, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(txtcontador, wx.ALL | wx.ALIGN_CENTER, 5)
+        hbox1.Add(count_str_vm, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
-        self.Bind(wx.EVT_BUTTON, self.busquedadatos, btnbusqueda)
-        self.Bind(wx.EVT_BUTTON, self.recarga_VM, btnrecargaVM)#onItemSelected
+        self.Bind(wx.EVT_BUTTON, self.search_data_vm, btn_find_vm)
+        self.Bind(wx.EVT_BUTTON, self.reload_vm, btn_load_vm)#onItemSelected
+        self.Bind(wx.EVT_BUTTON, self.save_vm, btn_save_vm)#onItemSelected
         self.Bind(wx.EVT_BUTTON, self.bntlocateHost, btnhost)
 
         sizer.Add(self.list_ctrl, 1, wx.EXPAND)
@@ -121,11 +125,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     # buscamos un string en el nombre de las VM y lo pintamos de amarillo
     # si habia antes algo de amarillo lo ponemos blanco
-    def busquedadatos(self, event):
+    def search_data_vm(self, event):
 
             self.cargardatos_en_listctrl(self.tabla)
             
-            parabuscar = self.cadenaBusqueda.GetValue()
+            parabuscar = self.strind_search.GetValue()
         
             #parabuscar = re.comp(parabuscar, re.IGNORECASE)
             if parabuscar:
@@ -141,7 +145,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             else:
                 self.cargardatos_en_listctrl(self.tabla)
 
-    def recarga_VM(self, event):
+    def reload_vm(self, event):
         # conexion = conectar_con_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
@@ -181,6 +185,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.cargardatos_en_listctrl(self.tabla)
 
+    def save_vm(self, event):
+        with open('table_vm.csv', 'w')as my_csv_file_vm:
+             f_writer = csv.writer(my_csv_file_vm)
+             f_writer.writerows(self.tabla)
+        my_csv_file_vm.close()
 
     def cargardatos_en_listctrl(self, _tabla_paracargar):
         # cargamos las busquedas en el listado de tablas.
@@ -313,14 +322,16 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def onSsh(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
-        global conexion
-        conexion = self.checking_conexion(conexion)
+        #global conexion
+        #conexion = self.checking_conexion(conexion)
+        #For connect with ssh is not use with "conexion"
         action_vm.onSsh(self, event, conexion, logger)
         
     def onRdp(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
-        global conexion
-        conexion = self.checking_conexion(conexion)
+        #global conexion
+        #conexion = self.checking_conexion(conexion)
+        #For connect with ssh is not use with "conexion"
         action_vm.onRdp(self, event, conexion, logger)       
 
     def on_vmrc(self, event):
@@ -705,7 +716,7 @@ if __name__ == "__main__":
     logger = None
     #read inital config file
 
-    """if os.name == 'posix':
+    if os.name == 'posix':
         logging.config.fileConfig('logging.conf')
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
@@ -714,7 +725,7 @@ if __name__ == "__main__":
         #Update to last version pyvmwareclient
         answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
-            update_pyvmwareclient()"""
+            update_pyvmwareclient()
  
         
     app = wx.App(False)

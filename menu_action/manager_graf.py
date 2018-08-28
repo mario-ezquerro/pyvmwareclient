@@ -83,8 +83,7 @@ def display_plot(self, event, logger, conexion):
         '"{0}" using 1:2 title "CPU-Usage" with lines, '
         '"{0}" using 1:3 title "Memory-Usage" with lines, '
         '"{0}" using 1:4 title "CPU-Fairness" with lines, '
-        '"{0}" using 1:4 title "Memory-Fairness" with lines, '
-        '"{0}" using 1:6 title "Uptime" with lines'
+        '"{0}" using 1:4 title "Memory-Fairness" with lines'
         )
     l = formating_template.format(datafile)
     
@@ -131,35 +130,44 @@ def display_plot(self, event, logger, conexion):
     
 
     #p = subprocess.Popen(args=['cat', path])
-    data=str(oui_host_data.summary.quickStats.overallCpuUsage)
+    metric=[]
+    metric.append(host.summary.quickStats.overallCpuUsage)
+    metric.append(host.summary.quickStats.overallMemoryUsage)
+    metric.append(host.summary.quickStats.distributedCpuFairness)
+    metric.append(host.summary.quickStats.distributedMemoryFairness)
+    #metric.append(host.summary.quickStats.uptime)
+    data=metric
     with open(datafile, 'w') as fd:
             timestamp = time.time()
-            fd.write('{},{}\n'.format(str(timestamp), data))  
+            fd.write('{},{}\n'.format(str(timestamp),','.join([str(one_data) for one_data in data])))
 
+    q_write = threading.Thread(target=write_data_host_file, args=(host, datafile))
+    q_write.setDaemon(True)
+    q_write.start()
     p = subprocess.Popen(args=['gnuplot', path])
-    """dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK | wx.ICON_INFORMATION)
-    dlg_draw.ShowModal()"""
-    while True:
-            #data = self.pm.QueryPerf(querySpec=[query_spec]).pop()
-            #print("que hay en data: " + str(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host[0].summary.quickStats.overallCpuUsage))
+
+    """dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK  | wx.ICON_INFORMATION)
+    result = dlg_draw.ShowModal()
+    if result == wx.ID_OK:
+        p.terminate()
+        q_write.join(0.0)
+        dlg_draw.Destroy()"""
+        
+    
+def write_data_host_file(host, datafile):
+        while True:
             metric=[]
             metric.append(host.summary.quickStats.overallCpuUsage)
             metric.append(host.summary.quickStats.overallMemoryUsage)
             metric.append(host.summary.quickStats.distributedCpuFairness)
             metric.append(host.summary.quickStats.distributedMemoryFairness)
-            metric.append(host.summary.quickStats.uptime)
+            #metric.append(host.summary.quickStats.uptime)
+
             save_performance_samples(
                 path=datafile,
                 data=metric
             )
 
-            dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK  | wx.ICON_INFORMATION)
-            result = dlg_draw.ShowModal()
-   
-            if result == wx.ID_OK:
-                p.terminate()
-                dlg_draw.Destroy()
-                break
 
     
 
@@ -228,7 +236,4 @@ def save_performance_samples(path, data):
             
 
     my_dialogo_host.ShowModal()"""
-    # For use to auto-orden --- Call to Getlistctrl
-    #self.itemDataMap = self.tabla
-    #my_dialogo_host.list_ctrl_host.ColumnSorterMixin.__init__(self, len(name_rows))
 
