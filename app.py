@@ -60,7 +60,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.strind_search = wx.TextCtrl(self)
         btn_find_vm = wx.Button(self, label="Find")
         btn_load_vm = wx.Button(self, label="Update VM")
-        btn_save_vm = wx.Button(self, label="Save VM")
+        btn_save_file_vm = wx.Button(self, label="Save file VM")
+        btn_load_file_vm = wx.Button(self, label="Load file VM")
         btnhost = wx.Button(self, label="host")
 
         name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
@@ -93,13 +94,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         hbox1.Add(self.strind_search, wx.ALL | wx.ALIGN_CENTER, 5)
         hbox1.Add(btn_find_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btn_load_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btn_save_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_save_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_load_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btnhost, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(count_str_vm, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
         self.Bind(wx.EVT_BUTTON, self.search_data_vm, btn_find_vm)
         self.Bind(wx.EVT_BUTTON, self.reload_vm, btn_load_vm)#onItemSelected
-        self.Bind(wx.EVT_BUTTON, self.save_vm, btn_save_vm)#onItemSelected
+        self.Bind(wx.EVT_BUTTON, self.save_file_vm, btn_save_file_vm)
+        self.Bind(wx.EVT_BUTTON, self.load_file_vm, btn_load_file_vm)
         self.Bind(wx.EVT_BUTTON, self.bntlocateHost, btnhost)
 
         sizer.Add(self.list_ctrl, 1, wx.EXPAND)
@@ -185,11 +188,33 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.cargardatos_en_listctrl(self.tabla)
 
-    def save_vm(self, event):
+    def save_file_vm(self, event):
+        if logger != None: logger.info('Start to write table -> table_vm.csv')
         with open('table_vm.csv', 'w')as my_csv_file_vm:
-             f_writer = csv.writer(my_csv_file_vm)
-             f_writer.writerows(self.tabla)
+             f_writer = csv.writer(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+             for row in self.tabla:
+                 row_witnout_return = []
+                 for x in range(len(row)):
+                     element_without_return = row[x].split('\n')
+                     element_without_return = str(element_without_return[0])
+                     row_witnout_return.append(element_without_return)
+                 f_writer.writerow(row_witnout_return)
+                 #f_writer.writerows("end")
+             #f_writer.writerows(self.tabla)
         my_csv_file_vm.close()
+        if logger != None: logger.info('End to write table -> table_vm.csv')
+    
+    def load_file_vm(self, event):
+        if logger != None: logger.info('Start to Load table from  table_vm.csv')
+        self.tabla=[]
+        with open('table_vm.csv', 'r')as my_csv_file_vm:
+             f_reader = csv.reader(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+             for row in f_reader:
+                 self.tabla.append(row)
+        self.cargardatos_en_listctrl(self.tabla)
+        my_csv_file_vm.close()
+        if logger != None: logger.info('End to load table  from table_vm.csv')
+    
 
     def cargardatos_en_listctrl(self, _tabla_paracargar):
         # cargamos las busquedas en el listado de tablas.
