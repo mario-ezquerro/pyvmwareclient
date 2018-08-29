@@ -64,11 +64,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btn_load_file_vm = wx.Button(self, label="Load file VM")
         btnhost = wx.Button(self, label="host")
 
-        name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
+        self.name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
 
         # cargamos los nombres de los elementos
-        for x in range(len(name_rows)):
-            self.list_ctrl.InsertColumn(x, name_rows[x],format=wx.LIST_FORMAT_LEFT, width=150)
+        for x in range(len(self.name_rows)):
+            self.list_ctrl.InsertColumn(x, self.name_rows[x],format=wx.LIST_FORMAT_LEFT, width=150)
 
         # conexion = conectar_con_vcenter(self, id)
         self.tabla = []
@@ -79,7 +79,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         # For use to auto-orden --- Call to Getlistctrl
         self.itemDataMap = self.tabla
-        listmix.ColumnSorterMixin.__init__(self, len(name_rows))
+        listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
 
         # Add menu to Click element in VM 
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onItemSelected, self.list_ctrl)
@@ -192,6 +192,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         if logger != None: logger.info('Start to write table -> table_vm.csv')
         with open('table_vm.csv', 'w')as my_csv_file_vm:
              f_writer = csv.writer(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+             f_writer.writerow([head for head in self.name_rows])
              for row in self.tabla:
                  row_witnout_return = []
                  for x in range(len(row)):
@@ -211,6 +212,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
              f_reader = csv.reader(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
              for row in f_reader:
                  self.tabla.append(row)
+        #delete head they are not real data similar self.tabla.pop(0)         
+        self.tabla.remove(self.name_rows)
         self.cargardatos_en_listctrl(self.tabla)
         my_csv_file_vm.close()
         if logger != None: logger.info('End to load table  from table_vm.csv')
