@@ -185,12 +185,15 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
 
         #if not hasattr(self, "sshID"):
         self.graf_host = wx.NewId()
+        self.event_host = wx.NewId()
         self.Bind(wx.EVT_MENU, self.on_graf_host, id=self.graf_host)
+        self.Bind(wx.EVT_MENU, self.on_event_host, id=self.event_host)
         
         # build the menu
         self.menu_host = wx.Menu()
         item_separador = self.menu_host.AppendSeparator()
-        item_info_vm = self.menu_host.Append(self.graf_host, "Grafic Host...")
+        item_graf_vm = self.menu_host.Append(self.graf_host, "Grafic Host...")
+        item_event_vm = self.menu_host.Append(self.event_host, "Event Host...")
         item_separador = self.menu_host.AppendSeparator()
         
         # show the popup menu
@@ -202,3 +205,9 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         """conexion = self.checking_conexion(conexion)"""
         manager_graf.display_plot(self, event, self.logger, self.conexion)
+
+  def on_event_host(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        """conexion = self.checking_conexion(conexion)"""
+        #manager_graf.display_plot(self, event, self.logger, self.conexion)
+        pass

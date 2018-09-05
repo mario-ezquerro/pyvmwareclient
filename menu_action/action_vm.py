@@ -17,6 +17,7 @@ import subprocess
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
+from tools import alarm
 from distutils.spawn import find_executable
 
 __author__ = "Mario Ezquerro."
@@ -121,7 +122,49 @@ def on_info_vm(self, event, conexion, logger):
         self.my_dialogo_texto.Destroy()
 
 
+def on_event_vm(self, event, conexion, logger):
+        """
+        Arg:
+            event       (Var from menu)
+            conexion    (Var whit a conexion datacenter)
+            logger      (Var objet to pass the log)
+        """
+        fila = self.listadoVM
+        #print (self, event, conexion)
+        for i in range(len(fila)):
+            if logger != None: logger.info(fila[i])
+            
+        # El 9 elemento es el UUID
+        if logger != None: logger.info (fila[8])
+        
+        # List about vm detail in dialog box
 
+        self.my_dialogo_texto = dialogos.Dialogo_texto(None, -1, 'Listados de Eventos VM')
+
+        vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
+        if logger != None: logger.info('informacion vm: '+ vm.summary.config.name)
+        
+        snaptexto  = "=====================\n "
+        snaptexto += 'Maquna vm = ' + fila[1] + '\n'
+        snaptexto += 'Triggerd: ' + str(alarm.print_triggered_alarms(entity=vm)) + '\n'
+        snaptexto += 'Refs: ' + str(alarm.get_alarm_refs(entity=vm)) + '\n'
+
+        # Since the above method will list all of the triggered alarms we will now
+        # prompt the user for the entity info needed to reset an alarm from red
+        # to green
+        """
+            if alarm.reset_alarm(entity_moref=HOST._moId,
+                                 entity_type='HostSystem',
+                                 alarm_moref=alarm_mor.strip(),
+                                 service_instance=SI):
+               snaptexto +="Successfully reset alarm {0} to green.".format(alarm_mor)"""
+
+        snaptexto += "====================="
+
+
+        self.my_dialogo_texto.salida_texto.SetValue(snaptexto)
+        result = self.my_dialogo_texto.ShowModal() # pintamos la ventana con la informcion
+        self.my_dialogo_texto.Destroy()
 
 
 

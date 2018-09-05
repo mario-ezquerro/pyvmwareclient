@@ -59,24 +59,26 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         st1 = wx.StaticText(self, label='Find String VM: ')
         self.strind_search = wx.TextCtrl(self)
         btn_find_vm = wx.Button(self, label="Find")
-        btn_load_vm = wx.Button(self, label="Update VM")
+        btn_load_vm = wx.Button(self, label="Load VCenter DATA")
         btn_save_file_vm = wx.Button(self, label="Save file VM")
         btn_load_file_vm = wx.Button(self, label="Load file VM")
         btnhost = wx.Button(self, label="host")
 
-        self.name_rows = ['Folder', 'Name', 'IP', 'Estate', 'Ask', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
+        self.name_rows = ['Folder', 'Name', 'IP', 'State', 'DNS-Name', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
 
-        # cargamos los nombres de los elementos
+        # Import the table name_rows into supertable
         for x in range(len(self.name_rows)):
             self.list_ctrl.InsertColumn(x, self.name_rows[x],format=wx.LIST_FORMAT_LEFT, width=150)
 
-        # conexion = conectar_con_vcenter(self, id)
+        # conexion = connect_with_vcenter(self, id)
         self.tabla = []
-        self.tabla = sacar_listado_capertas(conexion)
+        ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
+        ######self.tabla = sacar_listado_capertas(conexion)
         self.vm_buscados = []
 
-        self.cargardatos_en_listctrl(self.tabla)
-
+        ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
+        #self.cargardatos_en_listctrl(self.tabla)
+        
         # For use to auto-orden --- Call to Getlistctrl
         self.itemDataMap = self.tabla
         listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
@@ -87,24 +89,27 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         #self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.onItemSelected, self.list_ctrl)
 
         # This code put items into window with orden.
-        count_str_vm = wx.StaticText(self, label='All VM: ' + str(len(self.tabla)))
+        self.count_str_vm = wx.StaticText(self, label='All VM: ' + str(len(self.tabla)))
         sizer = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox1.Add(st1, wx.ALL | wx.ALIGN_CENTER, 5)
-        hbox1.Add(self.strind_search, wx.ALL | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btn_find_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+
         hbox1.Add(btn_load_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btn_save_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
         hbox1.Add(btn_load_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+
+        hbox1.Add(st1, wx.ALL | wx.ALIGN_RIGHT, 5)
+        hbox1.Add(self.strind_search, wx.ALL | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_find_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        
         hbox1.Add(btnhost, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(count_str_vm, wx.ALL | wx.ALIGN_CENTER, 5)
+        hbox1.Add(self.count_str_vm, wx.ALL | wx.ALIGN_CENTER, 5)
         sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
         self.Bind(wx.EVT_BUTTON, self.search_data_vm, btn_find_vm)
         self.Bind(wx.EVT_BUTTON, self.reload_vm, btn_load_vm)#onItemSelected
         self.Bind(wx.EVT_BUTTON, self.save_file_vm, btn_save_file_vm)
         self.Bind(wx.EVT_BUTTON, self.load_file_vm, btn_load_file_vm)
         self.Bind(wx.EVT_BUTTON, self.bntlocateHost, btnhost)
-
+        
         sizer.Add(self.list_ctrl, 1, wx.EXPAND)
         self.SetSizer(sizer)
         sizer.Layout()
@@ -137,9 +142,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             #parabuscar = re.comp(parabuscar, re.IGNORECASE)
             if parabuscar:
                 i = self.list_ctrl.GetItemCount() - 1
-                while i >= 0 : # find data in name col=1, ip col=2 and mac col=9
+                while i >= 0 : # find data in name col=1, ip col=2 and mac col=9 dns_name=4
                     if re.search(parabuscar, self.list_ctrl.GetItemText(i, col=1),re.IGNORECASE) or \
                     re.search(parabuscar, self.list_ctrl.GetItemText(i, col=2),re.IGNORECASE) or \
+                    re.search(parabuscar, self.list_ctrl.GetItemText(i, col=4),re.IGNORECASE) or \
                     re.search(parabuscar, self.list_ctrl.GetItemText(i, col=9),re.IGNORECASE):
                         self.list_ctrl.SetItemBackgroundColour(i, 'yellow')
                     else:
@@ -149,7 +155,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                 self.cargardatos_en_listctrl(self.tabla)
 
     def reload_vm(self, event):
-        # conexion = conectar_con_vcenter(self, id)
+        # conexion = connect_with_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
         
@@ -160,7 +166,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         except:
             if logger != None: logger.info('NOT connecting')
-            conexion = conectar_con_vcenter()
+            conexion = connect_with_vcenter()
 
         self.tabla = []
         ###print( 'La conexion esta: {}'.format(conexion))
@@ -188,7 +194,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.cargardatos_en_listctrl(self.tabla)
 
-    def save_file_vm(self, event):
+    def save_file_vm(self, event=None):
         if logger != None: logger.info('Start to write table -> table_vm.csv')
         with open('table_vm.csv', 'w')as my_csv_file_vm:
              f_writer = csv.writer(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
@@ -205,18 +211,37 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         my_csv_file_vm.close()
         if logger != None: logger.info('End to write table -> table_vm.csv')
     
-    def load_file_vm(self, event):
-        if logger != None: logger.info('Start to Load table from  table_vm.csv')
+    def load_file_vm(self, event=None):
+        openFileDialog = wx.FileDialog(frame, "Open", "", "", 
+                                      "Python files (*.csv)|*.csv", 
+                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        openFileDialog.ShowModal()
+        if logger != None: logger.info('file select to load {}'.format(openFileDialog.GetPath()))
+        file_to_open = openFileDialog.GetPath()
+        openFileDialog.Destroy()
+
+        if logger != None: logger.info('Start to Load table from {}'.format(file_to_open))
         self.tabla=[]
-        with open('table_vm.csv', 'r')as my_csv_file_vm:
+        with open(file_to_open, 'r')as my_csv_file_vm:
              f_reader = csv.reader(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
              for row in f_reader:
                  self.tabla.append(row)
-        #delete head they are not real data similar self.tabla.pop(0)         
-        self.tabla.remove(self.name_rows)
-        self.cargardatos_en_listctrl(self.tabla)
+        #delete head they are not real data similar self.tabla.pop(0)
+        try:       
+            self.tabla.remove(self.name_rows)
+            self.cargardatos_en_listctrl(self.tabla)
+        except:
+            dlgerror = wx.MessageDialog(self,
+                                   "Error load file, error in data {}.".format(file_to_open),
+                                   caption = "Info Error load {}.".format(file_to_open),
+                                   style= wx.OK | wx.ICON_QUESTION)
+            dlgerror.ShowModal()
+            dlgerror.Destroy()
+            if logger != None: logger.warning('Error load {} file'.format(file_to_open))
+
         my_csv_file_vm.close()
-        if logger != None: logger.info('End to load table  from table_vm.csv')
+        if logger != None: logger.info('End to load table from {}'.format(file_to_open))
+
     
 
     def cargardatos_en_listctrl(self, _tabla_paracargar):
@@ -234,6 +259,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             
             #self.myRowDict[index] = elemen
             index += 1
+        self.save_file_vm()
+        self.count_str_vm.SetLabel('All VM: ' + str(len(self.tabla)))
 
 
 
@@ -252,6 +279,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         #if not hasattr(self, "sshID"):
         self.info_vm = wx.NewId()
+        self.event_vm = wx.NewId()
         self.set_note = wx.NewId()
         self.sshID = wx.NewId()
         self.rdpID = wx.NewId()
@@ -265,6 +293,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.powerOff = wx.NewId()
         self.exitID = wx.NewId()
         self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
+        self.Bind(wx.EVT_MENU, self.on_event, id=self.event_vm)
         self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
         self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
         self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
@@ -294,6 +323,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # build the menu
         self.menu = wx.Menu()
         item_info_vm = self.menu.Append(self.info_vm, "Info VM...")
+        item_event_vm = self.menu.Append(self.event_vm, "Envents VM...")
         item_set_note = self.menu.Append(self.set_note, "Set Note...")
         item_snap_menu = self.menu.Append(wx.ID_ANY,'Manager Snapshot', self.snap_menu)
         item_ssh = self.menu.Append(self.sshID, "Connection ssh")
@@ -323,6 +353,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         global conexion
         conexion = self.checking_conexion(conexion)
         action_vm.on_info_vm(self, event, conexion, logger)
+    
+    def on_event(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
+        action_vm.on_event_vm(self, event, conexion, logger)
  
     def on_set_note(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
@@ -419,7 +455,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             
         except:
             if logger != None: logger.info('NOT connecting')
-            conexion = conectar_con_vcenter()
+            conexion = connect_with_vcenter()
             return conexion
 
 
@@ -504,7 +540,7 @@ class DialogAcceso():
    
 
     def OnDisConnect(self):
-        if logger != None: logger.info('desconecction')
+        if logger != None: logger.info('OUT Desconect')
         dlg = wx.MessageDialog(self.my_dialog_acceso_vcenter, 'Do you really want to close this application?',
                                'Confirm Exit', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         # wx.MessageDialog()
@@ -518,7 +554,7 @@ class DialogAcceso():
 
 # ----------------------------------------------------------------------
 # connect with Vcenter code and Dialog
-def conectar_con_vcenter():
+def connect_with_vcenter():
         """
             Present a dialog box to get the datas for conect to esxi or vcenter
         """
@@ -547,19 +583,20 @@ def conectar_con_vcenter():
 # ----------------------------------------------------------------------
 
 def sacar_listado_capertas(conexion):
-    listado_carpetas = []
+    listado_folders = []
     name = []
     path = []
     guest = []
     anotacion = []
-    estado = []
+    state = []
     dirmacs = []
     dirip = []
-    pregunta = []
+    dns_name = []
+    ask_data = []
     uuid = []
 
 
-    #Calculamos el maximo de elementos a analizar
+    # Calculate the max data to read to show process bar
 
     wait_cursor = wx.BusyCursor()
     max = 0
@@ -571,11 +608,11 @@ def sacar_listado_capertas(conexion):
             vmList = vmFolder.childEntity
             max = max + len(vmList)
 
-    if logger != None: logger.info('el maximo es : {}'.format(max))
+    if logger != None: logger.info('The max are : {}'.format(max))
     keepGoing = True
     count = 0
-    dlg = wx.ProgressDialog("Proceso cargando datos",
-                            "Cargando datos",
+    dlg = wx.ProgressDialog("Loading Data Process",
+                            "Loading VM data",
                             maximum = max,
                             #parent=-1,
                             #style = wx.PD_APP_MODAL
@@ -598,22 +635,21 @@ def sacar_listado_capertas(conexion):
             for vm in vmList:
                 count += 1
                 keepGoing= dlg.Update(count, "Loading")
-                # if logger != None: logger.info (vm.name) # imprime todo el listado de carpetas
-                carpeta = vm.name
-                PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas)
+                # if logger != None: logger.info (vm.name) # imprime todo el listado de folders
+                folder = vm.name
+                locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders)
 
     # salida tabulada----------------------------------------
-    if logger != None: logger.info('###############################')
+    if logger != None: logger.info('#'*35)
 
     tabla = []
     elemento = []
     for i in range(len(name)):
-        elemento.append(listado_carpetas[i])
-
+        elemento.append(listado_folders[i])
         elemento.append(name[i])
         elemento.append(dirip[i])
-        elemento.append(estado[i])
-        elemento.append(pregunta[i])
+        elemento.append(state[i])
+        elemento.append(dns_name[i])
         elemento.append(path[i])
         elemento.append(guest[i])
         elemento.append(anotacion[i])
@@ -622,7 +658,7 @@ def sacar_listado_capertas(conexion):
         tabla.append(elemento)
         elemento = []
 
-    # headers=['Carpeta', 'pool', 'Nombre','IP','Estado','pregunta', 'Disco Path', 'Sistema', 'Notas', 'uuid']
+    # headers=['Carpeta', 'pool', 'Nombre','IP','Estado','dns_name', 'Disco Path', 'Sistema', 'Notas', 'uuid']
     # if logger != None: logger.info (tabulate(tabla, headers, tablefmt="fancy_grid"))
 
     dlg.Destroy()
@@ -631,9 +667,9 @@ def sacar_listado_capertas(conexion):
 
 
 # ----------------------------------------------------------------------
-# Sacar listado carpetas
+# Locate list folders
 
-def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas, depth=1):
+def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, depth=1):
     """Print information for a particular virtual machine or recurse into a folder
     with depth protection
     """
@@ -648,21 +684,21 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
         vmList = vm.childEntity
 
         for c in vmList:
-            PrintVmInfo(c, name, path, guest, anotacion, estado, dirmacs, dirip, pregunta, uuid, carpeta, listado_carpetas,
+            locate_vm_info(c, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders,
                         depth + 1)
         return
 
     summary = vm.summary
 
-    if carpeta != None or carpeta != "":
-        listado_carpetas.append(carpeta)
+    if folder != None or folder != "":
+        listado_folders.append(folder)
     else:
-        listado_carpetas.append('sin carpeta')
+        listado_folders.append('sin folder')
 
     name.append(summary.config.name)
     path.append(summary.config.vmPathName)
     guest.append(summary.config.guestFullName)
-    estado.append(summary.runtime.powerState)
+    state.append(summary.runtime.powerState)
     uuid.append(summary.config.uuid)
 
     annotation = summary.config.annotation
@@ -671,7 +707,7 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
     else:
         anotacion.append('sin anotacion')
 
-    # If logger != None: logger.info("State      : ", summary.runtime.powerState)
+    # if logger != None: logger.info("Data: {}--".format(vm.summary))
     # Load the NIC's and locate all ip's
     #print(summary.guest)
     if summary.guest != None:
@@ -691,10 +727,16 @@ def PrintVmInfo(vm, name, path, guest, anotacion, estado, dirmacs, dirip, pregun
             dirmacs.append('mac?')
             dirip.append('ip?')
 
-    if summary.runtime.question is not None:
-        pregunta.append(summary.runtime.question)
+    """if summary.runtime.question is not None:
+        ask_data.append(summary.runtime.question)
     else:
-        pregunta.append('no datos')
+        ask_data.append('no datos')"""
+    
+    if summary.guest.hostName is not None:
+        dns_name.append(summary.guest.hostName)
+    else:
+        dns_name.append('no datos')
+
         # if logger != None: logger.info("Question  : ", summary.runtime.question.text)
         # if logger != None: logger.info("")
 
@@ -757,7 +799,8 @@ if __name__ == "__main__":
  
         
     app = wx.App(False)
-    conexion = conectar_con_vcenter()
+    ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
+    #conexion = connect_with_vcenter()
     frame = MyFrame()
     app.MainLoop()
 
