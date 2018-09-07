@@ -70,7 +70,8 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         for x in range(len(self.name_rows)):
             self.list_ctrl.InsertColumn(x, self.name_rows[x],format=wx.LIST_FORMAT_LEFT, width=150)
 
-        # conexion = connect_with_vcenter(self, id)
+        #conexion = connect_with_vcenter(self, id)
+        
         self.tabla = []
         ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
         ######self.tabla = sacar_listado_capertas(conexion)
@@ -192,11 +193,19 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         #if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
 
-        self.cargardatos_en_listctrl(self.tabla)
+        self.cargardatos_en_listctrl(self.tabla, _save = True)
 
     def save_file_vm(self, event=None):
-        if logger != None: logger.info('Start to write table -> table_vm.csv')
-        with open('table_vm.csv', 'w')as my_csv_file_vm:
+        
+        saveFileDialog = wx.FileDialog(frame, "Save file with VM data", "", "", 
+                                      "Python files ('table_vm.csv')|*.csv", 
+                                       wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        saveFileDialog.ShowModal()
+        file_to_save = saveFileDialog.GetPath()
+        saveFileDialog.Destroy()
+        if logger != None: logger.info('Start to write table -> {}'.format(file_to_save))
+
+        with open(file_to_save, 'w')as my_csv_file_vm:
              f_writer = csv.writer(my_csv_file_vm, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
              f_writer.writerow([head for head in self.name_rows])
              for row in self.tabla:
@@ -209,7 +218,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                  #f_writer.writerows("end")
              #f_writer.writerows(self.tabla)
         my_csv_file_vm.close()
-        if logger != None: logger.info('End to write table -> table_vm.csv')
+        if logger != None: logger.info('End to write table -> {}'.format(file_to_save))
     
     def load_file_vm(self, event=None):
         openFileDialog = wx.FileDialog(frame, "Open", "", "", 
@@ -244,7 +253,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     
 
-    def cargardatos_en_listctrl(self, _tabla_paracargar):
+    def cargardatos_en_listctrl(self, _tabla_paracargar, _save = False):
         # cargamos las busquedas en el listado de tablas.
         #self.myRowDict = {}
         self.list_ctrl.DeleteAllItems()
@@ -259,7 +268,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             
             #self.myRowDict[index] = elemen
             index += 1
-        self.save_file_vm()
+        if _save: self.save_file_vm()
         self.count_str_vm.SetLabel('All VM: ' + str(len(self.tabla)))
 
 
@@ -801,6 +810,7 @@ if __name__ == "__main__":
     app = wx.App(False)
     ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
     #conexion = connect_with_vcenter()
+    conexion = object
     frame = MyFrame()
     app.MainLoop()
 
