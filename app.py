@@ -20,6 +20,7 @@ from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
 from tools import tasks
 from tools import vm
+from tools import alarm
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 from wxgladegen import dialogos
@@ -38,9 +39,6 @@ class theListCtrl(wx.ListCtrl):
     def __init__(self, parent, ID=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
         wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
         
-
-
-
 class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
     """
         Create the center window 
@@ -64,7 +62,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btn_load_file_vm = wx.Button(self, label="Load file VM")
         btnhost = wx.Button(self, label="host")
 
-        self.name_rows = ['Folder', 'Name', 'IP', 'State', 'DNS-Name', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs']
+        self.name_rows = ['Folder', 'Name', 'IP', 'State', 'DNS-Name', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs', 'Sign']
 
         # Import the table name_rows into supertable
         for x in range(len(self.name_rows)):
@@ -74,15 +72,15 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         
         self.tabla = []
         ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
-        ######self.tabla = sacar_listado_capertas(conexion)
+        ######self.tabla = download_list_folder_and_vm(conexion)
         self.vm_buscados = []
 
         ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
         #self.cargardatos_en_listctrl(self.tabla)
         
-        # For use to auto-orden --- Call to Getlistctrl
+        """# For use to auto-orden --- Call to Getlistctrl
         self.itemDataMap = self.tabla
-        listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
+        listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))"""
 
         # Add menu to Click element in VM 
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.onItemSelected, self.list_ctrl)
@@ -171,7 +169,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.tabla = []
         ###print( 'La conexion esta: {}'.format(conexion))
-        self.tabla = sacar_listado_capertas(conexion)
+        self.tabla = download_list_folder_and_vm(conexion)
         self.vm_buscados = []
 
         #sacar datos acerca de vcenter.
@@ -196,7 +194,14 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.cargardatos_en_listctrl(self.tabla, _save = True)
 
     def save_file_vm(self, event=None):
-        
+        """
+        this function write a file wiht table information.
+
+        @param event:   when call this funtcion from button the pass a event
+                        when call from another code the event = Nont
+        @return: Not return need
+
+        """
         saveFileDialog = wx.FileDialog(frame, "Save file with VM data", "", "", 
                                       "Python files ('table_vm.csv')|*.csv", 
                                        wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -218,6 +223,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
                  #f_writer.writerows("end")
              #f_writer.writerows(self.tabla)
         my_csv_file_vm.close()
+        
+        # For use to auto-orden --- Call to Getlistctrl
+        self.itemDataMap = self.tabla
+        listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
+
         if logger != None: logger.info('End to write table -> {}'.format(file_to_save))
     
     def load_file_vm(self, event=None):
@@ -261,11 +271,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         for elemen in _tabla_paracargar:
             self.list_ctrl.InsertItem(index, elemen[0])
             total_elemen = len(elemen)
-            for i in range(total_elemen):
+            for i in range((total_elemen)):
                 self.list_ctrl.SetItem(index, i, str(elemen[i]))
             # the nex line is for work the auto list
             self.list_ctrl.SetItemData(index, index)
-            
             #self.myRowDict[index] = elemen
             index += 1
         if _save: self.save_file_vm()
@@ -591,7 +600,16 @@ def connect_with_vcenter():
 # Locate info about Machine MV
 # ----------------------------------------------------------------------
 
-def sacar_listado_capertas(conexion):
+def download_list_folder_and_vm(conexion):
+    """
+    Download the list of datacenter, folder, vm an another info
+
+    Args:
+        conexion: obj 'Informatión aboud conexion with datacenter or esxi.'
+
+    Returns:
+        Table with a lot datacenter information.
+    """
     listado_folders = []
     name = []
     path = []
@@ -603,6 +621,7 @@ def sacar_listado_capertas(conexion):
     dns_name = []
     ask_data = []
     uuid = []
+    sing = []
 
 
     # Calculate the max data to read to show process bar
@@ -646,7 +665,7 @@ def sacar_listado_capertas(conexion):
                 keepGoing= dlg.Update(count, "Loading")
                 # if logger != None: logger.info (vm.name) # imprime todo el listado de folders
                 folder = vm.name
-                locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders)
+                locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing)
 
     # salida tabulada----------------------------------------
     if logger != None: logger.info('#'*35)
@@ -664,6 +683,7 @@ def sacar_listado_capertas(conexion):
         elemento.append(anotacion[i])
         elemento.append(uuid[i])
         elemento.append(dirmacs[i])
+        elemento.append(sing[i])
         tabla.append(elemento)
         elemento = []
 
@@ -678,7 +698,7 @@ def sacar_listado_capertas(conexion):
 # ----------------------------------------------------------------------
 # Locate list folders
 
-def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, depth=1):
+def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing, depth=1):
     """Print information for a particular virtual machine or recurse into a folder
     with depth protection
     """
@@ -693,8 +713,7 @@ def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_
         vmList = vm.childEntity
 
         for c in vmList:
-            locate_vm_info(c, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders,
-                        depth + 1)
+            locate_vm_info(c, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing, depth + 1)
         return
 
     summary = vm.summary
@@ -709,6 +728,11 @@ def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_
     guest.append(summary.config.guestFullName)
     state.append(summary.runtime.powerState)
     uuid.append(summary.config.uuid)
+    
+    if str(alarm.print_triggered_alarms(entity=vm)) == 'None':
+        sing.append(str(0))
+    else:
+        sing.append(str(1))
 
     annotation = summary.config.annotation
     if annotation != None and annotation != "":

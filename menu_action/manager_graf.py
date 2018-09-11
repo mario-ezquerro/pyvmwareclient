@@ -19,6 +19,8 @@ import threading
 from wxgladegen import dialogos
 from pyVmomi import vim
 from tools import tasks
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 __author__ = "Mario Ezquerro."
 
@@ -27,6 +29,10 @@ __all__ = [
 ]
 
 def display_plot(self, event, logger, conexion):
+
+    def data_animate(*args):
+        #data1.append(host.summary.quickStats.overallCpuUsage)     
+        return data1,
 
     if logger != None: logger.info(" \n The manual debug: {}".format(conexion.rootFolder.childEntity[0].hostFolder.childEntity[0].host))
     posicion=self.posicionLista
@@ -85,6 +91,41 @@ def display_plot(self, event, logger, conexion):
         '"{0}" using 1:4 title "CPU-Fairness" with lines, '
         '"{0}" using 1:4 title "Memory-Fairness" with lines'
         )
+
+    # For use with matplotlib
+    grafic2 = []
+    grafic3 = []
+    grafic4 = []
+    
+    plt.grid(True)
+    #plt.xlabel('Time') 
+    #plt.plot(data1, marker='x', linestyle=':', color='b', linewidth=0.55, label='CPU-Usage')
+    #plt.plot(grafic2, marker='*', linestyle='-', color='g', linewidth=0.25, label='Memory-Usage')
+    #plt.plot(grafic3, marker='o', linestyle='--', color='r', linewidth=0.25, label='CPU-Fairness')
+    #plt.plot(grafic4, marker='+', linestyle='-.', color='m', linewidth=0.25, label='Memory-Fairness')
+    #plt.legend(loc='upper left')
+
+    fig1 = plt.figure()
+    data1 = []
+    data1.append(host.summary.quickStats.overallCpuUsage)
+
+    l1, = plt.plot([], [], marker='x', linestyle=':', color='b', linewidth=0.55, label='CPU-Usage')
+    l2, = plt.plot([], [], marker='*', linestyle='-', color='g', linewidth=0.25, label='Memory-Usage')
+
+    plt.title("{name} - {title}".format(name=list_data_host[0],title=list_data_host[2]))
+
+    graf_ani = animation.FuncAnimation(fig1, 
+                                       data_animate, 
+                                       data1, 
+                                       interval=50, 
+                                       repeat_delay=3000, 
+                                       blit=True)
+    
+    plt.show()
+
+
+    #plt.show()
+    # End for use with matplotlig
     l = formating_template.format(datafile)
     
     lines.append(l)
@@ -135,16 +176,38 @@ def display_plot(self, event, logger, conexion):
     metric.append(host.summary.quickStats.overallMemoryUsage)
     metric.append(host.summary.quickStats.distributedCpuFairness)
     metric.append(host.summary.quickStats.distributedMemoryFairness)
+    #
+    #timestamp = time.time()
+    #data1.append(host.summary.quickStats.overallCpuUsage)
+    #grafic2.append(host.summary.quickStats.overallMemoryUsage)
+    #grafic3.append(host.summary.quickStats.distributedCpuFairness)
+    #grafic4.append(host.summary.quickStats.distributedMemoryFairness)
+    
+    #plt.show(block=False)
     #metric.append(host.summary.quickStats.uptime)
     data=metric
     with open(datafile, 'w') as fd:
             timestamp = time.time()
             fd.write('{},{}\n'.format(str(timestamp),','.join([str(one_data) for one_data in data])))
+    
+    """while True:
+            timestamp = time.time()
+            grafic1.append(host.summary.quickStats.overallCpuUsage)
+            grafic2.append(host.summary.quickStats.overallMemoryUsage)
+            grafic3.append(host.summary.quickStats.distributedCpuFairness)
+            grafic4.append(host.summary.quickStats.distributedMemoryFairness)
+            
+            plt.plot(grafic1, grafic1)
 
-    q_write = threading.Thread(target=write_data_host_file, args=(host, datafile))
-    q_write.setDaemon(True)
-    q_write.start()
-    p = subprocess.Popen(args=['gnuplot', path])
+            print('here')
+            #plt.plot()
+            plt.pause(0.001)"""
+   
+
+    #q_write = threading.Thread(target=write_data_host_file, args=(host, datafile, plt, grafic1, grafic2, grafic3, grafic4))
+    #q_write.setDaemon(True)
+    #q_write.start()
+    #######p = subprocess.Popen(args=['gnuplot', path])
 
     """dlg_draw = wx.MessageDialog(None, "Press OK to stop plotting the graph and exit",'Confirm Exit', wx.OK  | wx.ICON_INFORMATION)
     result = dlg_draw.ShowModal()
@@ -154,20 +217,32 @@ def display_plot(self, event, logger, conexion):
         dlg_draw.Destroy()"""
         
     
-def write_data_host_file(host, datafile):
+
+def write_data_host_file(host, datafile, plt, grafic1, grafic2, grafic3, grafic4):
         while True:
+            timestamp = time.time()
             metric=[]
             metric.append(host.summary.quickStats.overallCpuUsage)
             metric.append(host.summary.quickStats.overallMemoryUsage)
             metric.append(host.summary.quickStats.distributedCpuFairness)
             metric.append(host.summary.quickStats.distributedMemoryFairness)
             #metric.append(host.summary.quickStats.uptime)
-
+            grafic1.append(host.summary.quickStats.overallCpuUsage)
+            grafic2.append(host.summary.quickStats.overallMemoryUsage)
+            grafic3.append(host.summary.quickStats.distributedCpuFairness)
+            grafic4.append(host.summary.quickStats.distributedMemoryFairness)
+            
+            plt.plot(grafic1, grafic1)
+            print('here')
+            #plt.plot()
+            plt.pause(5.00)
+           
+            """
             save_performance_samples(
                 path=datafile,
                 data=metric
             )
-
+            """
 
     
 
