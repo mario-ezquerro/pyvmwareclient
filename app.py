@@ -27,6 +27,7 @@ from wxgladegen import dialogos
 from menu_action import action_vm
 from menu_action import action_host
 from menu_action import manager_snap
+from menu_action import manager_graf_vm
 
 import datetime
 import tempfile
@@ -298,6 +299,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         #if not hasattr(self, "sshID"):
         self.info_vm = wx.NewId()
         self.event_vm = wx.NewId()
+        self.graf_vm = wx.NewId()
         self.set_note = wx.NewId()
         self.sshID = wx.NewId()
         self.rdpID = wx.NewId()
@@ -312,6 +314,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.exitID = wx.NewId()
         self.Bind(wx.EVT_MENU, self.on_info, id=self.info_vm)
         self.Bind(wx.EVT_MENU, self.on_event, id=self.event_vm)
+        self.Bind(wx.EVT_MENU, self.on_graf_vm, id=self.graf_vm)
         self.Bind(wx.EVT_MENU, self.on_set_note, id=self.set_note)
         self.Bind(wx.EVT_MENU, self.onSsh, id=self.sshID)
         self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
@@ -342,6 +345,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.menu = wx.Menu()
         item_info_vm = self.menu.Append(self.info_vm, "Info VM...")
         item_event_vm = self.menu.Append(self.event_vm, "Envents VM...")
+        item_graf_vm = self.menu.Append(self.graf_vm, "Grafics VM...")
         item_set_note = self.menu.Append(self.set_note, "Set Note...")
         item_snap_menu = self.menu.Append(wx.ID_ANY,'Manager Snapshot', self.snap_menu)
         item_ssh = self.menu.Append(self.sshID, "Connection ssh")
@@ -377,6 +381,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         global conexion
         conexion = self.checking_conexion(conexion)
         action_vm.on_event_vm(self, event, conexion, logger)
+
+    def on_graf_vm(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        global conexion
+        conexion = self.checking_conexion(conexion)
+        manager_graf_vm.graf_vm(self, event, conexion, logger)
  
     def on_set_note(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
@@ -728,8 +738,8 @@ def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_
     guest.append(summary.config.guestFullName)
     state.append(summary.runtime.powerState)
     uuid.append(summary.config.uuid)
-    
-    if str(alarm.print_triggered_alarms(entity=vm)) == 'None':
+   
+    if str(alarm.print_triggered_alarms(entity=vm)) == 'None' and  len(str(alarm.get_alarm_refs(entity=vm))) == 2 :
         sing.append(str(0))
     else:
         sing.append(str(1))
@@ -825,10 +835,10 @@ if __name__ == "__main__":
         logger.info("# Start here a new loggin now")
         #pass
     
-        #Update to last version pyvmwareclient
+        """#Update to last version pyvmwareclient
         answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
-            update_pyvmwareclient()
+            update_pyvmwareclient()"""
  
         
     app = wx.App(False)

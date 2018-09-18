@@ -210,4 +210,9 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         """conexion = self.checking_conexion(conexion)"""
         #manager_graf.display_plot(self, event, self.logger, self.conexion)
-        pass
+        dlg_info_pass = wx.MessageDialog(None,
+                                     'Not implemented',
+                                     'Not implemented',
+                                     wx.OK )
+        result_dlg_info_pass = dlg_info_pass.ShowModal()
+        dlg_info_pass.Destroy()
