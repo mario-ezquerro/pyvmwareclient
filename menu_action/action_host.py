@@ -18,7 +18,7 @@ from wxgladegen import dialogos
 import wx.lib.mixins.listctrl as listmix
 from pyVmomi import vim
 from tools import tasks
-from menu_action import manager_graf
+from menu_action import manager_graf_host
 from distutils.spawn import find_executable
 
 __author__ = "Mario Ezquerro."
@@ -204,12 +204,12 @@ class theListCtrlHost(wx.ListCtrl, listmix.ColumnSorterMixin):
   def on_graf_host(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         """conexion = self.checking_conexion(conexion)"""
-        manager_graf.display_plot(self, event, self.logger, self.conexion)
+        manager_graf_host.display_plot(self, event, self.logger, self.conexion)
 
   def on_event_host(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         """conexion = self.checking_conexion(conexion)"""
-        #manager_graf.display_plot(self, event, self.logger, self.conexion)
+        #manager_graf_host.display_plot(self, event, self.logger, self.conexion)
         dlg_info_pass = wx.MessageDialog(None,
                                      'Not implemented',
                                      'Not implemented',

@@ -97,12 +97,12 @@ def graf_vm(self, event, conexion, logger):
     """
     fila = self.listadoVM
     for i in range(len(fila)):
-        if logger != None: logger.info(fila[i])
+        if logger != None: logger.info('Create plots about: ' + fila[i])
     vm = conexion.searchIndex.FindByUuid(None,fila[8], True)
 
 
     #grafica 1
-    fig1, ax = plt.subplots(2, 2)
+    fig1, ax = plt.subplots(3, 3)
 
     scope_maxCpuUsage = Scope(ax[0,0],
                           label ='maxCpuUsage',
@@ -133,7 +133,7 @@ def graf_vm(self, event, conexion, logger):
 
 
     #grafica 3
-    graf_cpu_memorySizeMB = Scope(ax[1,0],
+    graf_cpu_memorySizeMB = Scope(ax[0,2],
                           label ='memorySizeMB',
                           oid = vm.summary.config.memorySizeMB,
                           maxy = 50,
@@ -146,7 +146,7 @@ def graf_vm(self, event, conexion, logger):
                                        interval=1000,
                                        blit=False)
     #grafica 4
-    graf_memory_overallCpuUsage = Scope(ax[1,1],
+    graf_memory_overallCpuUsage = Scope(ax[1,0],
                           label ='overallCpuUsage',
                           oid = vm.summary.quickStats.overallCpuUsage,
                           maxy = 50,
@@ -159,8 +159,79 @@ def graf_vm(self, event, conexion, logger):
                                        interval=1000,
                                        blit=False)
 
+    #grafica 5
+    graf_memory_overallCpuDemand = Scope(ax[1,1],
+                          label ='overallCpuDemand',
+                          oid = vm.summary.quickStats.overallCpuDemand,
+                          maxy = 50,
+                          maxt = 100)
+
+
+    graf_ani5 = animation.FuncAnimation(fig1,
+                                       graf_memory_overallCpuDemand.update,
+                                       data_gen_memory_overallCpuDemand(oid=vm),
+                                       interval=1000,
+                                       blit=False)
+
+    #grafica 6
+    graf_memory_guestMemoryUsage = Scope(ax[1,2],
+                          label ='guestMemoryUsage',
+                          oid = vm.summary.quickStats.guestMemoryUsage,
+                          maxy = 50,
+                          maxt = 100)
+
+
+    graf_ani6 = animation.FuncAnimation(fig1,
+                                       graf_memory_guestMemoryUsage.update,
+                                       data_gen_memory_guestMemoryUsage(oid=vm),
+                                       interval=1000,
+                                       blit=False)
+
+    #grafica 7
+    graf_memory_privateMemory = Scope(ax[2,0],
+                          label ='privateMemory',
+                          oid = vm.summary.quickStats.privateMemory,
+                          maxy = 50,
+                          maxt = 100)
+
+
+    graf_ani7 = animation.FuncAnimation(fig1,
+                                       graf_memory_privateMemory.update,
+                                       data_gen_memory_privateMemory(oid=vm),
+                                       interval=1000,
+                                       blit=False)
+
+    #grafica 8
+    graf_memory_sharedMemory = Scope(ax[2,1],
+                          label ='sharedMemory',
+                          oid = vm.summary.quickStats.sharedMemory,
+                          maxy = 50,
+                          maxt = 100)
+
+
+    graf_ani8 = animation.FuncAnimation(fig1,
+                                       graf_memory_sharedMemory.update,
+                                       data_gen_memory_sharedMemory(oid=vm),
+                                       interval=1000,
+                                       blit=False)
+
+    #grafica 9
+    graf_memory_swappedMemory = Scope(ax[2,2],
+                          label ='swappedMemory',
+                          oid = vm.summary.quickStats.swappedMemory,
+                          maxy = 50,
+                          maxt = 100)
+
+
+    graf_ani9 = animation.FuncAnimation(fig1,
+                                       graf_memory_swappedMemory.update,
+                                       data_gen_memory_swappedMemory(oid=vm),
+                                       interval=1000,
+                                       blit=False)
+
+
     #plt.subplot_tool()
-    fig1.suptitle('Data VM: {}'.format(vm.runtime.host.name))
+    fig1.suptitle('Data VM: {}'.format(vm.summary.config.name))
     plt.show()
 
 class Scope(object):

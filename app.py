@@ -260,6 +260,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if logger != None: logger.warning('Error load {} file'.format(file_to_open))
 
         my_csv_file_vm.close()
+        
+        # For use to auto-orden --- Call to Getlistctrl
+        self.itemDataMap = self.tabla
+        listmix.ColumnSorterMixin.__init__(self, len(self.name_rows))
+
         if logger != None: logger.info('End to load table from {}'.format(file_to_open))
 
     
@@ -498,7 +503,7 @@ class MyFrame(wx.Frame):
         panel = MyPanel(self)
         self.Show()
 
-        # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
 
 
 # ######Display data for connet whit esxi an vcenter ######################
