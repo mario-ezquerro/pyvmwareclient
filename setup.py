@@ -1,7 +1,7 @@
 #!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 # Dependencies are automatically detected, but it might need
-# Fine tuning . python3.5 setup.py build
+# Fine tuning  python3.5 setup.py build
 # Usar python  en Macos bdist_dmg
 # Or in python sudo python3.5 setup.py bdist_rpm y en windows bdist_msi
 # Error subsane with :
@@ -15,7 +15,16 @@ from codecs import open
 from cx_Freeze import setup, Executable
 
 build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
-                                'packages': ['idna', 'cryptography', 'cffi', 'OpenSSL', 'webbrowser', 'setuptools', 'humanize'],
+                                'packages': ['idna', 
+                                             'cryptography',
+                                             'cffi',
+                                             'OpenSSL',
+                                             'webbrowser',
+                                             'setuptools',
+                                             'humanize',
+                                             'matplotlib',
+                                             'numpy',
+                                             'tkinter'],
                                 'includes': [],
                                 'excludes': []
                                 },
@@ -44,7 +53,7 @@ else:
                      targetName='pyvmwareclient')
 
 setup(name='pyvmwareclient',
-      version='0.3.25',
+      version='0.4.1',
       description='Client for Vcenter 6.0/6.5 VMware en python',
       author='Mario Ezquerro',
       author_email='mario.ezquerro@gmail.com',

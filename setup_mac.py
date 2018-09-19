@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # Use http://sveinbjorn.org/platypus
 # python3.5 setup_mac.py  py2app usar el otroooo
+# from setuptools import setup
 
-#from setuptools import setup
+
 from distutils.core import setup
 import py2app
 
@@ -23,8 +24,8 @@ OPTIONS = {
         'CFBundleDevelopmentRegion': 'English',
         'CFBundleGetInfoString': "Client VMWare make with python",
         'CFBundleIdentifier': "com.ezquerro.mario",
-        'CFBundleVersion': "0.3.25",
-        'CFBundleShortVersionString': "0.3.25",
+        'CFBundleVersion': "0.4.1",
+        'CFBundleShortVersionString': "0.4.1",
         'NSAppleScriptEnabled':False,
         'NSHumanReadableCopyright': u"Copyright © 2018, Mario Ezquerro, All Rights Reserved"
     }

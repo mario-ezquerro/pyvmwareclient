@@ -8,18 +8,17 @@ $ python app.py
 
 Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
 
-Works in linux using putty (If also the putty in linux) and the Remminia to connect with RDP. And work in Windows the putty is necesary to with the path and work MacOs too
+Works in linux using putty (If also the putty in linux) an the Remminia. And work in Windows the putty is necesary to with the path and work MacOs too
 
 What programs do yo need in your path?
 
-|**Linux**        |**Windows**       |**MacOs**            |
-|:----------------|:-----------------|:--------------------|
-|putty            |putty             |shell (on system)    |
-|remminia         |mstsc (As sistem) |mstsc (By Microsoft) |
-|vmrc or vmplayer |vmrc or vmplayer  |vmrc or vmplayer     |
+|**Linux**        |**Windows**      |**MacOs**            |
+|:----------------|:----------------|:--------------------|
+|putty            |putty            |shell (on system)    |
+|remminia         |mstsc            |mstsc (By Microsoft) |
+|vmrc or vmplayer |vmrc or vmplayer |vmrc or vmplayer     |
 
 You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
-
 Note: The vmplayer it instaler with vmware-workstation, vmware does not allow simultaneos installation of vrmc and  vmplayer)
 
 ## Available Options for a VM:
@@ -29,17 +28,12 @@ Note: The vmplayer it instaler with vmware-workstation, vmware does not allow si
   03. Connection RDP using client Remminia(linux) or Windows Client (Windows MacOS)
   04. Connection VRMC add to menu.
   05. Connection console wiht HTML Client
-  06. Power on and power off VM
-  07. Reset hard y soft VM
-  08. Reboot a VM
+  06. Power on
+  07. Reset hard y soft
+  08. Power off hard y soft
   09. Change or Add Notes
-  10. Display tecnical Info about VM
-  11. Display Info about host (when connection vcenter)
-  12. Display Grafic about data host
-  13. Display Grafic about data VM
-  14. Save and Load the data VM in csv file format
-  15. Show event an error in a VM
-  16. Search with name or ir or mac table
+  10. Display tecnicla Info about VM
+  11. Display Infor about host (when connection vcenter)
 
 ## Example of  screenshots the are made with wx-windows
 

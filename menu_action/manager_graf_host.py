@@ -21,7 +21,7 @@ from pyVmomi import vim
 from tools import tasks
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import matplotlib.animation as animation 
 
 
 __author__ = "Mario Ezquerro."
