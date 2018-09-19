@@ -3,7 +3,7 @@ cx_Freeze==6.0b1
 py2app==0.14
 wxPython>=4.0.0b2
 idna==2.5
-cryptography==2.0
+cryptography>=2.3.0
 cffi==1.10.0
 pyOpenSSL==17.2.0
 setuptools>=38.4.0
