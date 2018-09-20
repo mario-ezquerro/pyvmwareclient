@@ -44,18 +44,18 @@ Note: The vmplayer it instaler with vmware-workstation, vmware does not allow si
 
 ## Example of  screenshots the are made with wx-windows
 
-At start you must put your user and domain an name of esxi or vcenter:
+At start you must put your user and domain an name of esxi or vcenter, the captured images may not present all the options, but they are not the last version of the program):
 
-![Image user an password window](/images/user_pass.png)
+![Image user an password window](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/user_pass.png)
 
 Then you can see the "LOAD" of datacente data:
 
-![Image window lading data](/images/loading_data.png)
+![Image window lading data](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/loading_data.png)
 
 The list of VM that are in your system:
 
-![Window list VM](/images/list_vm.png)
+![Window list VM](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/list_vm.png)
 
 And you can make a lot of commands in your VM (this image is not the ultimate menu options:
 
-![Exampe window Menu (not the update version)](/images/menu.png)
+![Exampe window Menu (not the update version)](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/menu.png)
