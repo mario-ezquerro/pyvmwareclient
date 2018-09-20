@@ -38,6 +38,8 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 if sys.platform == 'win32':
+    os.environ['TCL_LIBRARY'] = r'E:\python\tcl\tcl8.6'
+    os.environ['TK_LIBRARY'] = r'E:\python\tcl\tk8.6'
     exe = Executable(script='app.py',
                      targetName="pyvmwareclient.exe",
                      base="Win32GUI",
