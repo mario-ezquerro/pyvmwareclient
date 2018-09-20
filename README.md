@@ -1,5 +1,8 @@
 # pyvmwareclient [![GitHub license](https://img.shields.io/github/license/wbugbofh/pyvmwareclient.svg)](https://github.com/wbugbofh/pyvmwareclient/blob/master/LICENSE)
 
+
+[![HitCount](http://hits.dwyl.io/wbugbofh/wbugbofh/pyvmwareclient.svg)](http://hits.dwyl.io/wbugbofh/wbugbofh/pyvmwareclient)
+
 Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version.
 ```bash
 $ pip install -r requirements.txt
