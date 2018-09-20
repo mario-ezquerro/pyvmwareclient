@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3.5
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
 import wx
@@ -837,13 +837,13 @@ if __name__ == "__main__":
     logger = None
     #read inital config file
 
-    if os.name == 'posix':
+    """if os.name == 'posix':
         logging.config.fileConfig('logging.conf')
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
         #pass
     
-        """#Update to last version pyvmwareclient
+        #Update to last version pyvmwareclient
         answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
             update_pyvmwareclient()"""

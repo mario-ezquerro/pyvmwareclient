@@ -49,10 +49,17 @@ if sys.platform == 'win32':
                      icon=os.path.join("icons", "vmwareclient.ico"))
 
 else:
+    os.environ['TCL_LIBRARY']=r'/System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl' 
+    os.environ['TK_LIBRARY']=r'/System/Library/Frameworks/Tk.framework/Versions/8.5/Tk' 
     exe = Executable(script='app.py',
                      base='Console',
                      icon='./icons/vmwareclient.ico',
                      targetName='pyvmwareclient')
+
+# sudo mkdir -p /Library/Frameworks/Tcl.framework/Versions/8.5
+# sudo mkdir -p /Library/Frameworks/Tk.framework/Versions/8.5
+# sudo cp  -r /System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl /Library/Frameworks/Tcl.framework/Versions/8.5
+# sudo cp -r /System/Library/Frameworks/Tk.framework/Versions/8.5/Tk /Library/Frameworks/Tk.framework/Versions/8.5
 
 setup(name='pyvmwareclient',
       version='0.4.1',
