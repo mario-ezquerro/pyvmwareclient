@@ -110,3 +110,4 @@ ENV/
 *.py~
 
 .idea/
+.vscode/
