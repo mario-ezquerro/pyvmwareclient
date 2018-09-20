@@ -161,6 +161,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         try:
+            control = conexion.rootFolder.childEntity
             if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
             if logger != None: logger.info('connecting')
 
@@ -170,6 +171,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.tabla = []
         ###print( 'La conexion esta: {}'.format(conexion))
+
         self.tabla = download_list_folder_and_vm(conexion)
         self.vm_buscados = []
 
@@ -482,6 +484,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def checking_conexion(self, conexion):
         try:
+            control = conexion.rootFolder.childEntity
             if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
             if logger != None: logger.info('connecting')
             return conexion

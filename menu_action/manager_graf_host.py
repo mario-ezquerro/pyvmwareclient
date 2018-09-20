@@ -70,23 +70,7 @@ def display_plot(self, event, logger, conexion):
                        oid_host_data = host
                        break
 
-    if logger != None: logger.info('The OUI is : {}'.format(oid_host_data))    
-    try:
-            subprocess.Popen(
-                args=['gnuplot', '--version'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-                
-    except OSError as e:
-
-            if logger != None: logger.info('Error no gnunplot or not path to gnuplot')
-
-            dlg = wx.MessageDialog(self.my_dialog, 'Unable to find gnuplot(1): \n{}\n'.format(e), style = wx.OK  | wx.ICON_QUESTION)
-            dlg.ShowModal()
-            dlg.Destroy()
-
-            return
+    if logger != None: logger.info('The OUI is : {}'.format(oid_host_data))
 
     #Locate metric on host
     print("{}".format(oid_host_data.summary.quickStats))
