@@ -837,7 +837,7 @@ if __name__ == "__main__":
     logger = None
     #read inital config file
 
-    """if os.name == 'posix':
+    if os.name == 'posix':
         logging.config.fileConfig('logging.conf')
         logger = logging.getLogger('pyvmwareclient')
         logger.info("# Start here a new loggin now")
@@ -846,7 +846,7 @@ if __name__ == "__main__":
         #Update to last version pyvmwareclient
         answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
-            update_pyvmwareclient()"""
+            update_pyvmwareclient()
  
         
     app = wx.App(False)

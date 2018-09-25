@@ -59,3 +59,7 @@ The list of VM that are in your system:
 And you can make a lot of commands in your VM (this image is not the ultimate menu options:
 
 ![Exampe window Menu (not the update version)](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/menu.png)
+
+You can  look the grafic about VM with this:
+
+![Exampe window Menu (not the update version)](https://github.com/wbugbofh/pyvmwareclient/blob/master/images/grafic_vm.png)
