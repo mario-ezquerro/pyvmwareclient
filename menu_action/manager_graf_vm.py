@@ -270,7 +270,7 @@ class Scope(object):
             self.ax.figure.canvas.draw()
         
         lasty = self.ydata[-1] 
-        if lasty > (self.suma_maxy -(self.suma_maxy/8)) :
+        if lasty > (self.suma_maxy -(self.suma_maxy/4)) :
             self.suma_maxy = self.suma_maxy + self.maxy
             #self.tdata = [self.tdata[-1]]
             #self.ydata = [self.ydata[-1]]

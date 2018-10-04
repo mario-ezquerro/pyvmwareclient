@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+﻿#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
 import wx
@@ -15,6 +15,7 @@ import logging.config
 import humanize
 import sys
 import csv
+import maquina
 #from threading import Thread #The snapshot is crating in a tread to not stop the app
 from wxgladegen import dialogos
 from pyVim.connect import SmartConnect, Disconnect
@@ -22,8 +23,7 @@ from tools import tasks
 from tools import vm
 from tools import alarm
 from pyVmomi import vim
-from pyVim.connect import SmartConnect, Disconnect
-from wxgladegen import dialogos
+
 from menu_action import action_vm
 from menu_action import action_host
 from menu_action import manager_snap
@@ -32,7 +32,6 @@ from menu_action import manager_graf_vm
 import datetime
 import tempfile
 import subprocess
-
 
 
 class theListCtrl(wx.ListCtrl):
@@ -174,26 +173,6 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         self.tabla = download_list_folder_and_vm(conexion)
         self.vm_buscados = []
-
-        #sacar datos acerca de vcenter.
-        #object_about = conexion.about
-        """for obj in object_view.view:
-            print(obj)
-            if isinstance(obj, vim.VirtualMachine):
-                vm.print_vm_info(obj)
-        #print (object_about)
-        #print(object_about.version)
-
-        object_view = conexion.viewManager.CreateContainerView(conexion.rootFolder, [], True)
-        for obj in object_view.view:
-            print(obj)
-            if isinstance(obj, vim.HostSystem):
-                    print("El host es: " + obj.name)
-
-        object_view.Destroy()"""
-
-        #if logger != None: logger.info("Reload of VM: {0}".format(self.tabla))
-
         self.cargardatos_en_listctrl(self.tabla, _save = True)
 
     def save_file_vm(self, event=None):
@@ -619,15 +598,8 @@ def connect_with_vcenter():
 # ----------------------------------------------------------------------
 
 def download_list_folder_and_vm(conexion):
-    """
-    Download the list of datacenter, folder, vm an another info
 
-    Args:
-        conexion: obj 'Informatión aboud conexion with datacenter or esxi.'
 
-    Returns:
-        Table with a lot datacenter information.
-    """
     listado_folders = []
     name = []
     path = []
@@ -642,19 +614,19 @@ def download_list_folder_and_vm(conexion):
     sing = []
 
 
+
+    condemore = conexion
+    container = condemore.rootFolder  # starting point to look into
+    viewType = [vim.VirtualMachine]  # object types to look for
+    recursive = True  # whether we should look into it recursively
+    containerView = condemore.viewManager.CreateContainerView(container, viewType, recursive)
+    children = containerView.view
+    
     # Calculate the max data to read to show process bar
 
     wait_cursor = wx.BusyCursor()
-    max = 0
-    for child in conexion.rootFolder.childEntity:
-        max += 1
-        if hasattr(child, 'vmFolder'):
-            datacenter = child
-            vmFolder = datacenter.vmFolder
-            vmList = vmFolder.childEntity
-            max = max + len(vmList)
-
-    if logger != None: logger.info('The max are : {}'.format(max))
+    max = len(children)
+    if logger != None: logger.info('The max virtual machine: {}'.format(max))
     keepGoing = True
     count = 0
     dlg = wx.ProgressDialog("Loading Data Process",
@@ -669,127 +641,51 @@ def download_list_folder_and_vm(conexion):
                             )
     keepGoing = dlg.Update(count)
 
-    # miramos el arbol de Virtual Machine
-    for child in conexion.rootFolder.childEntity:
+    servidores = []
+    for child in children:
         count += 1
         keepGoing = dlg.Update(count, "Loading")
-        if hasattr(child, 'vmFolder'):
-            datacenter = child
-            vmFolder = datacenter.vmFolder
-            vmList = vmFolder.childEntity
 
-            for vm in vmList:
-                count += 1
-                keepGoing= dlg.Update(count, "Loading")
-                # if logger != None: logger.info (vm.name) # imprime todo el listado de folders
-                folder = vm.name
-                locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing)
-
-    # salida tabulada----------------------------------------
-    if logger != None: logger.info('#'*35)
+        servidor = print_vm_info(child)
+        servidores.append(servidor)
+    dlg.Destroy()
+    del wait_cursor
 
     tabla = []
     elemento = []
-    for i in range(len(name)):
-        elemento.append(listado_folders[i])
-        elemento.append(name[i])
-        elemento.append(dirip[i])
-        elemento.append(state[i])
-        elemento.append(dns_name[i])
-        elemento.append(path[i])
-        elemento.append(guest[i])
-        elemento.append(anotacion[i])
-        elemento.append(uuid[i])
-        elemento.append(dirmacs[i])
-        elemento.append(sing[i])
+    
+    for i in range(len(servidores)):
+        elemento.append(servidores[i].listado_folders)
+        elemento.append(servidores[i].name)
+        elemento.append(servidores[i].dirip)
+        elemento.append(servidores[i].state)
+        elemento.append(servidores[i].dns_name)
+        elemento.append(servidores[i].path)
+        elemento.append(servidores[i].guest)
+        elemento.append(servidores[i].anotacion)
+        elemento.append(servidores[i].uuid)
+        elemento.append(servidores[i].dirmacs)
+        elemento.append(servidores[i].sing)
         tabla.append(elemento)
         elemento = []
 
-    # headers=['Carpeta', 'pool', 'Nombre','IP','Estado','dns_name', 'Disco Path', 'Sistema', 'Notas', 'uuid']
-    # if logger != None: logger.info (tabulate(tabla, headers, tablefmt="fancy_grid"))
-
-    dlg.Destroy()
-    del wait_cursor
+    
     return (tabla)
 
-
-# ----------------------------------------------------------------------
-# Locate list folders
-
-def locate_vm_info(vm, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing, depth=1):
-    """Print information for a particular virtual machine or recurse into a folder
-    with depth protection
+def print_vm_info(virtual_machine):
     """
-    maxdepth = 50
-
-    # if this is a group it will have children. if it does, recurse into them
-    # and then return
-
-    if hasattr(vm, 'childEntity'):
-        if depth > maxdepth:
-            return
-        vmList = vm.childEntity
-
-        for c in vmList:
-            locate_vm_info(c, name, path, guest, anotacion, state, dirmacs, dirip, dns_name, uuid, folder, listado_folders, sing, depth + 1)
-        return
-
-    summary = vm.summary
-
-    if folder != None or folder != "":
-        listado_folders.append(folder)
-    else:
-        listado_folders.append('sin folder')
-
-    name.append(summary.config.name)
-    path.append(summary.config.vmPathName)
-    guest.append(summary.config.guestFullName)
-    state.append(summary.runtime.powerState)
-    uuid.append(summary.config.uuid)
-   
-    if str(alarm.print_triggered_alarms(entity=vm)) == 'None' and  len(str(alarm.get_alarm_refs(entity=vm))) == 2 :
-        sing.append(str(0))
-    else:
-        sing.append(str(1))
-
-    annotation = summary.config.annotation
-    if annotation != None and annotation != "":
-        anotacion.append(summary.config.annotation)
-    else:
-        anotacion.append('sin anotacion')
-
-    # if logger != None: logger.info("Data: {}--".format(vm.summary))
-    # Load the NIC's and locate all ip's
-    #print(summary.guest)
-    if summary.guest != None:
-        ip = summary.guest.ipAddress
-        if ip is not None and ip != "":
-            macs = ''
-            ips = ''
-            for nic in vm.guest.net:                         
-                if  hasattr(nic.ipConfig, 'ipAddress'):
-                    for ipAddress in nic.ipConfig.ipAddress:
-                        macs = macs + nic.macAddress + ' '
-                        ips = ips + ipAddress.ipAddress + ' '
-            dirmacs.append(macs)
-            dirip.append(ips)
-            #dirip.append(summary.guest.ipAddress)
-        else:
-            dirmacs.append('mac?')
-            dirip.append('ip?')
-
-    """if summary.runtime.question is not None:
-        ask_data.append(summary.runtime.question)
-    else:
-        ask_data.append('no datos')"""
+    Print information for a particular virtual machine or recurse into a
+    folder with depth protection
+    """ 
+    servidor =  maquina.Maquina(virtual_machine)
+    return servidor
     
-    if summary.guest.hostName is not None:
-        dns_name.append(summary.guest.hostName)
-    else:
-        dns_name.append('no datos')
 
-        # if logger != None: logger.info("Question  : ", summary.runtime.question.text)
-        # if logger != None: logger.info("")
+
+
+
+
+
 
 
 ########################### Start the program  ####################
@@ -844,9 +740,9 @@ if __name__ == "__main__":
         #pass
     
         #Update to last version pyvmwareclient
-        answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
+        """answer_yes_no =  yes_no('Can update pyvmware: [yes/no]')
         if answer_yes_no == True:
-            update_pyvmwareclient()
+            update_pyvmwareclient()"""
  
         
     app = wx.App(False)

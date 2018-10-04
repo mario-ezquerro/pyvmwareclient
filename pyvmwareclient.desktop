@@ -2,16 +2,16 @@
 # If yo like another path, change the data
 [Desktop Entry]
 Encoding=UTF-8
-Version=1.0
+Version=0.4.1
 Type=Application
 Terminal=false
-Icon=/opt/pyvmwareclient/icons/vmwareclient.png
-Icon[es_ES]=/opt/pyvmwareclient/icons/vmwareclient.png
+Icon=vmwareclient.png
+Icon[es_ES]=vmwareclient.png
 Name=pyvmwareclient
 Name[es_ES]=pyvmwareclient
 Comment=Client vmware esxi and vcenter
 Comment[es_ES]=Cliente vcenter-vmware
-Exec=/opt/pyvmwareclient/app.py
+Exec=app.py
 Categories=Utility;Development;Other
 GenericName[es_ES]=Cliente VMware para Vcenter6.0 by python
 StartupNotify=true
