@@ -46,8 +46,9 @@ class Maquina():
     def __init__(self, vm, logger=None):
 
         self.vm = vm
+        
         self.summary = vm.summary
-        self.folder = vm.name
+        self.folder = self.vm.name
         self.listado_folders = ''
         self.name = self.summary.config.name
         self.path = self.summary.config.vmPathName
@@ -115,34 +116,3 @@ class Maquina():
             self.sing='0'
         else:
             self.sing='ALARMA'
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

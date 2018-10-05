@@ -155,6 +155,7 @@ def get_alarm_refs(entity=None):
     for alarm_state in alarm_states:
         tdict = {
             "alarm": alarm_state.key.split('.')[0],
+            "name": alarm_state,
             "status": alarm_state.overallStatus
         }
         ret.append(tdict)

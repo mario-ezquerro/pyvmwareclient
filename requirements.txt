@@ -5,7 +5,7 @@ wxPython>=4.0.0b2
 idna==2.5
 cryptography>=2.3.0
 cffi==1.10.0
-pyOpenSSL==17.2.0
+pyOpenSSL>=17.2.0
 setuptools>=38.4.0
 pyvim>=2.0.23
 pyVmomi>=6.7.0

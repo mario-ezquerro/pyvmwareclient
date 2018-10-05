@@ -1,12 +1,14 @@
 #!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
+#
 # Dependencies are automatically detected, but it might need
-# Fine tuning  python3.5 setup.py build
+# Fine tuning  Linux: "sudo python3.5 setup.py build"
 # Usar python  en Macos bdist_dmg
-# Or in python sudo python3.5 setup.py bdist_rpm y en windows bdist_msi
+# Or in python windows: "python3.5 setup.py bdist_msi"
 # Error subsane with :
 # pip install --upgrade setuptools
 # pip install --upgrade distribute
+#
 
 import sys
 import os.path
@@ -14,7 +16,7 @@ import glob
 from codecs import open
 from cx_Freeze import setup, Executable
 
-build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons'],
+build_options = dict(build_exe={'include_files': ['logging.conf', 'LICENSE', 'README.md', 'icons', 'pyvmwareclient.desktop'],
                                 'packages': ['idna', 
                                              'cryptography',
                                              'cffi',
@@ -49,17 +51,20 @@ if sys.platform == 'win32':
                      icon=os.path.join("icons", "vmwareclient.ico"))
 
 else:
-    os.environ['TCL_LIBRARY']=r'/System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl' 
-    os.environ['TK_LIBRARY']=r'/System/Library/Frameworks/Tk.framework/Versions/8.5/Tk' 
+    if sys.platform == 'Darwin':
+        os.environ['TCL_LIBRARY']=r'/System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl' 
+        os.environ['TK_LIBRARY']=r'/System/Library/Frameworks/Tk.framework/Versions/8.5/Tk' 
     exe = Executable(script='app.py',
                      base='Console',
                      icon='./icons/vmwareclient.ico',
                      targetName='pyvmwareclient')
 
+# For compile with MacOs High Sierra I need make adjus at sistem:
 # sudo mkdir -p /Library/Frameworks/Tcl.framework/Versions/8.5
 # sudo mkdir -p /Library/Frameworks/Tk.framework/Versions/8.5
 # sudo cp  -r /System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl /Library/Frameworks/Tcl.framework/Versions/8.5
 # sudo cp -r /System/Library/Frameworks/Tk.framework/Versions/8.5/Tk /Library/Frameworks/Tk.framework/Versions/8.5
+#
 
 setup(name='pyvmwareclient',
       version='0.4.1',
