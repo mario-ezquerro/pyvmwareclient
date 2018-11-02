@@ -48,7 +48,7 @@ class Maquina():
         self.vm = vm
         
         self.summary = vm.summary
-        self.folder = self.vm.name
+        self.folder = self.vm.parent.name
         self.listado_folders = ''
         self.name = self.summary.config.name
         self.path = self.summary.config.vmPathName
@@ -62,10 +62,19 @@ class Maquina():
         self.uuid = self.summary.config.uuid
         self.sing = ''
         self.logger = logger
-
+        
+        #try:
+        #    print(self.vm.resourcePool.summary.name)
+        #except:
+        #    pass
+        #print(self.vm.datastore[0].summary)
+        #print(self.vm.parent.parent.summary)
+        #for datamol in self.vm.datastore:
+        #    print(datamol)
+        
 
         if self.folder != None or self.folder != "":
-            self.listado_folders = self.folder
+            self.listado_folders = self.vm.parent.name
         else:
             self.listado_folders = 'sin folder'
 
