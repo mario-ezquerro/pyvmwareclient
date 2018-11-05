@@ -198,11 +198,11 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def save_file_vm(self, event=None):
         """
-        this function write a file wiht table information.
+        This function write a file wiht table information.
 
-        @param event:   when call this funtcion from button the pass a event
+        :param event:   when call this funtcion from button the pass a event
                         when call from another code the event = Nont
-        @return: Not return need
+        :return: Not return need
 
         """
         saveFileDialog = wx.FileDialog(frame, "Save file with VM data", "", "", 
@@ -483,6 +483,13 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         sys.exit(0)
 
     def checking_conexion(self, conexion):
+        """
+        Checking teh conexion is active with the vcenter or esxi
+
+        :param conexion: The actual conexion to check it is alive.
+        :return conexion: Retrun the actual or new conexion.
+        
+        """
         try:
             control = conexion.rootFolder.childEntity
             if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
@@ -621,7 +628,7 @@ def connect_with_vcenter():
 def download_list_folder_and_vm(conexion):
     """
     Locate a vm in the vcenter or esxi  and chek if the the data
-    corect or this is correct.
+    agout vm  is corect or not.
 
     :param conexion: this is a connector with vcenter or exi
     :return serviores: A table with information with all VM 
