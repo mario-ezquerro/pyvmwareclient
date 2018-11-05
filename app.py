@@ -62,7 +62,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         btn_load_file_vm = wx.Button(self, label="Load file VM")
         btnhost = wx.Button(self, label="host")
 
-        self.name_rows = ['Folder', 'Name', 'IP', 'State', 'DNS-Name', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs', 'Sign']
+        self.name_rows = ['Folder', 'Name', 'IP', 'State', 'DNS-Name', 'Path Disk', 'Sistem', 'Note', 'uuid', 'Macs', 'Sign', 'Resource Pool']
 
         # Import the table name_rows into supertable
         for x in range(len(self.name_rows)):
@@ -168,10 +168,31 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             if logger != None: logger.info('NOT connecting')
             conexion = connect_with_vcenter()
 
-        self.tabla = []
+        self.servidores = []
         ###print( 'La conexion esta: {}'.format(conexion))
 
-        self.tabla = download_list_folder_and_vm(conexion)
+        self.servidores = download_list_folder_and_vm(conexion)
+        # The array obj VM traslate to table
+
+        self.tabla = []
+        elemento = []
+    
+        for i in range(len(self.servidores)):
+            elemento.append(self.servidores[i].listado_folders)
+            elemento.append(self.servidores[i].name)
+            elemento.append(self.servidores[i].dirip)
+            elemento.append(self.servidores[i].state)
+            elemento.append(self.servidores[i].dns_name)
+            elemento.append(self.servidores[i].path)
+            elemento.append(self.servidores[i].guest)
+            elemento.append(self.servidores[i].anotacion)
+            elemento.append(self.servidores[i].uuid)
+            elemento.append(self.servidores[i].dirmacs)
+            elemento.append(self.servidores[i].sing)
+            elemento.append(self.servidores[i].resource_pool)
+            self.tabla.append(elemento)
+            elemento = []
+
         self.vm_buscados = []
         self.cargardatos_en_listctrl(self.tabla, _save = True)
 
@@ -571,7 +592,7 @@ class DialogAcceso():
 # connect with Vcenter code and Dialog
 def connect_with_vcenter():
         """
-            Present a dialog box to get the datas for conect to esxi or vcenter
+        Present a dialog box to get the data for conect to esxi or vcenter
         """
 
         dlgDialogo = DialogAcceso()
@@ -598,23 +619,14 @@ def connect_with_vcenter():
 # ----------------------------------------------------------------------
 
 def download_list_folder_and_vm(conexion):
+    """
+    Locate a vm in the vcenter or esxi  and chek if the the data
+    corect or this is correct.
 
+    :param conexion: this is a connector with vcenter or exi
+    :return serviores: A table with information with all VM 
 
-    listado_folders = []
-    name = []
-    path = []
-    guest = []
-    anotacion = []
-    state = []
-    dirmacs = []
-    dirip = []
-    dns_name = []
-    ask_data = []
-    uuid = []
-    sing = []
-
-
-
+    """
     condemore = conexion
     container = condemore.rootFolder  # starting point to look into
     viewType = [vim.VirtualMachine]  # object types to look for
@@ -646,40 +658,13 @@ def download_list_folder_and_vm(conexion):
         count += 1
         keepGoing = dlg.Update(count, "Loading")
 
-        servidor = print_vm_info(child)
+        servidor = maquina.Maquina(child)
         servidores.append(servidor)
     dlg.Destroy()
     del wait_cursor
-
-    tabla = []
-    elemento = []
     
-    for i in range(len(servidores)):
-        elemento.append(servidores[i].listado_folders)
-        elemento.append(servidores[i].name)
-        elemento.append(servidores[i].dirip)
-        elemento.append(servidores[i].state)
-        elemento.append(servidores[i].dns_name)
-        elemento.append(servidores[i].path)
-        elemento.append(servidores[i].guest)
-        elemento.append(servidores[i].anotacion)
-        elemento.append(servidores[i].uuid)
-        elemento.append(servidores[i].dirmacs)
-        elemento.append(servidores[i].sing)
-        tabla.append(elemento)
-        elemento = []
+    return servidores
 
-    
-    return (tabla)
-
-def print_vm_info(virtual_machine):
-    """
-    Print information for a particular virtual machine or recurse into a
-    folder with depth protection
-    """ 
-    servidor =  maquina.Maquina(virtual_machine)
-    return servidor
-    
 
 
 
