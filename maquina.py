@@ -48,6 +48,7 @@ class Maquina():
         self.vm = vm
         
         self.summary = vm.summary
+        self.resource_pool=''
         self.folder = self.vm.parent.name
         self.listado_folders = ''
         self.name = self.summary.config.name
@@ -63,10 +64,11 @@ class Maquina():
         self.sing = ''
         self.logger = logger
         
-        #try:
-        #    print(self.vm.resourcePool.summary.name)
-        #except:
-        #    pass
+        try:
+            self.resource_pool = self.vm.resourcePool.summary.name
+        except:
+            self.resource_pool = 'none'
+
         #print(self.vm.datastore[0].summary)
         #print(self.vm.parent.parent.summary)
         #for datamol in self.vm.datastore:
