@@ -312,6 +312,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.rdpID = wx.NewId()
         self.vmrcID = wx.NewId()
         self.htmlID = wx.NewId()
+        self.html_id_ip = wx.NewId()
         self.separador = wx.NewId()
         self.softreboot = wx.NewId()
         self.softpoweroff = wx.NewId()
@@ -327,6 +328,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.Bind(wx.EVT_MENU, self.onRdp, id=self.rdpID)
         self.Bind(wx.EVT_MENU, self.on_vmrc, id=self.vmrcID)
         self.Bind(wx.EVT_MENU, self.onHtml, id=self.htmlID)
+        self.Bind(wx.EVT_MENU, self.on_httml_ip, id=self.html_id_ip)
         self.Bind(wx.EVT_MENU, self.onsoftreboot, id=self.softreboot)
         self.Bind(wx.EVT_MENU, self.onsoftPowerOff, id=self.softpoweroff)
         self.Bind(wx.EVT_MENU, self.onreboot, id=self.reboot)
@@ -359,6 +361,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         item_rdp = self.menu.Append(self.rdpID, "Connection rdp")
         item_vmrc = self.menu.Append(self.vmrcID, "Connection vmrc")
         item_html = self.menu.Append(self.htmlID, "Connection html")
+        item_html_ip = self.menu.Append(self.html_id_ip, "Connect vm with web")
         item_separador = self.menu.AppendSeparator()
         item_soft_rebbot = self.menu.Append(self.softreboot, "Soft-reboot...")
         item_soft_rebbot = self.menu.Append(self.softpoweroff, "Soft-PowerOff...")
@@ -444,6 +447,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         global conexion
         conexion = self.checking_conexion(conexion)
         action_vm.onHtml(self, event, conexion, logger)
+    
+    def on_httml_ip(self, event):
+        # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
+        #global conexion
+        #conexion = self.checking_conexion(conexion)
+        action_vm.on_httml_ip(self, event, conexion, logger)
 
     def onsoftreboot(self, event):
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
@@ -488,7 +497,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
         :param conexion: The actual conexion to check it is alive.
         :return conexion: Retrun the actual or new conexion.
-        
+
         """
         try:
             control = conexion.rootFolder.childEntity
@@ -504,15 +513,12 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
 
 # #######################################################################
 class MyFrame(wx.Frame):
-    """"""
-
     # ----------------------------------------------------------------------
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, wx.ID_ANY, "Intances VM")
         panel = MyPanel(self)
         self.Show()
-
     # ----------------------------------------------------------------------
 
 
