@@ -564,7 +564,8 @@ class DialogAcceso():
         # Acces to vcenter
         try:
             if not self.si:
-                self.context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                # [RFR] Changing way to create the ssl context as TLSv1.0 is disabled by VMware for vSphere 6.7 #315
+                self.context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 self.context.verify_mode = ssl.CERT_NONE
                 if logger != None: logger.info('vcenter:  ' + self.vcenter)
 
@@ -577,16 +578,17 @@ class DialogAcceso():
 
                 #self.Close(True)
 
+       
         except:
-            dlgexcept = wx.MessageDialog(self.my_dialog_acceso_vcenter,
+                dlgexcept = wx.MessageDialog(self.my_dialog_acceso_vcenter,
                                    "Error en Conexion o ya esta conectado Verifique parametros",
                                    caption= "Confirm Exit",
                                    style= wx.OK | wx.ICON_QUESTION)
-            dlgexcept.ShowModal()
-            dlgexcept.Destroy()
-            if logger != None: logger.warning('Error en el acceso a vcenter')
+                dlgexcept.ShowModal()
+                dlgexcept.Destroy()
+                if logger != None: logger.warning('Error en el acceso a vcenter')
 
-   
+            
 
     def OnDisConnect(self):
         if logger != None: logger.info('OUT Desconect')

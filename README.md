@@ -7,7 +7,7 @@ $ pip install -r requirements.txt
 $ python app.py
 ```
 
-Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0 & 6.5 , uses the python APIs.
+Similar the old vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0, 6.5  and 6.7 , uses the python APIs.
 
 Works in linux using putty (If also the putty in linux) and the Remminia to connect with RDP. And work in Windows the putty is necesary to with the path and work MacOs too
 
@@ -40,7 +40,7 @@ Note: The vmplayer it instaler with vmware-workstation, vmware does not allow si
   13. Display Grafic about data VM
   14. Save and Load the data VM in csv file format
   15. Show event an error in a VM
-  16. Search with name or ir or mac table
+  16. Search with name or ip or mac table
 
 ## Example of  screenshots the are made with wx-windows
 
