@@ -30,17 +30,18 @@ Note: The vmplayer it instaler with vmware-workstation, vmware does not allow si
   03. Connection RDP using client Remminia(linux) or Windows Client (Windows MacOS)
   04. Connection VRMC add to menu.
   05. Connection console wiht HTML Client
-  06. Power on and power off VM
-  07. Reset hard y soft VM
-  08. Reboot a VM
-  09. Change or Add Notes
-  10. Display tecnical Info about VM
-  11. Display Info about host (when connection vcenter)
-  12. Display Grafic about data host
-  13. Display Grafic about data VM
-  14. Save and Load the data VM in csv file format
-  15. Show event an error in a VM
-  16. Search with name or ip or mac table
+  06. Connection http y https VM with ip (if vmtools is instaled)
+  07. Power on and power off VM
+  08. Reset hard y soft VM
+  09. Reboot a VM
+  10. Change or Add Notes
+  11. Display tecnical Info about VM
+  12. Display Info about host (when connection vcenter)
+  13. Display Grafic about data host
+  14. Display Grafic about data VM
+  15. Save and Load the data VM in csv file format
+  16. Show event an error in a VM
+  17. Search with name or ip or mac table
 
 ## Example of  screenshots the are made with wx-windows
 
