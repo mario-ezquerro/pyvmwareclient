@@ -463,17 +463,17 @@ def on_httml_ip(self, event, conexion, logger):
             if logger != None: logger.info(fila[i])
         # El tercer elemento es la ip es decier la fila[2]
         ips = fila[2].split()
-        self.my_dialogo_ssh = dialogos.Dialogo_user_pass(None, -1, 'Port and password')
+        self.my_dialogo_http = dialogos.Dialog_conexion_html(None, -1, 'Port and password')
         for ip in ips:
-            self.my_dialogo_ssh.combo_box_ip.Append(ip)
+            self.my_dialogo_http.combo_box_ip.Append(ip)
         # Load from file config the user to use with login to ssh
         cfg = wx.Config('appconfig')
         port= '80'      
-        self.my_dialogo_ssh.usuario.SetValue(port)
-        #self.my_dialogo_ssh.usuario.SetValue('root')
-        result = self.my_dialogo_ssh.ShowModal()  # show the dialog window with the information
+        self.my_dialogo_http.port.SetValue(port)
+        #self.my_dialogo_http.usuario.SetValue('root')
+        result = self.my_dialogo_http.ShowModal()  # show the dialog window with the information
         if result == wx.ID_OK:
-            URL = "http://" + self.my_dialogo_ssh.combo_box_ip.GetStringSelection() + ':' + str(self.my_dialogo_ssh.usuario.GetValue())
+            URL = str(self.my_dialogo_http.protocol.GetValue())+'://' + self.my_dialogo_http.combo_box_ip.GetStringSelection() + ':' + str(self.my_dialogo_http.port.GetValue())
             if logger != None: logger.info(URL)
             webbrowser.open(URL, new=1, autoraise=True)
             if logger != None: logger.info ("Waiting for open web seconds, then exit")

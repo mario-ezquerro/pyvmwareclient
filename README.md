@@ -16,7 +16,7 @@ What programs do yo need in your path?
 |**Linux**        |**Windows**       |**MacOs**            |
 |:----------------|:-----------------|:--------------------|
 |putty            |putty             |shell (on system)    |
-|remminia         |mstsc (As sistem) |mstsc (By Microsoft) |
+|remminia         |mstsc (on sistem) |mstsc (By Microsoft) |
 |vmrc or vmplayer |vmrc or vmplayer  |vmrc or vmplayer     |
 
 You need the path in your system to work the three client application ,Linux (Remminia, putty, vrmc or vmplayer) in Windows (putty, Terminal server client and vrmc or vmplayer) in Macos(Terminarl server Windows, and vrmc or vmplayer)
