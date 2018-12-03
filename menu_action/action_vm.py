@@ -439,6 +439,7 @@ def onHtml(self, event, conexion, logger):
 
         # Locate the version of vcenter the object .version for locate the version of vcenter
         object_about = conexion.about
+        if logger != None: logger.info("Vcenter version: : {}".format(object_about.version))
         #For version vcenter 5.5
         if object_about.version == '5.5.0':
             console_portv5 = '7331'
@@ -448,7 +449,7 @@ def onHtml(self, event, conexion, logger):
             webbrowser.open(URL5, new=1, autoraise=True)
 
         #For version vcenter 6.0 and 6.5
-        if object_about.version == '6.0.0' or object_about.version == '6.5.0':
+        if object_about.version == '6.0.0' or object_about.version == '6.5.0' or object_about.version == '6.7.0':
             URL = "https://" + host + ":" + console_port + "/vsphere-client/webconsole.html?vmId=" \
                   + str(vm_moid) + "&vmName=" + vm_name + "&host=" + vcenter_fqdn \
                   + "&sessionTicket=" + session + "&thumbprint.info=" + vc_fingerprint.decode('utf-8')
