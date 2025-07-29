@@ -1,13 +1,13 @@
 # pyvmwareclient [![GitHub license](https://img.shields.io/github/license/wbugbofh/pyvmwareclient.svg)](https://github.com/wbugbofh/pyvmwareclient/blob/master/LICENSE)
 
 
-Download the code, install the 'requirements.txt' and then you use:"python3.5 app.py" to work with the ultimate version.
+Download the code, install the 'requirements.txt' and then you use:"python3.13 app.py" to work with the ultimate version.
 ```bash
 $ pip install -r requirements.txt
 $ python app.py
 ```
 
-Similar the old client vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0, 6.5  and 6.7 , uses the python APIs.
+Similar the old client vmwareclient, vmware client that connect to esxi or vcenterVMware 5.0, 5.5 6.0, 6.5, 6.7 and now 7.x y 8.x, uses the python APIs.
 
 Works in linux using putty (yes, there is  the putty in linux) and the Remminia to connect with RDP. And work in Windows, the putty is necesary to add the path and work MacOs too.
 

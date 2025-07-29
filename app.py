@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3.5
+﻿#!/usr/bin/env python3.11
 # -*- coding: utf-8 -*-
 
 import wx
@@ -92,17 +92,17 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         sizer = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
 
-        hbox1.Add(btn_load_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btn_save_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btn_load_file_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_load_vm, 0, wx.ALL  | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_save_file_vm, 0, wx.ALL  | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_load_file_vm, 0, wx.ALL  | wx.ALIGN_CENTER, 5)
 
-        hbox1.Add(st1, wx.ALL | wx.ALIGN_RIGHT, 5)
+        hbox1.Add(st1, wx.ALL, 5)
         hbox1.Add(self.strind_search, wx.ALL | wx.ALIGN_CENTER, 5)
-        hbox1.Add(btn_find_vm, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btn_find_vm, 0, wx.ALL  | wx.ALIGN_CENTER, 5)
         
-        hbox1.Add(btnhost, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER, 5)
+        hbox1.Add(btnhost, 0, wx.ALL  | wx.ALIGN_CENTER, 5)
         hbox1.Add(self.count_str_vm, wx.ALL | wx.ALIGN_CENTER, 5)
-        sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.ALIGN_CENTER, border=2)
+        sizer.Add(hbox1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=2)
         self.Bind(wx.EVT_BUTTON, self.search_data_vm, btn_find_vm)
         self.Bind(wx.EVT_BUTTON, self.reload_vm, btn_load_vm)#onItemSelected
         self.Bind(wx.EVT_BUTTON, self.save_file_vm, btn_save_file_vm)
@@ -157,9 +157,10 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         # conexion = connect_with_vcenter(self, id)
         #for i in range(self.list_ctrl.GetItemCount() - 1):
         #   self.list_ctrl.DeleteItem(i)
-        
+        # ???? conexion = object
         # If past the timeout to connecto to vcenter or esxi you need reconnect one time more
         try:
+            global conexion
             control = conexion.rootFolder.childEntity
             if logger != None: logger.info('connecting: {}'.format(conexion.rootFolder.childEntity))
             if logger != None: logger.info('connecting')
@@ -194,7 +195,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
             elemento = []
 
         self.vm_buscados = []
-        self.cargardatos_en_listctrl(self.tabla, _save = True)
+        self.cargardatos_en_listctrl(self.tabla, _save = False)
 
     def save_file_vm(self, event=None):
         """
@@ -316,7 +317,7 @@ class MyPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.separador = wx.NewId()
         self.softreboot = wx.NewId()
         self.softpoweroff = wx.NewId()
-        self.reboot = wx.NewId()
+        self.reboot =wx.NewId()
         self.powerOn = wx.NewId()
         self.powerOff = wx.NewId()
         self.exitID = wx.NewId()
@@ -565,30 +566,59 @@ class DialogAcceso():
         try:
             if not self.si:
                 # [RFR] Changing way to create the ssl context as TLSv1.0 is disabled by VMware for vSphere 6.7 #315
-                self.context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                self.context.verify_mode = ssl.CERT_NONE
+                #self.context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+                self.context.check_hostname = False  # DO NOT check the hostname
+                self.context.verify_mode = ssl.CERT_NONE # DO NOT verify the certificat
+
                 if logger != None: logger.info('vcenter:  ' + self.vcenter)
+
+                if logger:
+                    logger.info(f"Intentando conectar a vCenter: {self.vcenter}")
 
                 self.si = SmartConnect(host=self.vcenter,
                                        user=self.login,
                                        pwd=self.pwd,
                                        port=int(self.port),
                                        sslContext=self.context,
-                                       connectionPoolTimeout=0)
+                                       connectionPoolTimeout=10)
 
-                #self.Close(True)
+                # self.Close(True)
+                # --- ¡COMPROBACIÓN CRÍTICA! ---
+                # Verifica si SmartConnect devolvió None (fallo silencioso)
+                if self.si is None:
+                    # Crea un mensaje de error específico
+                    error_msg = f"Fallo al conectar con '{self.vcenter}'. Revisa la red (firewall, DNS) y que el host sea correcto."
+                    if logger:
+                        logger.error(error_msg)
+                    # Muestra el error en el diálogo
+                    wx.MessageBox(error_msg, "Error de Conexión", wx.OK | wx.ICON_ERROR)
+                    return  # Sale de la función si no hay conexión
 
-       
-        except:
+        # --- CAPTURA DE EXCEPCIONES ESPECÍFICAS ---
+        except vim.fault.InvalidLogin as e:
+            error_msg = f"Error de autenticación: Usuario o contraseña incorrectos. Mensaje de vCenter: {e.msg}"
+            if logger:
+                logger.error(error_msg)
+            wx.MessageBox(error_msg, "Error de Autenticación", wx.OK | wx.ICON_ERROR)
+
+
+
+        except Exception as e:
+
+                print(f"ERROR: No se pudo conectar a vCenter. Tipo de error: {type(e).__name__}, Mensaje: {e}")
+
+                error_msg = f"Error de autenticación: Usuario o contraseña incorrectos. Mensaje de vCenter: {e}"
                 dlgexcept = wx.MessageDialog(self.my_dialog_acceso_vcenter,
-                                   "Error en Conexion o ya esta conectado Verifique parametros",
+                                   error_msg,
                                    caption= "Confirm Exit",
                                    style= wx.OK | wx.ICON_QUESTION)
                 dlgexcept.ShowModal()
                 dlgexcept.Destroy()
                 if logger != None: logger.warning('Error en el acceso a vcenter')
 
-            
+
 
     def OnDisConnect(self):
         if logger != None: logger.info('OUT Desconect')
@@ -747,8 +777,9 @@ if __name__ == "__main__":
         
     app = wx.App(False)
     ### -> if the app is loading at start the VM, you need uncomment the next line (you need uncomment another lines).
-    #conexion = connect_with_vcenter()
-    conexion = object
+    # conexion = object
+    conexion = connect_with_vcenter()
+
     frame = MyFrame()
     app.MainLoop()
 

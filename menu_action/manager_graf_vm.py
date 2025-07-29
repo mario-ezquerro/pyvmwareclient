@@ -115,7 +115,8 @@ def graf_vm(self, event, conexion, logger):
                                        scope_maxCpuUsage.update,
                                        data_gen_maxCpuUsage(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
     
     #grafica 2
     graf_memory_memorySizeMB = Scope(ax[0,1],
@@ -129,7 +130,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_memorySizeMB.update,
                                        data_gen_memorySizeMB(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
 
     #grafica 3
@@ -139,12 +141,12 @@ def graf_vm(self, event, conexion, logger):
                           maxy = 50,
                           maxt = 100)
 
-
     graf_ani3 = animation.FuncAnimation(fig1, 
                                        graf_cpu_memorySizeMB.update,
                                        data_gen_memorySizeMB(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data = False)
     #grafica 4
     graf_memory_overallCpuUsage = Scope(ax[1,0],
                           label ='overallCpuUsage',
@@ -157,8 +159,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_overallCpuUsage.update,
                                        data_gen_memory_overallCpuUsage(oid=vm),
                                        interval=1000,
-                                       blit=False)
-
+                                       blit=False,
+                                       cache_frame_data=False)
     #grafica 5
     graf_memory_overallCpuDemand = Scope(ax[1,1],
                           label ='overallCpuDemand',
@@ -171,7 +173,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_overallCpuDemand.update,
                                        data_gen_memory_overallCpuDemand(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
     #grafica 6
     graf_memory_guestMemoryUsage = Scope(ax[1,2],
@@ -185,7 +188,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_guestMemoryUsage.update,
                                        data_gen_memory_guestMemoryUsage(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
     #grafica 7
     graf_memory_privateMemory = Scope(ax[2,0],
@@ -199,7 +203,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_privateMemory.update,
                                        data_gen_memory_privateMemory(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
     #grafica 8
     graf_memory_sharedMemory = Scope(ax[2,1],
@@ -213,7 +218,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_sharedMemory.update,
                                        data_gen_memory_sharedMemory(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
     #grafica 9
     graf_memory_swappedMemory = Scope(ax[2,2],
@@ -227,7 +233,8 @@ def graf_vm(self, event, conexion, logger):
                                        graf_memory_swappedMemory.update,
                                        data_gen_memory_swappedMemory(oid=vm),
                                        interval=1000,
-                                       blit=False)
+                                       blit=False,
+                                       cache_frame_data=False)
 
 
     #plt.subplot_tool()
